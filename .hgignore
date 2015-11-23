@@ -1,6 +1,0 @@
-syntax: glob
-*~
-*.orig
-*._*
-.bash_history
-.DS_Store
