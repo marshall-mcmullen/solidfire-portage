@@ -1,0 +1,12 @@
+diff --recursive --unified --new-file a/src/contrib/zktreeutil/src/ZkAdaptor.cc b/src/contrib/zktreeutil/src/ZkAdaptor.cc
+--- a/src/contrib/zktreeutil/src/ZkAdaptor.cc	2013-10-22 21:06:53.000000000 -0600
++++ b/src/contrib/zktreeutil/src/ZkAdaptor.cc	2013-10-22 21:25:46.918573545 -0600
+@@ -201,7 +201,7 @@
+                     << std::endl; 
+                 return;
+             }
+-            else if ( state && state != ZOO_CONNECTING_STATE)
++            else if ( state && state != 999 && state != ZOO_CONNECTING_STATE)
+             {
+                 // Not connecting any more... some other issue
+                 std::ostringstream oss;

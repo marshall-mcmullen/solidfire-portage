@@ -1,0 +1,13 @@
+#UPSTREAM=http://boost.2283326.n4.nabble.com/Compiling-Boost-1-47-with-GCC-4-6-1-and-std-c-0x-td3992086.html
+diff --recursive --unified --new-file a/boost/signals/detail/named_slot_map.hpp b/boost/signals/detail/named_slot_map.hpp
+--- a/boost/signals/detail/named_slot_map.hpp	2012-10-13 11:27:29.000000000 -0600
++++ b/boost/signals/detail/named_slot_map.hpp	2013-06-17 22:40:15.000000000 -0600
+@@ -35,7 +35,7 @@
+   stored_group(storage_kind p_kind = sk_empty) : kind(p_kind), group() { }
+ 
+   template<typename T>
+-  stored_group(const T& p_group) : kind(sk_group), group(new T(p_group)) { }
++  explicit stored_group(const T& p_group) : kind(sk_group), group(new T(p_group)) { }
+ 
+   bool is_front() const { return kind == sk_front; }
+   bool is_back() const { return kind == sk_back; }

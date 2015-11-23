@@ -1,0 +1,31 @@
+diff --recursive --unified --new-file a/services/LogService.cpp b/services/LogService.cpp
+--- a/services/LogService.cpp	2012-10-31 23:50:46.000000000 -0600
++++ b/services/LogService.cpp	2013-06-17 22:40:43.107309483 -0600
+@@ -1,3 +1,5 @@
++#if defined(PION_DISABLE_LOGGING)
++
+ // ---------------------------------------------------------------------
+ // pion:  a Boost C++ framework for building lightweight HTTP interfaces
+ // ---------------------------------------------------------------------
+@@ -170,3 +172,5 @@
+ {
+     delete service_ptr;
+ }
++
++#endif // PION_DISABLED_LOGGING
+diff --recursive --unified --new-file a/services/LogService.hpp b/services/LogService.hpp
+--- a/services/LogService.hpp	2012-10-31 23:50:46.000000000 -0600
++++ b/services/LogService.hpp	2013-06-17 22:40:43.107309483 -0600
+@@ -1,3 +1,5 @@
++#if defined(PION_DISABLE_LOGGING)
++
+ // ---------------------------------------------------------------------
+ // pion:  a Boost C++ framework for building lightweight HTTP interfaces
+ // ---------------------------------------------------------------------
+@@ -153,3 +155,6 @@
+ }   // end namespace pion
+ 
+ #endif
++
++#endif // PION_DISABLED_LOGGING
++

@@ -1,0 +1,11 @@
+diff --recursive --unified a/src/gflags.cc b/src/gflags.cc
+--- a/src/gflags.cc	2012-01-25 16:09:56.000000000 -0700
++++ b/src/gflags.cc	2013-10-15 09:51:28.653177743 -0600
+@@ -1004,6 +1004,7 @@
+   char buffer[kBufSize];
+   string s;
+   FILE* fp = fopen(filename, "r");
++  if (!fp && errno == ENOENT) return "";
+   if (!fp)  PFATAL(filename);
+   size_t n;
+   while ( (n=fread(buffer, 1, kBufSize, fp)) > 0 ) {

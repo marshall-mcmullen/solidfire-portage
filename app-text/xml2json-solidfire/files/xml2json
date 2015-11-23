@@ -1,0 +1,6 @@
+#!/bin/bash
+
+input=$1
+[[ -z ${input} ]] && input="-"
+
+perl -MJSON::Any -MXML::Simple -le"print JSON::Any->new()->objToJson(XMLin('${input}', KeepRoot => 1, KeyAttr => []))"

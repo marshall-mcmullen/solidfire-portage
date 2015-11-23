@@ -1,0 +1,20 @@
+diff --recursive --unified a/src/microhttpd/daemon.c b/src/microhttpd/daemon.c
+--- a/src/microhttpd/daemon.c	2013-12-03 13:32:04.000000000 -0700
++++ b/src/microhttpd/daemon.c	2013-12-10 09:02:17.660541607 -0700
+@@ -3978,6 +3978,16 @@
+ 	       (0 != CLOSE (daemon->worker_pool[i].epoll_fd)) )
+ 	    MHD_PANIC ("close failed\n");
+ #endif
++          if ( (MHD_USE_SUSPEND_RESUME == (daemon->options & MHD_USE_SUSPEND_RESUME)) )
++            {
++              if (-1 != daemon->worker_pool[i].wpipe[1])
++                {
++	           if (0 != CLOSE (daemon->worker_pool[i].wpipe[0]))
++	             MHD_PANIC ("close failed\n");
++	           if (0 != CLOSE (daemon->worker_pool[i].wpipe[1]))
++	             MHD_PANIC ("close failed\n");
++                }
++	    }
+ 	}
+       free (daemon->worker_pool);
+     }

@@ -1,0 +1,15 @@
+diff -p1 --unified --recursive murder-0.1.2/dist/BitTornado/SocketHandler.py murder-patch/dist/BitTornado/SocketHandler.py
+--- murder-0.1.2/dist/BitTornado/SocketHandler.py	2014-11-13 14:37:20.066310150 -0700
++++ murder-patch/dist/BitTornado/SocketHandler.py	2014-11-13 14:40:18.066894189 -0700
+@@ -175,6 +175,11 @@ class SocketHandler:
+                     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                 server.setblocking(0)
+                 server.bind(addrinfo[4])
++
++                boundTo = server.getsockname()
++                print "Bound to", boundTo[0], "on port", boundTo[1]
++                sys.stdout.flush()
++
+                 self.servers[server.fileno()] = server
+                 if bind:
+                     self.interfaces.append(server.getsockname()[0])

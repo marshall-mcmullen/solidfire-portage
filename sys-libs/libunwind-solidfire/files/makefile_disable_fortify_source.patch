@@ -1,0 +1,13 @@
+#UPSTREAM=N/A (Build patch)
+diff --recursive --unified --new-file a/src/Makefile.in b/src/Makefile.in
+--- a/src/Makefile.in	2012-10-05 22:54:59.000000000 -0600
++++ b/src/Makefile.in	2013-06-17 22:41:17.843374035 -0600
+@@ -744,7 +744,7 @@
+ CCASDEPMODE = @CCASDEPMODE@
+ CCASFLAGS = @CCASFLAGS@
+ CCDEPMODE = @CCDEPMODE@
+-CFLAGS = @CFLAGS@
++CFLAGS = @CFLAGS@ -U_FORTIFY_SOURCE
+ CPP = @CPP@
+ CPPFLAGS = @CPPFLAGS@
+ CXX = @CXX@

@@ -1,0 +1,20 @@
+diff --recursive --unified --new-file a/src/tbb/concurrent_vector.cpp b/src/tbb/concurrent_vector.cpp
+--- a/src/tbb/concurrent_vector.cpp	2013-03-25 06:24:44.000000000 -0600
++++ b/src/tbb/concurrent_vector.cpp	2013-06-17 22:40:56.439334256 -0600
+@@ -114,6 +114,16 @@
+     static void extend_segment_table(concurrent_vector_base_v3 &v, size_type start);
+ 
+     inline static segment_t &acquire_segment(concurrent_vector_base_v3 &v, size_type index, size_type element_size, bool owner) {
++        // Ensure that the previous segment has been fully allocated.  If this is not done,
++        // then size() may not report this segment even after it is fully constructed
++        // bugzilla 184
++        if (index > 0)
++        {
++            segment_t &previous_s = v.my_segment[index - 1];
++            if( !__TBB_load_with_acquire(previous_s.array) )
++                spin_wait_while_eq( previous_s.array, (void*)0 );
++        }
++
+         segment_t &s = v.my_segment[index]; // TODO: pass v.my_segment as argument
+         if( !__TBB_load_with_acquire(s.array) ) { // do not check for internal::vector_allocation_error_flag 
+             if( owner ) {

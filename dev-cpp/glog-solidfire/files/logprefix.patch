@@ -1,0 +1,24 @@
+diff --recursive --unified a/src/logging.cc b/src/logging.cc
+--- a/src/logging.cc	2013-01-22 22:26:35.000000000 -0700
++++ b/src/logging.cc	2013-09-27 14:49:53.946196555 -0600
+@@ -1203,8 +1203,8 @@
+   data_->has_been_flushed_ = false;
+ 
+   // If specified, prepend a prefix to each line.  For example:
+-  //    I1018 160715 f5d4fbb0 logging.cc:1153]
+-  //    (log level, GMT month, date, time, thread_id, file basename, line)
++  //    I1018 160715 f5d4fbb0
++  //    (log level, GMT month, date, time, thread_id)
+   // We exclude the thread_id for the default thread.
+   if (FLAGS_log_prefix && (line != kNoLogPrefix)) {
+     stream() << LogSeverityNames[severity][0]
+@@ -1218,8 +1218,7 @@
+              << ' '
+              << setfill(' ') << setw(5)
+              << static_cast<unsigned int>(GetTID()) << setfill('0')
+-             << ' '
+-             << data_->basename_ << ':' << data_->line_ << "] ";
++             << ' ';
+   }
+   data_->num_prefix_chars_ = data_->stream_->pcount();
+ 

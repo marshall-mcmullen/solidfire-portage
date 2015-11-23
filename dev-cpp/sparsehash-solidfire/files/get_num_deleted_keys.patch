@@ -1,0 +1,24 @@
+diff --recursive --unified --new-file a/src/sparsehash/internal/sparsehashtable.h b/src/sparsehash/internal/sparsehashtable.h
+--- a/src/sparsehash/internal/sparsehashtable.h	2012-02-22 13:49:42.000000000 -0700
++++ b/src/sparsehash/internal/sparsehashtable.h	2013-06-17 22:41:18.000000000 -0600
+@@ -435,6 +435,9 @@
+   // Accessor function for statistics gathering.
+   int num_table_copies() const { return settings.num_ht_copies(); }
+ 
++  // Accessor function to get num_deleted.
++  size_t get_num_deleted() const { return num_deleted; }
++
+  private:
+   // We need to copy values when we set the special marker for deleted
+   // elements, but, annoyingly, we can't just use the copy assignment
+diff --recursive --unified --new-file a/src/sparsehash/sparse_hash_map b/src/sparsehash/sparse_hash_map
+--- a/src/sparsehash/sparse_hash_map	2012-02-22 13:49:42.000000000 -0700
++++ b/src/sparsehash/sparse_hash_map	2013-06-17 22:41:18.000000000 -0600
+@@ -280,6 +280,7 @@
+   }
+   void clear_deleted_key()                    { rep.clear_deleted_key(); }
+   key_type deleted_key() const                { return rep.deleted_key(); }
++  size_t get_num_deleted_keys()               { return rep.get_num_deleted(); }
+ 
+   // These are standard
+   size_type erase(const key_type& key)               { return rep.erase(key); }

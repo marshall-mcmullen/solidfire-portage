@@ -1,0 +1,48 @@
+diff --recursive --unified --new-file a/include/pion/http/message.hpp b/include/pion/http/message.hpp
+--- a/include/pion/http/message.hpp	2012-10-31 23:50:46.000000000 -0600
++++ b/include/pion/http/message.hpp	2013-09-17 23:26:12.741669102 -0600
+@@ -54,7 +54,7 @@
+         : public boost::system::error_category
+     {
+         virtual ~receive_error_t() {}
+-        virtual inline const char *name() const { return "receive_error_t"; }
++        virtual inline const char *name() const noexcept { return "receive_error_t"; }
+         virtual inline std::string message(int ev) const {
+             std::string result;
+             switch(ev) {
+diff --recursive --unified --new-file a/include/pion/http/parser.hpp b/include/pion/http/parser.hpp
+--- a/include/pion/http/parser.hpp	2012-10-31 23:50:46.000000000 -0600
++++ b/include/pion/http/parser.hpp	2013-09-17 23:26:38.373702007 -0600
+@@ -71,7 +71,7 @@
+         : public boost::system::error_category
+     {
+     public:
+-        const char *name() const { return "parser"; }
++        const char *name() const noexcept { return "parser"; }
+         std::string message(int ev) const {
+             switch (ev) {
+             case ERROR_METHOD_CHAR:
+diff --recursive --unified --new-file a/include/pion/spdy/decompressor.hpp b/include/pion/spdy/decompressor.hpp
+--- a/include/pion/spdy/decompressor.hpp	2012-10-31 23:50:46.000000000 -0600
++++ b/include/pion/spdy/decompressor.hpp	2013-09-17 23:24:48.413557615 -0600
+@@ -51,7 +51,7 @@
+         : public boost::system::error_category
+     {
+     public:
+-        const char *name() const { return "SPDYDecompressor"; }
++        const char *name() const noexcept { return "SPDYDecompressor"; }
+         std::string message(int ev) const {
+             switch (ev) {
+                 case ERROR_DECOMPRESSION_FAILED:
+diff --recursive --unified --new-file a/include/pion/spdy/parser.hpp b/include/pion/spdy/parser.hpp
+--- a/include/pion/spdy/parser.hpp	2012-10-31 23:50:46.000000000 -0600
++++ b/include/pion/spdy/parser.hpp	2013-09-17 23:25:31.405614304 -0600
+@@ -50,7 +50,7 @@
+         : public boost::system::error_category
+     {
+     public:
+-        const char *name() const { return "SPDYParser"; }
++        const char *name() const noexcept { return "SPDYParser"; }
+         std::string message(int ev) const {
+             switch (ev) {
+                 case ERROR_INVALID_SPDY_FRAME:

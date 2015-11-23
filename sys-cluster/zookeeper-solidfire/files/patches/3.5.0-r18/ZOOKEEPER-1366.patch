@@ -1,0 +1,1063 @@
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/ClientCnxn.java b/src/java/main/org/apache/zookeeper/ClientCnxn.java
+--- a/src/java/main/org/apache/zookeeper/ClientCnxn.java	2013-10-22 21:32:30.151016034 -0600
++++ b/src/java/main/org/apache/zookeeper/ClientCnxn.java	2013-10-22 21:31:49.534971462 -0600
+@@ -59,6 +59,7 @@
+ import org.apache.zookeeper.ZooKeeper.WatchRegistration;
+ import org.apache.zookeeper.client.HostProvider;
+ import org.apache.zookeeper.client.ZooKeeperSaslClient;
++import org.apache.zookeeper.common.Time;
+ import org.apache.zookeeper.proto.AuthPacket;
+ import org.apache.zookeeper.proto.ConnectRequest;
+ import org.apache.zookeeper.proto.Create2Response;
+@@ -1017,7 +1018,7 @@
+             clientCnxnSocket.updateNow();
+             clientCnxnSocket.updateLastSendAndHeard();
+             int to;
+-            long lastPingRwServer = System.currentTimeMillis();
++            long lastPingRwServer = Time.currentElapsedTime();
+             final int MAX_SEND_PING_INTERVAL = 10000; //10 seconds
+             while (state.isAlive()) {
+                 try {
+@@ -1092,7 +1093,7 @@
+ 
+                     // If we are in read-only mode, seek for read/write server
+                     if (state == States.CONNECTEDREADONLY) {
+-                        long now = System.currentTimeMillis();
++                        long now = Time.currentElapsedTime();
+                         int idlePingRwServer = (int) (now - lastPingRwServer);
+                         if (idlePingRwServer >= pingRwTimeout) {
+                             lastPingRwServer = now;
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/ClientCnxnSocket.java b/src/java/main/org/apache/zookeeper/ClientCnxnSocket.java
+--- a/src/java/main/org/apache/zookeeper/ClientCnxnSocket.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/main/org/apache/zookeeper/ClientCnxnSocket.java	2013-10-22 21:31:49.534971462 -0600
+@@ -27,6 +27,7 @@
+ 
+ import org.apache.jute.BinaryInputArchive;
+ import org.apache.zookeeper.ClientCnxn.Packet;
++import org.apache.zookeeper.common.Time;
+ import org.apache.zookeeper.proto.ConnectResponse;
+ import org.apache.zookeeper.server.ByteBufferInputStream;
+ import org.slf4j.Logger;
+@@ -74,7 +75,7 @@
+     }
+ 
+     void updateNow() {
+-        now = System.currentTimeMillis();
++        now = Time.currentElapsedTime();
+     }
+ 
+     int getIdleRecv() {
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/common/Time.java b/src/java/main/org/apache/zookeeper/common/Time.java
+--- a/src/java/main/org/apache/zookeeper/common/Time.java	1969-12-31 17:00:00.000000000 -0700
++++ b/src/java/main/org/apache/zookeeper/common/Time.java	2013-10-22 21:31:49.534971462 -0600
+@@ -0,0 +1,31 @@
++/**
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package org.apache.zookeeper.common;
++
++public class Time {
++    /**
++     * Returns time in milliseconds as does System.currentTimeMillis(), but uses elapsed time from an arbitrary epoch
++     * more like System.nanoTime().  The difference is that if somebody changes the system clock, Time.currentElapsedTime
++     * will change but nanoTime won't.  On the other hand, all of ZK assumes that time is measured in milliseconds.
++     * @return  The time in milliseconds from some arbitrary point in time.
++     */
++    public static long currentElapsedTime() {
++        return System.nanoTime() / 1000000;
++    }
++}
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/Login.java b/src/java/main/org/apache/zookeeper/Login.java
+--- a/src/java/main/org/apache/zookeeper/Login.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/main/org/apache/zookeeper/Login.java	2013-10-22 21:31:49.534971462 -0600
+@@ -33,6 +33,7 @@
+ import javax.security.auth.callback.CallbackHandler;
+ 
+ import org.apache.log4j.Logger;
++import org.apache.zookeeper.common.Time;
+ import org.apache.zookeeper.client.ZooKeeperSaslClient;
+ import javax.security.auth.kerberos.KerberosTicket;
+ import javax.security.auth.Subject;
+@@ -121,7 +122,7 @@
+                 LOG.info("TGT refresh thread started.");
+                 while (true) {  // renewal thread's main loop. if it exits from here, thread will exit.
+                     KerberosTicket tgt = getTGT();
+-                    long now = System.currentTimeMillis();
++                    long now = Time.currentElapsedTime();
+                     long nextRefresh;
+                     Date nextRefreshDate;
+                     if (tgt == null) {
+@@ -298,7 +299,7 @@
+                 (TICKET_RENEW_WINDOW + (TICKET_RENEW_JITTER * rng.nextDouble())));
+         if (proposedRefresh > expires) {
+             // proposedRefresh is too far in the future: it's after ticket expires: simply return now.
+-            return System.currentTimeMillis();
++            return Time.currentElapsedTime();
+         }
+         else {
+             return proposedRefresh;
+@@ -318,7 +319,7 @@
+     }
+ 
+     private boolean hasSufficientTimeElapsed() {
+-        long now = System.currentTimeMillis();
++        long now = Time.currentElapsedTime();
+         if (now - getLastLogin() < MIN_TIME_BEFORE_RELOGIN ) {
+             LOG.warn("Not attempting to re-login since the last re-login was " +
+                     "attempted less than " + (MIN_TIME_BEFORE_RELOGIN/1000) + " seconds"+
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/server/ExpiryQueue.java b/src/java/main/org/apache/zookeeper/server/ExpiryQueue.java
+--- a/src/java/main/org/apache/zookeeper/server/ExpiryQueue.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/main/org/apache/zookeeper/server/ExpiryQueue.java	2013-10-22 21:31:49.534971462 -0600
+@@ -26,6 +26,8 @@
+ import java.util.concurrent.atomic.AtomicLong;
+ import java.util.concurrent.ConcurrentHashMap;
+ 
++import org.apache.zookeeper.common.Time;
++
+ /**
+  * ExpiryQueue tracks elements in time sorted fixed duration buckets.
+  * It's used by SessionTrackerImpl to expire sessions and NIOServerCnxnFactory
+@@ -47,7 +49,7 @@
+ 
+     public ExpiryQueue(int expirationInterval) {
+         this.expirationInterval = expirationInterval;
+-        nextExpirationTime.set(roundToNextInterval(System.currentTimeMillis()));
++        nextExpirationTime.set(roundToNextInterval(Time.currentElapsedTime()));
+     }
+ 
+     private long roundToNextInterval(long time) {
+@@ -83,7 +85,7 @@
+      */
+     public Long update(E elem, int timeout) {
+         Long prevExpiryTime = elemMap.get(elem);
+-        long now = System.currentTimeMillis();
++        long now = Time.currentElapsedTime();
+         Long newExpiryTime = roundToNextInterval(now + timeout);
+ 
+         if (newExpiryTime.equals(prevExpiryTime)) {
+@@ -122,7 +124,7 @@
+      * @return milliseconds until next expiration time, or 0 if has already past
+      */
+     public long getWaitTime() {
+-        long now = System.currentTimeMillis();
++        long now = Time.currentElapsedTime();
+         long expirationTime = nextExpirationTime.get();
+         return now < expirationTime ? (expirationTime - now) : 0L;
+     }
+@@ -136,7 +138,7 @@
+      *         ready
+      */
+     public Set<E> poll() {
+-        long now = System.currentTimeMillis();
++        long now = Time.currentElapsedTime();
+         long expirationTime = nextExpirationTime.get();
+         if (now < expirationTime) {
+             return Collections.emptySet();
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/server/FinalRequestProcessor.java b/src/java/main/org/apache/zookeeper/server/FinalRequestProcessor.java
+--- a/src/java/main/org/apache/zookeeper/server/FinalRequestProcessor.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/main/org/apache/zookeeper/server/FinalRequestProcessor.java	2013-10-22 21:31:49.534971462 -0600
+@@ -23,6 +23,7 @@
+ import java.util.List;
+ 
+ import org.apache.jute.Record;
++import org.apache.zookeeper.common.Time;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ import org.apache.zookeeper.KeeperException;
+@@ -178,7 +179,7 @@
+ 
+                 lastOp = "PING";
+                 cnxn.updateStatsForResponse(request.cxid, request.zxid, lastOp,
+-                        request.createTime, System.currentTimeMillis());
++                        request.createTime, Time.currentElapsedTime());
+ 
+                 cnxn.sendResponse(new ReplyHeader(-2,
+                         zks.getZKDatabase().getDataTreeLastProcessedZxid(), 0), null, "response");
+@@ -189,7 +190,7 @@
+ 
+                 lastOp = "SESS";
+                 cnxn.updateStatsForResponse(request.cxid, request.zxid, lastOp,
+-                        request.createTime, System.currentTimeMillis());
++                        request.createTime, Time.currentElapsedTime());
+ 
+                 zks.finishSessionInit(request.cnxn, true);
+                 return;
+@@ -425,7 +426,7 @@
+ 
+         zks.serverStats().updateLatency(request.createTime);
+         cnxn.updateStatsForResponse(request.cxid, lastZxid, lastOp,
+-                    request.createTime, System.currentTimeMillis());
++                    request.createTime, Time.currentElapsedTime());
+ 
+         try {
+             cnxn.sendResponse(hdr, rsp, "response");
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/server/quorum/AuthFastLeaderElection.java b/src/java/main/org/apache/zookeeper/server/quorum/AuthFastLeaderElection.java
+--- a/src/java/main/org/apache/zookeeper/server/quorum/AuthFastLeaderElection.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/main/org/apache/zookeeper/server/quorum/AuthFastLeaderElection.java	2013-10-22 21:31:49.534971462 -0600
+@@ -35,6 +35,7 @@
+ import java.util.concurrent.TimeUnit;
+ import java.util.Random;
+ 
++import org.apache.zookeeper.common.Time;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ 
+@@ -410,7 +411,7 @@
+             WorkerSender(int attempts) {
+                 maxAttempts = attempts;
+                 rand = new Random(java.lang.Thread.currentThread().getId()
+-                        + System.currentTimeMillis());
++                        + Time.currentElapsedTime());
+             }
+ 
+             long genChallenge() {
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/server/quorum/FastLeaderElection.java b/src/java/main/org/apache/zookeeper/server/quorum/FastLeaderElection.java
+--- a/src/java/main/org/apache/zookeeper/server/quorum/FastLeaderElection.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/main/org/apache/zookeeper/server/quorum/FastLeaderElection.java	2013-10-22 21:31:49.534971462 -0600
+@@ -27,6 +27,7 @@
+ import java.util.concurrent.LinkedBlockingQueue;
+ import java.util.concurrent.TimeUnit;
+ 
++import org.apache.zookeeper.common.Time;
+ import org.apache.zookeeper.jmx.MBeanRegistry;
+ import org.apache.zookeeper.server.quorum.QuorumCnxManager.Message;
+ import org.apache.zookeeper.server.quorum.QuorumPeer.LearnerType;
+@@ -783,7 +784,7 @@
+             self.jmxLeaderElectionBean = null;
+         }
+         if (self.start_fle == 0) {
+-           self.start_fle = System.currentTimeMillis();
++           self.start_fle = Time.currentElapsedTime();
+         }
+         try {
+             HashMap<Long, Vote> recvset = new HashMap<Long, Vote>();
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/server/quorum/Follower.java b/src/java/main/org/apache/zookeeper/server/quorum/Follower.java
+--- a/src/java/main/org/apache/zookeeper/server/quorum/Follower.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/main/org/apache/zookeeper/server/quorum/Follower.java	2013-10-22 21:31:49.534971462 -0600
+@@ -23,6 +23,7 @@
+ import java.nio.ByteBuffer;
+ 
+ import org.apache.jute.Record;
++import org.apache.zookeeper.common.Time;
+ import org.apache.zookeeper.ZooDefs.OpCode;
+ import org.apache.zookeeper.server.Request;
+ import org.apache.zookeeper.server.quorum.flexible.QuorumVerifier;
+@@ -61,7 +62,7 @@
+      * @throws InterruptedException
+      */
+     void followLeader() throws InterruptedException {
+-        self.end_fle = System.currentTimeMillis();
++        self.end_fle = Time.currentElapsedTime();
+         LOG.info("FOLLOWING - LEADER ELECTION TOOK - " +
+               (self.end_fle - self.start_fle));
+         self.start_fle = 0;
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/server/quorum/Leader.java b/src/java/main/org/apache/zookeeper/server/quorum/Leader.java
+--- a/src/java/main/org/apache/zookeeper/server/quorum/Leader.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/main/org/apache/zookeeper/server/quorum/Leader.java	2013-10-22 21:31:49.538971470 -0600
+@@ -41,6 +41,7 @@
+ 
+ import org.apache.jute.BinaryOutputArchive;
+ import org.apache.zookeeper.ZooDefs.OpCode;
++import org.apache.zookeeper.common.Time;
+ import org.apache.zookeeper.server.FinalRequestProcessor;
+ import org.apache.zookeeper.server.Request;
+ import org.apache.zookeeper.server.RequestProcessor;
+@@ -442,7 +443,7 @@
+      * @throws InterruptedException
+      */
+     void lead() throws IOException, InterruptedException {
+-        self.end_fle = System.currentTimeMillis();
++        self.end_fle = Time.currentElapsedTime();
+         LOG.info("LEADING - LEADER ELECTION TOOK - " +
+               (self.end_fle - self.start_fle));
+         self.start_fle = 0;
+@@ -1147,12 +1148,12 @@
+                 self.setAcceptedEpoch(epoch);
+                 connectingFollowers.notifyAll();
+             } else {
+-                long start = System.currentTimeMillis();
++                long start = Time.currentElapsedTime();
+                 long cur = start;
+                 long end = start + self.getInitLimit()*self.getTickTime();
+                 while(waitingForNewEpoch && cur < end) {
+                     connectingFollowers.wait(end - cur);
+-                    cur = System.currentTimeMillis();
++                    cur = Time.currentElapsedTime();
+                 }
+                 if (waitingForNewEpoch) {
+                     throw new InterruptedException("Timeout while waiting for epoch from quorum");
+@@ -1184,12 +1185,12 @@
+                 electionFinished = true;
+                 electingFollowers.notifyAll();
+             } else {
+-                long start = System.currentTimeMillis();
++                long start = Time.currentElapsedTime();
+                 long cur = start;
+                 long end = start + self.getInitLimit()*self.getTickTime();
+                 while(!electionFinished && cur < end) {
+                     electingFollowers.wait(end - cur);
+-                    cur = System.currentTimeMillis();
++                    cur = Time.currentElapsedTime();
+                 }
+                 if (!electionFinished) {
+                     throw new InterruptedException("Timeout while waiting for epoch to be acked by quorum");
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/server/Request.java b/src/java/main/org/apache/zookeeper/server/Request.java
+--- a/src/java/main/org/apache/zookeeper/server/Request.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/main/org/apache/zookeeper/server/Request.java	2013-10-22 21:31:49.538971470 -0600
+@@ -24,6 +24,7 @@
+ import org.apache.jute.Record;
+ import org.apache.zookeeper.KeeperException;
+ import org.apache.zookeeper.ZooDefs.OpCode;
++import org.apache.zookeeper.common.Time;
+ import org.apache.zookeeper.data.Id;
+ import org.apache.zookeeper.server.quorum.flexible.QuorumVerifier;
+ import org.apache.zookeeper.txn.TxnHeader;
+@@ -75,7 +76,7 @@
+ 
+     public final List<Id> authInfo;
+ 
+-    public final long createTime = System.currentTimeMillis();
++    public final long createTime = Time.currentElapsedTime();
+ 
+     private Object owner;
+ 
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/server/ServerStats.java b/src/java/main/org/apache/zookeeper/server/ServerStats.java
+--- a/src/java/main/org/apache/zookeeper/server/ServerStats.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/main/org/apache/zookeeper/server/ServerStats.java	2013-10-22 21:31:49.538971470 -0600
+@@ -20,6 +20,8 @@
+ 
+ 
+ 
++import org.apache.zookeeper.common.Time;
++
+ /**
+  * Basic Server Statistics
+  */
+@@ -103,7 +105,7 @@
+     }
+     // mutators
+     synchronized void updateLatency(long requestCreateTime) {
+-        long latency = System.currentTimeMillis() - requestCreateTime;
++        long latency = Time.currentElapsedTime() - requestCreateTime;
+         totalLatency += latency;
+         count++;
+         if (latency < minLatency) {
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/server/SessionTrackerImpl.java b/src/java/main/org/apache/zookeeper/server/SessionTrackerImpl.java
+--- a/src/java/main/org/apache/zookeeper/server/SessionTrackerImpl.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/main/org/apache/zookeeper/server/SessionTrackerImpl.java	2013-10-22 21:33:05.291054599 -0600
+@@ -27,6 +27,7 @@
+ 
+ import org.apache.zookeeper.KeeperException;
+ import org.apache.zookeeper.KeeperException.SessionExpiredException;
++import org.apache.zookeeper.common.Time;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ 
+@@ -75,7 +76,7 @@
+      */
+     public static long initializeNextSession(long id) {
+         long nextSid = 0;
+-        nextSid = (System.currentTimeMillis() << 24) >> 8;
++        nextSid = (Time.currentElapsedTime() << 24) >> 8;
+         nextSid =  nextSid | (id <<56);
+         return nextSid;
+     }
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/server/ZooKeeperServer.java b/src/java/main/org/apache/zookeeper/server/ZooKeeperServer.java
+--- a/src/java/main/org/apache/zookeeper/server/ZooKeeperServer.java	2013-10-22 21:32:30.147016030 -0600
++++ b/src/java/main/org/apache/zookeeper/server/ZooKeeperServer.java	2013-10-22 21:31:49.538971470 -0600
+@@ -38,6 +38,7 @@
+ import org.apache.jute.BinaryInputArchive;
+ import org.apache.jute.BinaryOutputArchive;
+ import org.apache.jute.Record;
++import org.apache.zookeeper.common.Time;
+ import org.apache.zookeeper.Environment;
+ import org.apache.zookeeper.Sessions;
+ import org.apache.zookeeper.KeeperException.NoNodeException;
+@@ -306,7 +307,7 @@
+     }
+ 
+     long getTime() {
+-        return System.currentTimeMillis();
++        return Time.currentElapsedTime();
+     }
+ 
+     private void close(long sessionId) {
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/Shell.java b/src/java/main/org/apache/zookeeper/Shell.java
+--- a/src/java/main/org/apache/zookeeper/Shell.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/main/org/apache/zookeeper/Shell.java	2013-10-22 21:31:49.538971470 -0600
+@@ -39,6 +39,7 @@
+ import java.util.TimerTask;
+ import java.util.concurrent.atomic.AtomicBoolean;
+ import org.apache.log4j.Logger;
++import org.apache.zookeeper.common.Time;
+ 
+ /** 
+  * A base class for running a Unix command.
+@@ -146,7 +147,7 @@
+ 
+   /** check to see if a command needs to be executed and execute if needed */
+   protected void run() throws IOException {
+-    if (lastTime + interval > System.currentTimeMillis())
++    if (lastTime + interval > Time.currentElapsedTime())
+       return;
+     exitCode = 0; // reset for next run
+     runCommand();
+@@ -245,7 +246,7 @@
+         LOG.warn("Error while closing the error stream", ioe);
+       }
+       process.destroy();
+-      lastTime = System.currentTimeMillis();
++      lastTime = Time.currentElapsedTime();
+     }
+   }
+ 
+diff --recursive --unified --new-file a/src/java/main/org/apache/zookeeper/ZKUtil.java b/src/java/main/org/apache/zookeeper/ZKUtil.java
+--- a/src/java/main/org/apache/zookeeper/ZKUtil.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/main/org/apache/zookeeper/ZKUtil.java	2013-10-22 21:31:49.538971470 -0600
+@@ -120,5 +120,6 @@
+         }
+         return tree;
+     }
+-    
++
++
+ }
+\ No newline at end of file
+diff --recursive --unified --new-file a/src/java/systest/org/apache/zookeeper/test/system/GenerateLoad.java b/src/java/systest/org/apache/zookeeper/test/system/GenerateLoad.java
+--- a/src/java/systest/org/apache/zookeeper/test/system/GenerateLoad.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/systest/org/apache/zookeeper/test/system/GenerateLoad.java	2013-10-22 21:31:49.538971470 -0600
+@@ -53,6 +53,8 @@
+ import org.apache.zookeeper.ZooKeeper;
+ import org.apache.zookeeper.data.Stat;
+ import org.apache.zookeeper.WatchedEvent;
++import org.apache.zookeeper.common.Time;
++
+ 
+ public class GenerateLoad {
+     protected static final Logger LOG = LoggerFactory.getLogger(GenerateLoad.class);
+@@ -194,7 +196,7 @@
+ 
+         public void run() {
+             try {
+-                currentInterval = System.currentTimeMillis() / INTERVAL;
++                currentInterval = Time.currentElapsedTime() / INTERVAL;
+                 // Give things time to report;
+                 Thread.sleep(INTERVAL * 2);
+                 long min = 99999;
+@@ -202,7 +204,7 @@
+                 long total = 0;
+                 int number = 0;
+                 while (true) {
+-                    long now = System.currentTimeMillis();
++                    long now = Time.currentElapsedTime();
+                     long lastInterval = currentInterval;
+                     currentInterval += 1;
+                     long count = remove(lastInterval);
+@@ -249,13 +251,13 @@
+     }
+ 
+     synchronized static void sendChange(int percentage) {
+-        long now = System.currentTimeMillis();
++        long now = Time.currentElapsedTime();
+         long start = now;
+         ReporterThread.percentage = percentage;
+         for (SlaveThread st : slaves.toArray(new SlaveThread[0])) {
+             st.send(percentage);
+         }
+-        now = System.currentTimeMillis();
++        now = Time.currentElapsedTime();
+         long delay = now - start;
+         if (delay > 1000) {
+             System.out.println("Delay of " + delay + " to send new percentage");
+@@ -387,7 +389,7 @@
+                         errors++;
+                     } else {
+                         finished++;
+-                        rlatency += System.currentTimeMillis() - (Long) ctx;
++                        rlatency += Time.currentElapsedTime() - (Long) ctx;
+                         reads++;
+                     }
+                 }
+@@ -401,7 +403,7 @@
+                         errors++;
+                     } else {
+                         finished++;
+-                        wlatency += System.currentTimeMillis() - (Long) ctx;
++                        wlatency += Time.currentElapsedTime() - (Long) ctx;
+                         writes++;
+                     }
+                 }
+@@ -427,7 +429,7 @@
+                         if (percentage == -1 || (finished == 0 && errors == 0)) {
+                             continue;
+                         }
+-                        String report = System.currentTimeMillis() + " "
++                        String report = Time.currentElapsedTime() + " "
+                                 + percentage + " " + finished + " " + errors + " "
+                                 + outstanding + "\n";
+                        /* String subreport = reads + " "
+@@ -543,9 +545,9 @@
+ 
+         synchronized public boolean waitConnected(long timeout)
+                 throws InterruptedException {
+-            long endTime = System.currentTimeMillis() + timeout;
+-            while (!connected && System.currentTimeMillis() < endTime) {
+-                wait(endTime - System.currentTimeMillis());
++            long endTime = Time.currentElapsedTime() + timeout;
++            while (!connected && Time.currentElapsedTime() < endTime) {
++                wait(endTime - Time.currentElapsedTime());
+             }
+             return connected;
+         }
+diff --recursive --unified --new-file a/src/java/systest/org/apache/zookeeper/test/system/InstanceManager.java b/src/java/systest/org/apache/zookeeper/test/system/InstanceManager.java
+--- a/src/java/systest/org/apache/zookeeper/test/system/InstanceManager.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/systest/org/apache/zookeeper/test/system/InstanceManager.java	2013-10-22 21:31:49.538971470 -0600
+@@ -38,6 +38,7 @@
+ import org.apache.zookeeper.KeeperException.NodeExistsException;
+ import org.apache.zookeeper.ZooDefs.Ids;
+ import org.apache.zookeeper.data.Stat;
++import org.apache.zookeeper.common.Time;
+ 
+ /**
+  * This class doles out assignments to InstanceContainers that are registered to
+@@ -294,9 +295,9 @@
+     public String getStatus(String name, long timeout) throws KeeperException, InterruptedException {
+         Stat stat = new Stat();
+         byte data[] = null;
+-        long endTime = System.currentTimeMillis() + timeout;
++        long endTime = Time.currentElapsedTime() + timeout;
+         KeeperException lastException = null;
+-        for(int i = 0; i < maxTries && endTime > System.currentTimeMillis(); i++) {
++        for(int i = 0; i < maxTries && endTime > Time.currentElapsedTime(); i++) {
+             try {
+                 data = zk.getData(reportsNode + '/' + name, false, stat);
+                 if (LOG.isDebugEnabled()) {
+@@ -317,7 +318,7 @@
+                             }
+                         }});
+                     if (eStat == null) {
+-                        eventObj.wait(endTime - System.currentTimeMillis());
++                        eventObj.wait(endTime - Time.currentElapsedTime());
+                     }
+                 }
+                 lastException = e;
+diff --recursive --unified --new-file a/src/java/systest/org/apache/zookeeper/test/system/SimpleSysTest.java b/src/java/systest/org/apache/zookeeper/test/system/SimpleSysTest.java
+--- a/src/java/systest/org/apache/zookeeper/test/system/SimpleSysTest.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/systest/org/apache/zookeeper/test/system/SimpleSysTest.java	2013-10-22 21:31:49.538971470 -0600
+@@ -31,6 +31,7 @@
+ import org.apache.zookeeper.ZooKeeper.States;
+ import org.apache.zookeeper.data.Stat;
+ import org.junit.Test;
++import org.apache.zookeeper.common.Time;
+ 
+ /**
+  * This does a basic system test. It starts up an ensemble of servers and a set of clients.
+@@ -46,8 +47,8 @@
+     
+     synchronized private boolean waitForConnect(ZooKeeper zk, long timeout) throws InterruptedException {
+         connected = (zk.getState() == States.CONNECTED);
+-        long end = System.currentTimeMillis() + timeout;
+-        while(!connected && end > System.currentTimeMillis()) {
++        long end = Time.currentElapsedTime() + timeout;
++        while(!connected && end > Time.currentElapsedTime()) {
+             wait(timeout);
+             connected = (zk.getState() == States.CONNECTED);
+         }
+diff --recursive --unified --new-file a/src/java/test/org/apache/zookeeper/common/TimeTest.java b/src/java/test/org/apache/zookeeper/common/TimeTest.java
+--- a/src/java/test/org/apache/zookeeper/common/TimeTest.java	1969-12-31 17:00:00.000000000 -0700
++++ b/src/java/test/org/apache/zookeeper/common/TimeTest.java	2013-10-22 21:31:49.538971470 -0600
+@@ -0,0 +1,90 @@
++/**
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package org.apache.zookeeper.common;
++
++import junit.framework.Assert;
++import org.apache.zookeeper.*;
++import org.apache.zookeeper.test.ClientBase;
++import org.junit.Test;
++
++import java.util.concurrent.atomic.AtomicInteger;
++
++public class TimeTest extends ClientBase {
++    private static final long mt0 = System.currentTimeMillis();
++    private static final long nt0 = Time.currentElapsedTime();
++    
++    private static AtomicInteger watchCount = new AtomicInteger(0);
++
++    @Test 
++    public void testCurrentElapsedTime() throws InterruptedException {
++        long mt0 = System.currentTimeMillis();
++        long nt0 = Time.currentElapsedTime();
++
++        Thread.sleep(200);
++
++        Assert.assertEquals(Time.currentElapsedTime() - nt0, System.currentTimeMillis() - mt0, 10);
++    }
++
++    /**
++     * Command line program for demonstrating robustness to clock changes.
++     *
++     * While running this, try changing the clock forward using something like [date -s "+1hour"].
++     * On a zookeeper that uses currentTimeMillis(), this will cause all ephemerals to be deleted
++     * due to session expiration.  With the use of nanoTime instead, zookeeper is unphased.
++     *
++     * @param args  Not used.
++     * @throws Exception Not really.  In fact, the only exceptions are InterruptedException, KeeperException
++     * and IOException, but setUp claims to throw more than it ought to.
++     */
++    public static void main(String[] args) throws Exception {
++        System.out.printf("Starting\n");
++        final TimeTest test = new TimeTest();
++        System.out.printf("After construct\n");
++        test.setUp();
++        ZooKeeper zk = test.createClient();
++        zk.create("/ephemeral", new byte[]{1, 2, 3}, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
++        while (Time.currentElapsedTime() - nt0 < 100000) {
++            System.out.printf("%d\t%s\n", discrepancy(), zk.exists("/ephemeral", watchCount.get() == 0 ? createWatcher() : null) != null);
++            waitByYielding(500);
++        }
++    }
++
++    private static Watcher createWatcher() {
++        watchCount.incrementAndGet();
++        return new Watcher() {
++            @Override
++            public void process(WatchedEvent event) {
++                watchCount.decrementAndGet();
++                System.out.printf("%d event = %s\n", discrepancy(), event);
++            }
++        };
++
++    }
++
++    private static void waitByYielding(long delay) {
++        long t0 = Time.currentElapsedTime();
++        while (Time.currentElapsedTime() < t0 + delay) {
++            Thread.yield();
++        }
++    }
++
++    private static long discrepancy() {
++        return (System.currentTimeMillis() - mt0) - (Time.currentElapsedTime() - nt0);
++    }
++}
+diff --recursive --unified --new-file a/src/java/test/org/apache/zookeeper/server/quorum/QuorumPeerMainTest.java b/src/java/test/org/apache/zookeeper/server/quorum/QuorumPeerMainTest.java
+--- a/src/java/test/org/apache/zookeeper/server/quorum/QuorumPeerMainTest.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/test/org/apache/zookeeper/server/quorum/QuorumPeerMainTest.java	2013-10-22 21:31:49.538971470 -0600
+@@ -42,6 +42,7 @@
+ import org.apache.zookeeper.ZooKeeper;
+ import org.apache.zookeeper.ZooDefs.Ids;
+ import org.apache.zookeeper.ZooKeeper.States;
++import org.apache.zookeeper.common.Time;
+ import org.apache.zookeeper.server.quorum.Leader.Proposal;
+ import org.apache.zookeeper.test.ClientBase;
+ import org.junit.Assert;
+@@ -663,9 +664,9 @@
+         q1.start();
+         // Let the notifications timeout
+         Thread.sleep(30000);
+-        long start = System.currentTimeMillis();
++        long start = Time.currentElapsedTime();
+         q1.shutdown();
+-        long end = System.currentTimeMillis();
++        long end = Time.currentElapsedTime();
+         if ((end - start) > maxwait) {
+             Assert.fail("QuorumPeer took " + (end - start) +
+                     " to shutdown, expected " + maxwait);
+diff --recursive --unified --new-file a/src/java/test/org/apache/zookeeper/test/ClientBase.java b/src/java/test/org/apache/zookeeper/test/ClientBase.java
+--- a/src/java/test/org/apache/zookeeper/test/ClientBase.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/test/org/apache/zookeeper/test/ClientBase.java	2013-10-22 21:31:49.538971470 -0600
+@@ -37,6 +37,7 @@
+ 
+ import javax.management.MBeanServerConnection;
+ 
++import org.apache.zookeeper.common.Time;
+ import org.apache.zookeeper.KeeperException;
+ import org.apache.zookeeper.PortAssignment;
+ import org.apache.zookeeper.TestableZooKeeper;
+@@ -116,11 +117,11 @@
+         synchronized public void waitForConnected(long timeout)
+             throws InterruptedException, TimeoutException
+         {
+-            long expire = System.currentTimeMillis() + timeout;
++            long expire = Time.currentElapsedTime() + timeout;
+             long left = timeout;
+             while(!connected && left > 0) {
+                 wait(left);
+-                left = expire - System.currentTimeMillis();
++                left = expire - Time.currentElapsedTime();
+             }
+             if (!connected) {
+                 throw new TimeoutException("Did not connect");
+@@ -130,11 +131,11 @@
+         synchronized public void waitForDisconnected(long timeout)
+             throws InterruptedException, TimeoutException
+         {
+-            long expire = System.currentTimeMillis() + timeout;
++            long expire = Time.currentElapsedTime() + timeout;
+             long left = timeout;
+             while(connected && left > 0) {
+                 wait(left);
+-                left = expire - System.currentTimeMillis();
++                left = expire - Time.currentElapsedTime();
+             }
+             if (connected) {
+                 throw new TimeoutException("Did not disconnect");
+@@ -224,7 +225,7 @@
+     }
+ 
+     public static boolean waitForServerUp(String hp, long timeout) {
+-        long start = System.currentTimeMillis();
++        long start = Time.currentElapsedTime();
+         while (true) {
+             try {
+                 // if there are multiple hostports, just take the first one
+@@ -239,7 +240,7 @@
+                 LOG.info("server " + hp + " not up " + e);
+             }
+ 
+-            if (System.currentTimeMillis() > start + timeout) {
++            if (Time.currentElapsedTime() > start + timeout) {
+                 break;
+             }
+             try {
+@@ -251,7 +252,7 @@
+         return false;
+     }
+     public static boolean waitForServerDown(String hp, long timeout) {
+-        long start = System.currentTimeMillis();
++        long start = Time.currentElapsedTime();
+         while (true) {
+             try {
+                 HostPort hpobj = parseHostPortList(hp).get(0);
+@@ -260,7 +261,7 @@
+                 return true;
+             }
+ 
+-            if (System.currentTimeMillis() > start + timeout) {
++            if (Time.currentElapsedTime() > start + timeout) {
+                 break;
+             }
+             try {
+@@ -274,7 +275,7 @@
+ 
+     public static boolean waitForServerState(QuorumPeer qp, int timeout,
+             String serverState) {
+-        long start = System.currentTimeMillis();
++        long start = Time.currentElapsedTime();
+         while (true) {
+             try {
+                 Thread.sleep(250);
+@@ -283,7 +284,7 @@
+             }
+             if (qp.getServerState().equals(serverState))
+                 return true;
+-            if (System.currentTimeMillis() > start + timeout) {
++            if (Time.currentElapsedTime() > start + timeout) {
+                 return false;
+             }
+         }
+diff --recursive --unified --new-file a/src/java/test/org/apache/zookeeper/test/ClientHammerTest.java b/src/java/test/org/apache/zookeeper/test/ClientHammerTest.java
+--- a/src/java/test/org/apache/zookeeper/test/ClientHammerTest.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/test/org/apache/zookeeper/test/ClientHammerTest.java	2013-10-22 21:31:49.538971470 -0600
+@@ -22,6 +22,7 @@
+ import java.util.Date;
+ import java.util.List;
+ 
++import org.apache.zookeeper.common.Time;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ import org.apache.zookeeper.CreateMode;
+@@ -124,7 +125,7 @@
+     {
+         try {
+             HammerThread[] threads = new HammerThread[threadCount];
+-            long start = System.currentTimeMillis();
++            long start = Time.currentElapsedTime();
+             for (int i = 0; i < threads.length; i++) {
+                 ZooKeeper zk = createClient();
+                 String prefix = "/test-" + i;
+@@ -157,7 +158,7 @@
+             final int childCount = 10;
+ 
+             HammerThread[] threads = new HammerThread[threadCount];
+-            long start = System.currentTimeMillis();
++            long start = Time.currentElapsedTime();
+             for (int i = 0; i < threads.length; i++) {
+                 String prefix = "/test-" + i;
+                 {
+@@ -218,7 +219,7 @@
+                     * HAMMERTHREAD_LATENCY * (long)safetyFactor);
+         }
+         LOG.info(new Date() + " Total time "
+-                + (System.currentTimeMillis() - start));
++                + (Time.currentElapsedTime() - start));
+ 
+         ZooKeeper zk = createClient();
+         try {
+diff --recursive --unified --new-file a/src/java/test/org/apache/zookeeper/test/CnxManagerTest.java b/src/java/test/org/apache/zookeeper/test/CnxManagerTest.java
+--- a/src/java/test/org/apache/zookeeper/test/CnxManagerTest.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/test/org/apache/zookeeper/test/CnxManagerTest.java	2013-10-22 21:31:49.542971474 -0600
+@@ -30,6 +30,7 @@
+ import java.util.concurrent.TimeUnit;
+ import java.net.Socket;
+ 
++import org.apache.zookeeper.common.Time;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ import org.apache.zookeeper.PortAssignment;
+@@ -198,9 +199,9 @@
+             LOG.error("Null listener when initializing cnx manager");
+         }
+ 
+-        long begin = System.currentTimeMillis();
++        long begin = Time.currentElapsedTime();
+         cnxManager.toSend(2L, createMsg(ServerState.LOOKING.ordinal(), 1, -1, 1));
+-        long end = System.currentTimeMillis();
++        long end = Time.currentElapsedTime();
+ 
+         if((end - begin) > 6000) Assert.fail("Waited more than necessary");
+ 
+@@ -287,10 +288,10 @@
+ 
+         Socket sock = new Socket();
+         sock.connect(peers.get(1L).electionAddr, 5000);
+-        long begin = System.currentTimeMillis();
++        long begin = Time.currentElapsedTime();
+         // Read without sending data. Verify timeout.
+         cnxManager.receiveConnection(sock);
+-        long end = System.currentTimeMillis();
++        long end = Time.currentElapsedTime();
+         if((end - begin) > ((peer.getSyncLimit() * peer.getTickTime()) + 500)) Assert.fail("Waited more than necessary");
+     }
+ 
+diff --recursive --unified --new-file a/src/java/test/org/apache/zookeeper/test/LoadFromLogTest.java b/src/java/test/org/apache/zookeeper/test/LoadFromLogTest.java
+--- a/src/java/test/org/apache/zookeeper/test/LoadFromLogTest.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/test/org/apache/zookeeper/test/LoadFromLogTest.java	2013-10-22 21:31:49.542971474 -0600
+@@ -26,6 +26,7 @@
+ import java.util.ArrayList;
+ import java.util.List;
+ 
++import org.apache.zookeeper.common.Time;
+ import org.apache.jute.BinaryInputArchive;
+ import org.apache.jute.BinaryOutputArchive;
+ import org.apache.jute.Record;
+@@ -234,7 +235,7 @@
+         dt.createNode("/test", new byte[0], null, 0, -1, 1, 1);
+         for (count = 1; count <= 3; count++) {
+             dt.createNode("/test/" + count, new byte[0], null, 0, -1, count,
+-                    System.currentTimeMillis());
++                    Time.currentElapsedTime());
+         }
+         DataNode zk = dt.getNode("/test");
+ 
+@@ -283,10 +284,10 @@
+         if (type == OpCode.delete) {
+             txn = new DeleteTxn(path);
+             txnHeader = new TxnHeader(0xabcd, 0x123, prevPzxid + 1,
+-                System.currentTimeMillis(), OpCode.delete);
++                Time.currentElapsedTime(), OpCode.delete);
+         } else if (type == OpCode.create) {
+             txnHeader = new TxnHeader(0xabcd, 0x123, prevPzxid + 1,
+-                    System.currentTimeMillis(), OpCode.create);
++                    Time.currentElapsedTime(), OpCode.create);
+             txn = new CreateTxn(path, new byte[0], null, false, cversion);
+         }
+         else if (type == OpCode.multi) {
+@@ -329,7 +330,7 @@
+         File tmpDir = ClientBase.createTmpDir();
+         FileTxnLog txnLog = new FileTxnLog(tmpDir);
+         TxnHeader txnHeader = new TxnHeader(0xabcd, 0x123, 0x123,
+-              System.currentTimeMillis(), OpCode.create);
++              Time.currentElapsedTime(), OpCode.create);
+         Record txn = new CreateTxn("/Test", new byte[0], null, false, 1);
+         txnLog.append(txnHeader, txn);
+         FileInputStream in = new FileInputStream(tmpDir.getPath() + "/log." +
+@@ -361,9 +362,9 @@
+ 				.waitForServerUp(HOSTPORT, CONNECTION_TIMEOUT));
+ 		ZooKeeper zk = new ZooKeeper(HOSTPORT, CONNECTION_TIMEOUT, this);
+ 
+-		long start = System.currentTimeMillis();
++		long start = Time.currentElapsedTime();
+ 		while (!connected) {
+-			long end = System.currentTimeMillis();
++			long end = Time.currentElapsedTime();
+ 			if (end - start > 5000) {
+ 				Assert.assertTrue("Could not connect with server in 5 seconds",
+ 						false);
+@@ -415,9 +416,9 @@
+ 		Assert.assertTrue("Restore failed expected zxid=" + eZxid + " found="
+ 				+ fZxid, fZxid == eZxid);
+ 		zk = new ZooKeeper(HOSTPORT, CONNECTION_TIMEOUT, this);
+-		start = System.currentTimeMillis();
++		start = Time.currentElapsedTime();
+ 		while (!connected) {
+-			long end = System.currentTimeMillis();
++			long end = Time.currentElapsedTime();
+ 			if (end - start > 5000) {
+ 				Assert.assertTrue("Could not connect with server in 5 seconds",
+ 						false);
+diff --recursive --unified --new-file a/src/java/test/org/apache/zookeeper/test/ReadOnlyModeTest.java b/src/java/test/org/apache/zookeeper/test/ReadOnlyModeTest.java
+--- a/src/java/test/org/apache/zookeeper/test/ReadOnlyModeTest.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/test/org/apache/zookeeper/test/ReadOnlyModeTest.java	2013-10-22 21:31:49.542971474 -0600
+@@ -42,6 +42,7 @@
+ import org.apache.zookeeper.ZooDefs;
+ import org.apache.zookeeper.ZooKeeper;
+ import org.apache.zookeeper.ZooKeeper.States;
++import org.apache.zookeeper.common.Time;
+ import org.apache.zookeeper.test.ClientBase.CountdownWatcher;
+ import org.junit.After;
+ import org.junit.Before;
+@@ -197,13 +198,11 @@
+                         states.add(event.getState());
+                     }
+                 }, true);
+-        long start = System.currentTimeMillis();
++        long start = Time.currentElapsedTime();
+         while (!(zk.getState() == States.CONNECTEDREADONLY)) {
+             Thread.sleep(200);
+             // FIXME this was originally 5 seconds, but realistically, on random/slow/virt hosts, there is no way to guarantee this
+-            Assert.assertTrue("Can't connect to the server", System
+-                    .currentTimeMillis()
+-                    - start < 30000);
++            Assert.assertTrue("Can't connect to the server", Time.currentElapsedTime() - start < 30000);
+         }
+ 
+         // At this point states list should contain, in the given order,
+diff --recursive --unified --new-file a/src/java/test/org/apache/zookeeper/test/StaticHostProviderTest.java b/src/java/test/org/apache/zookeeper/test/StaticHostProviderTest.java
+--- a/src/java/test/org/apache/zookeeper/test/StaticHostProviderTest.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/test/org/apache/zookeeper/test/StaticHostProviderTest.java	2013-10-22 21:31:49.542971474 -0600
+@@ -25,6 +25,7 @@
+ import org.apache.zookeeper.ZKTestCase;
+ import org.apache.zookeeper.client.HostProvider;
+ import org.apache.zookeeper.client.StaticHostProvider;
++import org.apache.zookeeper.common.Time;
+ import org.junit.Test;
+ 
+ import java.net.InetAddress;
+@@ -55,9 +56,9 @@
+             hostProvider.next(0);
+             --size;
+         }
+-        long start = System.currentTimeMillis();
++        long start = Time.currentElapsedTime();
+         hostProvider.next(1000);
+-        long stop = System.currentTimeMillis();
++        long stop = Time.currentElapsedTime();
+         assertTrue(900 <= stop - start);
+     }
+ 
+@@ -69,9 +70,9 @@
+             hostProvider.next(0);
+             --size;
+         }
+-        long start = System.currentTimeMillis();
++        long start = Time.currentElapsedTime();
+         hostProvider.next(0);
+-        long stop = System.currentTimeMillis();
++        long stop = Time.currentElapsedTime();
+         assertTrue(5 > stop - start);
+     }
+ 
+diff --recursive --unified --new-file a/src/java/test/org/apache/zookeeper/test/TestHammer.java b/src/java/test/org/apache/zookeeper/test/TestHammer.java
+--- a/src/java/test/org/apache/zookeeper/test/TestHammer.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/test/org/apache/zookeeper/test/TestHammer.java	2013-10-22 21:31:49.542971474 -0600
+@@ -24,6 +24,7 @@
+ import org.apache.zookeeper.ZooKeeper;
+ import org.apache.zookeeper.AsyncCallback.VoidCallback;
+ import org.apache.zookeeper.ZooDefs.Ids;
++import org.apache.zookeeper.common.Time;
+ 
+ public class TestHammer implements VoidCallback {
+ 
+@@ -32,7 +33,7 @@
+      */
+     static int REPS = 50000;
+     public static void main(String[] args) {
+-            long startTime = System.currentTimeMillis();
++            long startTime = Time.currentElapsedTime();
+             ZooKeeper zk = null;
+             try {
+                 zk = new ZooKeeper(args[0], 10000, null);
+@@ -51,7 +52,7 @@
+                     e.printStackTrace();
+                 }
+             }
+-            System.out.println("creates/sec=" + (REPS*1000/(System.currentTimeMillis()-startTime)));
++            System.out.println("creates/sec=" + (REPS*1000/(Time.currentElapsedTime()-startTime)));
+     }
+ 
+     public void processResult(int rc, String path, Object ctx) {
+diff --recursive --unified --new-file a/src/java/test/org/apache/zookeeper/test/ZooKeeperTestClient.java b/src/java/test/org/apache/zookeeper/test/ZooKeeperTestClient.java
+--- a/src/java/test/org/apache/zookeeper/test/ZooKeeperTestClient.java	2013-10-22 21:06:54.000000000 -0600
++++ b/src/java/test/org/apache/zookeeper/test/ZooKeeperTestClient.java	2013-10-22 21:31:49.542971474 -0600
+@@ -33,6 +33,7 @@
+ import org.apache.zookeeper.KeeperException.Code;
+ import org.apache.zookeeper.Watcher.Event.EventType;
+ import org.apache.zookeeper.ZooDefs.Ids;
++import org.apache.zookeeper.common.Time;
+ import org.apache.zookeeper.data.Stat;
+ import org.apache.zookeeper.server.ServerCnxnFactory;
+ import org.apache.zookeeper.server.ZooKeeperServer;
+@@ -43,7 +44,7 @@
+ 
+   protected static final String dirOnZK = "/test_dir";
+ 
+-  protected String testDirOnZK = dirOnZK + "/" + System.currentTimeMillis();
++  protected String testDirOnZK = dirOnZK + "/" + Time.currentElapsedTime();
+ 
+   LinkedBlockingQueue<WatchedEvent> events = new LinkedBlockingQueue<WatchedEvent>();
+ 
+diff --recursive --unified --new-file a/src/recipes/queue/src/c/tests/Util.cc b/src/recipes/queue/src/c/tests/Util.cc
+--- a/src/recipes/queue/src/c/tests/Util.cc	2013-10-22 21:06:55.000000000 -0600
++++ b/src/recipes/queue/src/c/tests/Util.cc	2013-10-22 21:31:49.542971474 -0600
+@@ -27,4 +27,18 @@
+     ts.tv_sec=ms/1000;
+     ts.tv_nsec=(ms%1000)*1000000; // to nanoseconds
+     nanosleep(&ts,0);
++    public interface Operation<T> {
++        public T execute() throws Exception;
++    }
++
++    public static <T> T profile(Operation<T> op, long timeout, String message)
++            throws Exception {
++        long start = Time.currentElapsedTime();
++        T res = op.execute();
++        long end = Time.currentElapsedTime();
++        if (end - start > timeout) {
++            LOG.info("Elapsed "+(end - start) + " ms: " + message);
++        }
++        return res;
++    }
+ }

@@ -1,0 +1,28 @@
+#UPSTREAM=N/A (Integration patch)
+diff --recursive --unified --new-file a/boost/throw_exception.hpp b/boost/throw_exception.hpp
+--- a/boost/throw_exception.hpp	2012-06-20 20:15:24.000000000 -0600
++++ b/boost/throw_exception.hpp	2013-06-17 22:40:33.267291193 -0600
+@@ -55,6 +55,11 @@
+ 
+ #else
+ 
++#ifdef BOOST_EXCEPTION_CUSTOM_MESSAGE
++        typedef error_info<struct throw_message_, std::string> throw_message;
++        std::string custom_throw_message( );
++#endif
++
+ inline void throw_exception_assert_compatibility( std::exception const & ) { }
+ 
+ template<class E> BOOST_ATTRIBUTE_NORETURN inline void throw_exception( E const & e )
+@@ -64,7 +69,11 @@
+     throw_exception_assert_compatibility(e);
+ 
+ #ifndef BOOST_EXCEPTION_DISABLE
++#ifdef BOOST_EXCEPTION_CUSTOM_MESSAGE
++    throw enable_current_exception(set_info(enable_error_info(e), throw_message(custom_throw_message())));
++#else
+     throw enable_current_exception(enable_error_info(e));
++#endif
+ #else
+     throw e;
+ #endif

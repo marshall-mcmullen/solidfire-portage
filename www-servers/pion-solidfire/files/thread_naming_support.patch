@@ -1,0 +1,19 @@
+diff --recursive --unified --new-file a/src/scheduler.cpp b/src/scheduler.cpp
+--- a/src/scheduler.cpp	2012-10-31 23:50:46.000000000 -0600
++++ b/src/scheduler.cpp	2013-06-17 22:40:43.367309967 -0600
+@@ -10,6 +10,7 @@
+ #include <boost/exception/diagnostic_information.hpp>
+ #include <boost/date_time/posix_time/posix_time_duration.hpp>
+ #include <pion/scheduler.hpp>
++#include <sys/prctl.h>
+ 
+ namespace pion {    // begin namespace pion
+ 
+@@ -106,6 +107,7 @@
+ }
+                      
+ void scheduler::process_service_work(boost::asio::io_service& service) {
++    prctl(PR_SET_NAME, "PionScheduler");
+     while (m_is_running) {
+         try {
+             service.run();

@@ -1,0 +1,18 @@
+#UPSTREAM=http://ezix.org/project/ticket/553
+diff --recursive --unified --new-file a/src/core/disk.cc b/src/core/disk.cc
+--- a/src/core/disk.cc	2012-01-10 15:01:30.000000000 -0700
++++ b/src/core/disk.cc	2013-06-17 22:40:54.519330688 -0600
+@@ -69,11 +69,13 @@
+ 
+   close(fd);
+ 
++#if 0 // Disabling scan_partitions b/c scanning raw partitions can cause it to hang
+   if(n.getSize()>=0)
+   {
+     n.addHint("icon", string("disc"));
+     scan_partitions(n);
+   }
++#endif
+ 
+   return true;
+ }

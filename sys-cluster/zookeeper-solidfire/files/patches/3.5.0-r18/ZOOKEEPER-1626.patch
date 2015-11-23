@@ -1,0 +1,245 @@
+diff --recursive --unified --new-file a/src/c/configure.ac b/src/c/configure.ac
+--- a/src/c/configure.ac	2013-10-22 21:06:55.000000000 -0600
++++ b/src/c/configure.ac	2013-10-22 21:25:48.142574887 -0600
+@@ -142,6 +142,14 @@
+   AC_SUBST(USEIPV6)
+ fi
+ 
++# Determine which libraries we need to use clock_gettime
++saved_LIBS="$LIBS"
++LIBS=""
++AC_CHECK_LIB(rt, clock_gettime)
++CLOCK_GETTIME_LIBS=$LIBS
++AC_SUBST(CLOCK_GETTIME_LIBS)
++LIBS="$saved_LIBS"
++
+ # Checks for library functions.
+ AC_CHECK_FUNCS([getcwd gethostbyname gethostname getlogin getpwuid_r gettimeofday getuid memmove memset poll socket strchr strdup strerror strtol])
+ 
+diff --recursive --unified --new-file a/src/c/Makefile.am b/src/c/Makefile.am
+--- a/src/c/Makefile.am	2013-10-22 21:06:55.000000000 -0600
++++ b/src/c/Makefile.am	2013-10-22 21:25:48.142574887 -0600
+@@ -26,7 +26,7 @@
+ EXPORT_SYMBOLS = '(zoo_|zookeeper_|zhandle|Z|format_log_message|log_message|logLevel|deallocate_|zerror|is_unrecoverable)'
+ noinst_LTLIBRARIES += libzkst.la
+ libzkst_la_SOURCES =$(COMMON_SRC) src/st_adaptor.c
+-libzkst_la_LIBADD = -lm
++libzkst_la_LIBADD = -lm $(CLOCK_GETTIME_LIBS)
+ 
+ lib_LTLIBRARIES = libzookeeper_st.la
+ libzookeeper_st_la_SOURCES =
+@@ -38,7 +38,7 @@
+ noinst_LTLIBRARIES += libzkmt.la
+ libzkmt_la_SOURCES =$(COMMON_SRC) src/mt_adaptor.c
+ libzkmt_la_CFLAGS = -DTHREADED
+-libzkmt_la_LIBADD = -lm
++libzkmt_la_LIBADD = -lm $(CLOCK_GETTIME_LIBS)
+ 
+ lib_LTLIBRARIES += libzookeeper_mt.la
+ libzookeeper_mt_la_SOURCES =
+diff --recursive --unified --new-file a/src/c/src/zookeeper.c b/src/c/src/zookeeper.c
+--- a/src/c/src/zookeeper.c	2013-10-22 21:25:47.562574251 -0600
++++ b/src/c/src/zookeeper.c	2013-10-22 21:25:48.146574890 -0600
+@@ -40,6 +40,7 @@
+ #include <assert.h>
+ #include <stdarg.h>
+ #include <limits.h>
++#include <unistd.h> // needed for _POSIX_MONOTONIC_CLOCK
+ 
+ #ifndef WIN32
+ #include <sys/time.h>
+@@ -223,6 +224,43 @@
+ #endif
+ }
+ 
++/**
++ * Get the system time.
++ *
++ * If the monotonic clock is available, we use that.  The monotonic clock does
++ * not change when the wall-clock time is adjusted by NTP or the system
++ * administrator.  The monotonic clock returns a value which is monotonically
++ * increasing.
++ *
++ * If POSIX monotonic clocks are not available, we fall back on the wall-clock.
++ *
++ * @param tv         (out param) The time.
++ */
++void get_system_time(struct timeval *tv)
++{
++  int ret;
++
++#ifdef CLOCK_MONOTONIC_RAW
++  // On Linux, CLOCK_MONOTONIC is affected by ntp slew but CLOCK_MONOTONIC_RAW
++  // is not.  We want the non-slewed (constant rate) CLOCK_MONOTONIC_RAW if it
++  // is available.
++  struct timespec ts = { 0 };
++  ret = clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
++  tv->tv_sec = ts.tv_sec;
++  tv->tv_usec = ts.tv_nsec / 1000;
++#elif _POSIX_MONOTONIC_CLOCK
++  struct timespec ts = { 0 };
++  ret = clock_gettime(CLOCK_MONOTONIC, &ts);
++  tv->tv_sec = ts.tv_sec;
++  tv->tv_usec = ts.tv_nsec / 1000;
++#else
++  ret = gettimeofday(tv, NULL);
++#endif
++  if (ret) {
++    abort();
++  }
++}
++
+ const void *zoo_get_context(zhandle_t *zh)
+ {
+     return zh->context;
+@@ -1879,7 +1917,7 @@
+ 
+     rc = serialize_RequestHeader(oa, "header", &h);
+     enter_critical(zh);
+-    gettimeofday(&zh->last_ping, 0);
++    get_system_time(&zh->last_ping);
+     rc = rc < 0 ? rc : add_void_completion(zh, h.xid, 0, 0);
+     rc = rc < 0 ? rc : queue_buffer_bytes(&zh->to_send, get_buffer(oa),
+             get_buffer_len(oa));
+@@ -1904,7 +1942,7 @@
+         return ZBADARGUMENTS;
+     if (is_unrecoverable(zh))
+         return ZINVALIDSTATE;
+-    gettimeofday(&now, 0);
++    get_system_time(&now);
+     if(zh->next_deadline.tv_sec!=0 || zh->next_deadline.tv_usec!=0){
+         int time_left = calculate_interval(&zh->next_deadline, &now);
+         int max_exceed = zh->recv_timeout / 10 > 200 ? 200 :
+@@ -2105,7 +2143,7 @@
+                 "failed while receiving a server response");
+         }
+         if (rc > 0) {
+-            gettimeofday(&zh->last_recv, 0);
++            get_system_time(&zh->last_recv);
+             if (zh->input_buffer != &zh->primer_buffer) {
+                 queue_buffer(&zh->to_process, zh->input_buffer, 0);
+             } else  {
+@@ -2555,7 +2593,7 @@
+     }
+ #endif
+     else{
+-        gettimeofday(&zh->socket_readable,0);
++        get_system_time(&zh->socket_readable);
+     }
+ }
+ 
+@@ -2567,7 +2605,7 @@
+     if(zh->socket_readable.tv_sec==0)
+         return;
+ 
+-    gettimeofday(&now,0);
++    get_system_time(&now);
+     delay=calculate_interval(&zh->socket_readable, &now);
+     if(delay>20)
+         LOG_DEBUG(LOGCALLBACK(zh), "The following server response has spent at least %dms sitting in the client socket recv buffer",delay);
+@@ -2671,7 +2709,7 @@
+                 if(hdr.xid == PING_XID){
+                     int elapsed = 0;
+                     struct timeval now;
+-                    gettimeofday(&now, 0);
++                    get_system_time(&now);
+                     elapsed = calculate_interval(&zh->last_ping, &now);
+                     LOG_DEBUG(LOGCALLBACK(zh), "Got ping response in %d ms", elapsed);
+ 
+@@ -3833,7 +3871,7 @@
+     fd_set pollSet;
+     struct timeval wait;
+ #endif
+-    gettimeofday(&started,0);
++    get_system_time(&started);
+     // we can't use dequeue_buffer() here because if (non-blocking) send_buffer()
+     // returns EWOULDBLOCK we'd have to put the buffer back on the queue.
+     // we use a recursive lock instead and only dequeue the buffer if a send was
+@@ -3846,7 +3884,7 @@
+ #endif
+             int elapsed;
+             struct timeval now;
+-            gettimeofday(&now,0);
++            get_system_time(&now);
+             elapsed=calculate_interval(&started,&now);
+             if (elapsed>timeout) {
+                 rc = ZOPERATIONTIMEOUT;
+@@ -3885,7 +3923,7 @@
+         // if the buffer has been sent successfully, remove it from the queue
+         if (rc > 0)
+             remove_buffer(&zh->to_send);
+-        gettimeofday(&zh->last_send, 0);
++        get_system_time(&zh->last_send);
+         rc = ZOK;
+     }
+     unlock_buffer_list(&zh->to_send);
+diff --recursive --unified --new-file a/src/c/tests/LibCMocks.cc b/src/c/tests/LibCMocks.cc
+--- a/src/c/tests/LibCMocks.cc	2013-10-22 21:06:54.000000000 -0600
++++ b/src/c/tests/LibCMocks.cc	2013-10-22 21:25:48.146574890 -0600
+@@ -19,6 +19,7 @@
+ #include <cstdlib>
+ #include <cstdarg>
+ #include <iostream>
++#include <unistd.h> // needed for _POSIX_MONOTONIC_CLOCK
+ #include <stdarg.h>
+ 
+ #include "Util.h"
+@@ -331,3 +332,16 @@
+ 
+ Mock_gettimeofday* Mock_gettimeofday::mock_=0;
+ 
++// *****************************************************************************
++#ifdef _POSIX_MONOTONIC_CLOCK
++// clock_gettime
++int clock_gettime(clockid_t id, struct timespec *tp) {
++    if (!Mock_gettimeofday::mock_)
++        return LIBC_SYMBOLS.clock_gettime(id,tp);
++    struct timeval tv = { 0 };
++    int res = Mock_gettimeofday::mock_->call(&tv, NULL);
++    tp->tv_sec = tv.tv_sec;
++    tp->tv_nsec = tv.tv_usec * 1000;
++    return res;
++}
++#endif
+diff --recursive --unified --new-file a/src/c/tests/LibCSymTable.cc b/src/c/tests/LibCSymTable.cc
+--- a/src/c/tests/LibCSymTable.cc	2013-10-22 21:06:54.000000000 -0600
++++ b/src/c/tests/LibCSymTable.cc	2013-10-22 21:25:48.146574890 -0600
+@@ -17,6 +17,7 @@
+  */
+ 
+ #include "LibCSymTable.h" 
++#include <unistd.h> // needed for _POSIX_MONOTONIC_CLOCK
+ 
+ #define LOAD_SYM(sym) \
+     sym=(sym##_sig)dlsym(handle,#sym); \
+@@ -51,6 +52,9 @@
+     LOAD_SYM(select);
+     LOAD_SYM(poll);
+     LOAD_SYM(gettimeofday);
++#ifdef _POSIX_MONOTONIC_CLOCK
++    LOAD_SYM(clock_gettime);
++#endif
+ #ifdef THREADED
+     LOAD_SYM(pthread_create);
+     LOAD_SYM(pthread_detach);
+diff --recursive --unified --new-file a/src/c/tests/LibCSymTable.h b/src/c/tests/LibCSymTable.h
+--- a/src/c/tests/LibCSymTable.h	2013-10-22 21:06:54.000000000 -0600
++++ b/src/c/tests/LibCSymTable.h	2013-10-22 21:25:48.146574890 -0600
+@@ -26,6 +26,7 @@
+ #include <dlfcn.h>
+ #include <cassert>
+ #include <poll.h>
++#include <unistd.h> // needed for _POSIX_MONOTONIC_CLOCK
+ 
+ #ifdef THREADED
+ #include <pthread.h>
+@@ -80,6 +81,9 @@
+     DECLARE_SYM(int,select,(int,fd_set*,fd_set*,fd_set*,struct timeval*));
+     DECLARE_SYM(int,poll,(struct pollfd*,POLL_NFDS_TYPE,int));
+     DECLARE_SYM(int,gettimeofday,(struct timeval*,GETTIMEOFDAY_ARG2_TYPE));
++#ifdef _POSIX_MONOTONIC_CLOCK
++    DECLARE_SYM(int,clock_gettime,(clockid_t clk_id, struct timespec*));
++#endif
+ #ifdef THREADED
+     DECLARE_SYM(int,pthread_create,(pthread_t *, const pthread_attr_t *,
+                 void *(*)(void *), void *));

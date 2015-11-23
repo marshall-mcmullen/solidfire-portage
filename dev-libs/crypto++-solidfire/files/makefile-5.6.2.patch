@@ -1,0 +1,119 @@
+#UPSTREAM=N/A (Build patch)
+diff --recursive --unified --new-file a/GNUmakefile b/GNUmakefile
+--- a/GNUmakefile	2013-02-20 15:30:52.000000000 -0700
++++ b/GNUmakefile	2013-06-17 22:40:52.523326977 -0600
+@@ -1,14 +1,13 @@
+-CXXFLAGS = -DNDEBUG -g -O2
+-# -O3 fails to link on Cygwin GCC version 4.5.3
+-# -fPIC is supported. Please report any breakage of -fPIC as a bug.
+-# CXXFLAGS += -fPIC
+-# the following options reduce code size, but breaks link or makes link very slow on some systems
+-# CXXFLAGS += -ffunction-sections -fdata-sections
+-# LDFLAGS += -Wl,--gc-sections
++LIBTOOL = libtool
++LIBDIR = lib
++LIBSUFFIX =
++BINDIR = bin
++CXXFLAGS += -DNDEBUG -g -O2 -fPIC
+ ARFLAGS = -cr	# ar needs the dash on OpenBSD
+ RANLIB = ranlib
+ CP = cp
+ MKDIR = mkdir
++INSTALL = install
+ EGREP = egrep
+ UNAME = $(shell uname)
+ ISX86 = $(shell uname -m | $(EGREP) -c "i.86|x86|i86|amd64")
+@@ -79,8 +78,11 @@
+ LDLIBS += -lws2_32
+ endif
+ 
++THREAD_LIBS =
++
+ ifeq ($(IS_LINUX),1)
+ LDFLAGS += -pthread
++THREAD_LIBS += -lpthread
+ ifneq ($(shell uname -i | $(EGREP) -c "(_64|d64)"),0)
+ M32OR64 = -m64
+ endif
+@@ -127,7 +129,7 @@
+ endif
+ 
+ OBJS = $(SRCS:.cpp=.o)
+-# test.o needs to be after bench.o for cygwin 1.1.4 (possible ld bug?)
++# test.lo needs to be after bench.lo for cygwin 1.1.4 (possible ld bug?)
+ TESTOBJS = bench.o bench2.o test.o validat1.o validat2.o validat3.o adhoc.o datatest.o regtest.o fipsalgt.o dlltest.o
+ LIBOBJS = $(filter-out $(TESTOBJS),$(OBJS))
+ 
+@@ -136,44 +138,36 @@
+ LIBIMPORTOBJS = $(LIBOBJS:.o=.import.o)
+ TESTIMPORTOBJS = $(TESTOBJS:.o=.import.o)
+ DLLTESTOBJS = dlltest.dllonly.o
++CRYPTOPPLIBS = libcryptopp$(LIBSUFFIX).a libcryptopp$(LIBSUFFIX).so
++CRYPTOPPBINS = cryptest
+ 
+-all: cryptest.exe
+-static: libcryptopp.a
+-dynamic: libcryptopp.so
++all: $(CRYPTOPPLIBS) $(CRYPTOPPBINS)
+ 
+-test: cryptest.exe
+-	./cryptest.exe v
++test: cryptest
++	./cryptest v
+ 
+ clean:
+-	-$(RM) cryptest.exe libcryptopp.a libcryptopp.so $(LIBOBJS) $(TESTOBJS) cryptopp.dll libcryptopp.dll.a libcryptopp.import.a cryptest.import.exe dlltest.exe $(DLLOBJS) $(LIBIMPORTOBJS) $(TESTI MPORTOBJS) $(DLLTESTOBJS)
++	$(RM) -f .libs $(CRYPTOPPBINS) $(CRYPTOPPLIBS) $(LIBOBJS) $(TESTOBJS) cryptopp.dll cryptest.import dlltest $(DLLOBJS) $(LIBIMPORTOBJS) $(TESTIMPORTOBJS) $(DLLTESTOBJS)
+ 
+ install:
+-	$(MKDIR) -p $(PREFIX)/include/cryptopp $(PREFIX)/lib $(PREFIX)/bin
+-	-$(CP) *.h $(PREFIX)/include/cryptopp
+-	-$(CP) *.a $(PREFIX)/lib
+-	-$(CP) *.so $(PREFIX)/lib
+-	-$(CP) *.exe $(PREFIX)/bin
+-
+-remove:
+-	-$(RM) -rf $(PREFIX)/include/cryptopp
+-	-$(RM) $(PREFIX)/lib/libcryptopp.a
+-	-$(RM) $(PREFIX)/lib/libcryptopp.so
+-	-$(RM) $(PREFIX)/bin/cryptest.exe
++	$(MKDIR) -p $(DESTDIR)$(INCLUDEDIR) $(DESTDIR)$(LIBDIR)
++	$(CP) *.h $(DESTDIR)$(INCLUDEDIR)
++	$(CP) $(CRYPTOPPLIBS) $(DESTDIR)$(LIBDIR)
+ 
+-libcryptopp.a: $(LIBOBJS)
++libcryptopp$(LIBSUFFIX).a: $(LIBOBJS)
+ 	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
+ 	$(RANLIB) $@
+ 
+-libcryptopp.so: $(LIBOBJS)
+-	$(CXX) -shared -o $@ $(LIBOBJS)
++libcryptopp$(LIBSUFFIX).so: $(LIBOBJS)
++	$(CXX) $(CXXFLAGS) -shared -Xlinker -soname=$@ -o $@ $(LIBOBJS)
+ 
+-cryptest.exe: libcryptopp.a $(TESTOBJS)
+-	$(CXX) -o $@ $(CXXFLAGS) $(TESTOBJS) ./libcryptopp.a $(LDFLAGS) $(LDLIBS)
++cryptest: libcryptopp$(LIBSUFFIX).a $(TESTOBJS)
++	$(CXX) $(CXXFLAGS) -o $@ $(TESTOBJS) -L. -lcryptopp$(LIBSUFFIX) $(LDFLAGS) $(LDLIBS)
+ 
+ nolib: $(OBJS)		# makes it faster to test changes
+ 	$(CXX) -o ct $(CXXFLAGS) $(OBJS) $(LDFLAGS) $(LDLIBS)
+ 
+-dll: cryptest.import.exe dlltest.exe
++dll: cryptest.import dlltest
+ 
+ cryptopp.dll: $(DLLOBJS)
+ 	$(CXX) -shared -o $@ $(CXXFLAGS) $(DLLOBJS) $(LDFLAGS) $(LDLIBS) -Wl,--out-implib=libcryptopp.dll.a
+@@ -182,10 +176,10 @@
+ 	$(AR) $(ARFLAGS) $@ $(LIBIMPORTOBJS)
+ 	$(RANLIB) $@
+ 
+-cryptest.import.exe: cryptopp.dll libcryptopp.import.a $(TESTIMPORTOBJS)
++cryptest.import: cryptopp.dll libcryptopp.import.a $(TESTIMPORTOBJS)
+ 	$(CXX) -o $@ $(CXXFLAGS) $(TESTIMPORTOBJS) -L. -lcryptopp.dll -lcryptopp.import $(LDFLAGS) $(LDLIBS)
+ 
+-dlltest.exe: cryptopp.dll $(DLLTESTOBJS)
++dlltest: cryptopp.dll $(DLLTESTOBJS)
+ 	$(CXX) -o $@ $(CXXFLAGS) $(DLLTESTOBJS) -L. -lcryptopp.dll $(LDFLAGS) $(LDLIBS)
+ 
+ adhoc.cpp: adhoc.cpp.proto

@@ -1,0 +1,464 @@
+diff --recursive --unified --new-file a/include/gtest/gtest.h b/include/gtest/gtest.h
+--- a/include/gtest/gtest.h	2011-04-15 13:49:10.000000000 -0600
++++ b/include/gtest/gtest.h	2013-06-17 22:40:53.739329241 -0600
+@@ -102,6 +102,10 @@
+ // the tests to run. If the filter is not given all tests are executed.
+ GTEST_DECLARE_string_(filter);
+ 
++// This flag sets up the tag filter to select by comma separated key=value pairs
++// the tests to run. If the filter is not given all tests are executed.
++GTEST_DECLARE_string_(tag_filter);
++
+ // This flag causes the Google Test to list tests. None of the tests listed
+ // are actually run if the flag is provided.
+ GTEST_DECLARE_bool_(list_tests);
+@@ -156,6 +160,7 @@
+ class TestResultAccessor;
+ class TestEventListenersAccessor;
+ class TestEventRepeater;
++class UnitTestOptions;
+ class WindowsDeathTest;
+ class UnitTestImpl* GetUnitTestImpl();
+ void ReportFailureInUnknownLocation(TestPartResult::Type result_type,
+@@ -508,7 +513,7 @@
+ class GTEST_API_ TestResult {
+  public:
+   // Creates an empty TestResult.
+-  TestResult();
++  TestResult(const char* tags = "");
+ 
+   // D'tor.  Do not inherit from TestResult.
+   ~TestResult();
+@@ -548,6 +553,7 @@
+  private:
+   friend class TestInfo;
+   friend class UnitTest;
++  friend class internal::UnitTestOptions;
+   friend class internal::DefaultGlobalTestPartResultReporter;
+   friend class internal::ExecDeathTest;
+   friend class internal::TestResultAccessor;
+@@ -564,6 +570,11 @@
+     return test_properties_;
+   }
+ 
++  // Gets the vector of TagProperties.
++  const std::vector<TestProperty>& tag_properties() const {
++    return tag_properties_;
++  }
++
+   // Sets the elapsed time.
+   void set_elapsed_time(TimeInMillis elapsed) { elapsed_time_ = elapsed; }
+ 
+@@ -606,6 +617,8 @@
+   int death_test_count_;
+   // The elapsed time, in milliseconds.
+   TimeInMillis elapsed_time_;
++  // Saved off properties given at test definition macro as tags
++  std::vector<TestProperty> tag_properties_;
+ 
+   // We disallow copying TestResult.
+   GTEST_DISALLOW_COPY_AND_ASSIGN_(TestResult);
+@@ -686,7 +699,8 @@
+       internal::TypeId fixture_class_id,
+       Test::SetUpTestCaseFunc set_up_tc,
+       Test::TearDownTestCaseFunc tear_down_tc,
+-      internal::TestFactoryBase* factory);
++      internal::TestFactoryBase* factory,
++      const char* tags);
+ 
+   // Constructs a TestInfo object. The newly constructed instance assumes
+   // ownership of the factory object.
+@@ -694,7 +708,8 @@
+            const char* a_type_param,
+            const char* a_value_param,
+            internal::TypeId fixture_class_id,
+-           internal::TestFactoryBase* factory);
++           internal::TestFactoryBase* factory,
++           const char* tags);
+ 
+   // Increments the number of death tests encountered in this test so
+   // far.
+diff --recursive --unified --new-file a/include/gtest/gtest-typed-test.h b/include/gtest/gtest-typed-test.h
+--- a/include/gtest/gtest-typed-test.h	2011-04-15 13:49:10.000000000 -0600
++++ b/include/gtest/gtest-typed-test.h	2013-06-17 22:40:53.739329241 -0600
+@@ -181,7 +181,7 @@
+           ::testing::internal::TemplateSel< \
+               GTEST_TEST_CLASS_NAME_(CaseName, TestName)>, \
+           GTEST_TYPE_PARAMS_(CaseName)>::Register(\
+-              "", #CaseName, #TestName, 0); \
++              "", #CaseName, #TestName, 0, ""); \
+   template <typename gtest_TypeParam_> \
+   void GTEST_TEST_CLASS_NAME_(CaseName, TestName)<gtest_TypeParam_>::TestBody()
+ 
+@@ -252,7 +252,7 @@
+       ::testing::internal::TypeParameterizedTestCase<CaseName, \
+           GTEST_CASE_NAMESPACE_(CaseName)::gtest_AllTests_, \
+           ::testing::internal::TypeList< Types >::type>::Register(\
+-              #Prefix, #CaseName, GTEST_REGISTERED_TEST_NAMES_(CaseName))
++              #Prefix, #CaseName, GTEST_REGISTERED_TEST_NAMES_(CaseName), "")
+ 
+ #endif  // GTEST_HAS_TYPED_TEST_P
+ 
+diff --recursive --unified --new-file a/include/gtest/internal/gtest-internal.h b/include/gtest/internal/gtest-internal.h
+--- a/include/gtest/internal/gtest-internal.h	2011-04-15 13:49:10.000000000 -0600
++++ b/include/gtest/internal/gtest-internal.h	2013-06-17 22:40:53.743329246 -0600
+@@ -570,7 +570,8 @@
+     TypeId fixture_class_id,
+     SetUpTestCaseFunc set_up_tc,
+     TearDownTestCaseFunc tear_down_tc,
+-    TestFactoryBase* factory);
++    TestFactoryBase* factory,
++    const char* tags = "");
+ 
+ // If *pstr starts with the given prefix, modifies *pstr to be right
+ // past the prefix and returns true; otherwise leaves *pstr unchanged
+@@ -644,7 +645,8 @@
+   // Types).  Valid values for 'index' are [0, N - 1] where N is the
+   // length of Types.
+   static bool Register(const char* prefix, const char* case_name,
+-                       const char* test_names, int index) {
++                       const char* test_names, int index,
++                       const char* tags) {
+     typedef typename Types::Head Type;
+     typedef Fixture<Type> FixtureClass;
+     typedef typename GTEST_BIND_(TestSel, Type) TestClass;
+@@ -660,11 +662,12 @@
+         GetTypeId<FixtureClass>(),
+         TestClass::SetUpTestCase,
+         TestClass::TearDownTestCase,
+-        new TestFactoryImpl<TestClass>);
++        new TestFactoryImpl<TestClass>,
++		tags);
+ 
+     // Next, recurses (at compile time) with the tail of the type list.
+     return TypeParameterizedTest<Fixture, TestSel, typename Types::Tail>
+-        ::Register(prefix, case_name, test_names, index + 1);
++        ::Register(prefix, case_name, test_names, index + 1, tags);
+   }
+ };
+ 
+@@ -673,7 +676,8 @@
+ class TypeParameterizedTest<Fixture, TestSel, Types0> {
+  public:
+   static bool Register(const char* /*prefix*/, const char* /*case_name*/,
+-                       const char* /*test_names*/, int /*index*/) {
++                       const char* /*test_names*/, int /*index*/,
++                       const char* /*tags*/) {
+     return true;
+   }
+ };
+@@ -686,16 +690,16 @@
+ class TypeParameterizedTestCase {
+  public:
+   static bool Register(const char* prefix, const char* case_name,
+-                       const char* test_names) {
++                       const char* test_names, const char* tags) {
+     typedef typename Tests::Head Head;
+ 
+     // First, register the first test in 'Test' for each type in 'Types'.
+     TypeParameterizedTest<Fixture, Head, Types>::Register(
+-        prefix, case_name, test_names, 0);
++        prefix, case_name, test_names, 0, tags);
+ 
+     // Next, recurses (at compile time) with the tail of the test list.
+     return TypeParameterizedTestCase<Fixture, typename Tests::Tail, Types>
+-        ::Register(prefix, case_name, SkipComma(test_names));
++        ::Register(prefix, case_name, SkipComma(test_names), tags);
+   }
+ };
+ 
+@@ -704,7 +708,7 @@
+ class TypeParameterizedTestCase<Fixture, Templates0, Types> {
+  public:
+   static bool Register(const char* /*prefix*/, const char* /*case_name*/,
+-                       const char* /*test_names*/) {
++                       const char* /*test_names*/, const char* /*tags*/) {
+     return true;
+   }
+ };
+diff --recursive --unified --new-file a/include/gtest/internal/gtest-param-util.h b/include/gtest/internal/gtest-param-util.h
+--- a/include/gtest/internal/gtest-param-util.h	2011-04-15 13:49:10.000000000 -0600
++++ b/include/gtest/internal/gtest-param-util.h	2013-06-17 22:40:53.747329254 -0600
+@@ -449,6 +449,18 @@
+   typedef typename TestCase::ParamType ParamType;
+   // A function that returns an instance of appropriate generator type.
+   typedef ParamGenerator<ParamType>(GeneratorCreationFunc)();
++  // Records from INSTANTIATE_TEST_CASE_P
++  struct TestInstance {
++    TestInstance(const string& instantiation_name,
++                 GeneratorCreationFunc* func,
++                 const char* tags) :
++        instantiation_name_(instantiation_name),
++        func_(func),
++        tags_(tags) {};
++    string instantiation_name_;
++    GeneratorCreationFunc* func_;
++    string tags_;
++  };
+ 
+   explicit ParameterizedTestCaseInfo(const char* name)
+       : test_case_name_(name) {}
+@@ -475,8 +487,9 @@
+   int AddTestCaseInstantiation(const string& instantiation_name,
+                                GeneratorCreationFunc* func,
+                                const char* /* file */,
+-                               int /* line */) {
+-    instantiations_.push_back(::std::make_pair(instantiation_name, func));
++                               int /* line */,
++                               const char* tags = "") {
++    instantiations_.push_back(TestInstance(instantiation_name, func, tags));
+     return 0;  // Return value used only to run this method in namespace scope.
+   }
+   // UnitTest class invokes this method to register tests in this test case
+@@ -491,8 +504,9 @@
+       for (typename InstantiationContainer::iterator gen_it =
+                instantiations_.begin(); gen_it != instantiations_.end();
+                ++gen_it) {
+-        const string& instantiation_name = gen_it->first;
+-        ParamGenerator<ParamType> generator((*gen_it->second)());
++        const string& instantiation_name = gen_it->instantiation_name_;
++        ParamGenerator<ParamType> generator((*gen_it->func_)());
++		const string& tags = gen_it->tags_;
+ 
+         Message test_case_name_stream;
+         if ( !instantiation_name.empty() )
+@@ -513,7 +527,8 @@
+               GetTestCaseTypeId(),
+               TestCase::SetUpTestCase,
+               TestCase::TearDownTestCase,
+-              test_info->test_meta_factory->CreateTestFactory(*param_it));
++              test_info->test_meta_factory->CreateTestFactory(*param_it),
++              tags.c_str());
+         }  // for param_it
+       }  // for gen_it
+     }  // for test_it
+@@ -537,7 +552,7 @@
+   typedef ::std::vector<linked_ptr<TestInfo> > TestInfoContainer;
+   // Keeps pairs of <Instantiation name, Sequence generator creation function>
+   // received from INSTANTIATE_TEST_CASE_P macros.
+-  typedef ::std::vector<std::pair<string, GeneratorCreationFunc*> >
++  typedef ::std::vector<TestInstance>
+       InstantiationContainer;
+ 
+   const string test_case_name_;
+diff --recursive --unified --new-file a/src/gtest.cc b/src/gtest.cc
+--- a/src/gtest.cc	2011-04-15 13:49:11.000000000 -0600
++++ b/src/gtest.cc	2013-06-17 22:40:53.775329306 -0600
+@@ -212,8 +212,18 @@
+     "exclude).  A test is run if it matches one of the positive "
+     "patterns and does not match any of the negative patterns.");
+ 
+-GTEST_DEFINE_bool_(list_tests, false,
+-                   "List all tests without running them.");
++GTEST_DEFINE_string_(
++    tag_filter,
++    internal::StringFromGTestEnv("tag_filter", ""),
++    "A comma-separated list of key=value pairs for filtering the"
++    "tests to run. A test is run iff all key=value tags are matching"
++    "on the test. Tests can have other tags but these are the required"
++    "tags.");
++
++GTEST_DEFINE_bool_(
++    list_tests,
++    false,
++    "List all tests without running them.");
+ 
+ GTEST_DEFINE_string_(
+     output,
+@@ -501,6 +511,51 @@
+           !MatchesFilter(full_name, negative.c_str()));
+ }
+ 
++bool UnitTestOptions::TagFilterMatchesTags(const TestInfo& info)
++{
++  static TagMapType flag_map = ParseTags(GTEST_FLAG(tag_filter).c_str());
++
++  // Move all properties to an STL map
++  TagMapType test_map;
++  for (std::vector<TestProperty>::const_iterator it = info.result()->tag_properties().begin();
++    it != info.result()->tag_properties().end(); ++it)
++  {
++    test_map[it->key()] = it->value();
++  }
++
++  // Use the two STL maps to test if all the key=value pairs in flag_map exist in test_map
++  return std::includes(test_map.begin(), test_map.end(), flag_map.begin(), flag_map.end());
++}
++
++UnitTestOptions::TagMapType UnitTestOptions::ParseTags(const char* tag_string)
++{
++  TagMapType tag_map;
++  std::istringstream full_stream(tag_string);
++  std::string tag;
++
++  // Parse many tags key=value pairs, split by comma
++  while (std::getline(full_stream, tag, ','))
++  {
++    // Parse each pair, split by equals
++    size_t comma_index = tag.find('=');
++    if (tag.length() < 3 ||
++        comma_index == 0 ||
++        comma_index == tag.length()-1 ||
++        comma_index == std::string::npos)
++    {
++      ADD_FAILURE()
++        << "Ignoring invalid tag entry '"
++        << tag
++        << "'";
++    }
++    else
++    {
++      tag_map[tag.substr(0, comma_index)] = tag.substr(comma_index + 1);
++    }
++  }
++  return tag_map;
++}
++
+ #if GTEST_HAS_SEH
+ // Returns EXCEPTION_EXECUTE_HANDLER if Google Test should handle the
+ // given SEH exception, or EXCEPTION_CONTINUE_SEARCH otherwise.
+@@ -1771,9 +1826,13 @@
+ // class TestResult
+ 
+ // Creates an empty TestResult.
+-TestResult::TestResult()
++TestResult::TestResult(const char* tags)
+     : death_test_count_(0),
+       elapsed_time_(0) {
++  // Parse the tags argument once and save them off so we can restore them between each test
++  internal::UnitTestOptions::TagMapType tag_map = internal::UnitTestOptions::ParseTags(tags);
++  for (internal::UnitTestOptions::TagMapType::const_iterator tag = tag_map.begin(); tag != tag_map.end(); ++tag)
++    tag_properties_.push_back(TestProperty(tag->first.c_str(), tag->second.c_str()));
+ }
+ 
+ // D'tor.
+@@ -1844,7 +1903,7 @@
+ // Clears the object.
+ void TestResult::Clear() {
+   test_part_results_.clear();
+-  test_properties_.clear();
++  test_properties_ = tag_properties_;	// Add back the original properties every test
+   death_test_count_ = 0;
+   elapsed_time_ = 0;
+ }
+@@ -2192,7 +2251,8 @@
+                    const char* a_type_param,
+                    const char* a_value_param,
+                    internal::TypeId fixture_class_id,
+-                   internal::TestFactoryBase* factory)
++                   internal::TestFactoryBase* factory,
++                   const char* a_tags)
+     : test_case_name_(a_test_case_name),
+       name_(a_name),
+       type_param_(a_type_param ? new std::string(a_type_param) : NULL),
+@@ -2202,7 +2262,8 @@
+       is_disabled_(false),
+       matches_filter_(false),
+       factory_(factory),
+-      result_() {}
++      result_(a_tags) {
++}
+ 
+ // Destructs a TestInfo object.
+ TestInfo::~TestInfo() { delete factory_; }
+@@ -2233,10 +2294,11 @@
+     TypeId fixture_class_id,
+     SetUpTestCaseFunc set_up_tc,
+     TearDownTestCaseFunc tear_down_tc,
+-    TestFactoryBase* factory) {
++    TestFactoryBase* factory,
++    const char* tags) {
+   TestInfo* const test_info =
+       new TestInfo(test_case_name, name, type_param, value_param,
+-                   fixture_class_id, factory);
++                   fixture_class_id, factory, tags);
+   GetUnitTestImpl()->AddTestInfo(set_up_tc, tear_down_tc, test_info);
+   return test_info;
+ }
+@@ -4405,7 +4467,8 @@
+ 
+       const bool matches_filter =
+           internal::UnitTestOptions::FilterMatchesTest(test_case_name,
+-                                                       test_name);
++                                                       test_name) &&
++          internal::UnitTestOptions::TagFilterMatchesTags(*test_info);
+       test_info->matches_filter_ = matches_filter;
+ 
+       const bool is_runnable =
+@@ -4714,6 +4777,8 @@
+ "      Run only the tests whose name matches one of the positive patterns but\n"
+ "      none of the negative patterns. '?' matches any single character; '*'\n"
+ "      matches any substring; ':' separates two patterns.\n"
++"  @G--" GTEST_FLAG_PREFIX_ "tag_filter=@Ykey1=value1[@G,@Ykey2=value2@G,@Y...]@D\n"
++"      Run only tests whose tags all match the given key=value pairs.\n"
+ "  @G--" GTEST_FLAG_PREFIX_ "also_run_disabled_tests@D\n"
+ "      Run all disabled tests too.\n"
+ "\n"
+@@ -4791,6 +4856,7 @@
+         ParseBoolFlag(arg, kDeathTestUseFork,
+                       &GTEST_FLAG(death_test_use_fork)) ||
+         ParseStringFlag(arg, kFilterFlag, &GTEST_FLAG(filter)) ||
++        ParseStringFlag(arg, kTagFilterFlag, &GTEST_FLAG(tag_filter)) ||
+         ParseStringFlag(arg, kInternalRunDeathTestFlag,
+                         &GTEST_FLAG(internal_run_death_test)) ||
+         ParseBoolFlag(arg, kListTestsFlag, &GTEST_FLAG(list_tests)) ||
+diff --recursive --unified --new-file a/src/gtest-internal-inl.h b/src/gtest-internal-inl.h
+--- a/src/gtest-internal-inl.h	2011-04-15 13:49:11.000000000 -0600
++++ b/src/gtest-internal-inl.h	2013-06-17 22:40:53.767329293 -0600
+@@ -55,6 +55,7 @@
+ #include <algorithm>
+ #include <string>
+ #include <vector>
++#include <map>
+ 
+ #include "gtest/internal/gtest-port.h"
+ 
+@@ -86,6 +87,7 @@
+ const char kCatchExceptionsFlag[] = "catch_exceptions";
+ const char kColorFlag[] = "color";
+ const char kFilterFlag[] = "filter";
++const char kTagFilterFlag[] = "tag_filter";
+ const char kListTestsFlag[] = "list_tests";
+ const char kOutputFlag[] = "output";
+ const char kPrintTimeFlag[] = "print_time";
+@@ -158,6 +160,7 @@
+     death_test_style_ = GTEST_FLAG(death_test_style);
+     death_test_use_fork_ = GTEST_FLAG(death_test_use_fork);
+     filter_ = GTEST_FLAG(filter);
++    tag_filter_ = GTEST_FLAG(tag_filter);
+     internal_run_death_test_ = GTEST_FLAG(internal_run_death_test);
+     list_tests_ = GTEST_FLAG(list_tests);
+     output_ = GTEST_FLAG(output);
+@@ -179,6 +182,7 @@
+     GTEST_FLAG(death_test_style) = death_test_style_;
+     GTEST_FLAG(death_test_use_fork) = death_test_use_fork_;
+     GTEST_FLAG(filter) = filter_;
++    GTEST_FLAG(tag_filter) = tag_filter_;
+     GTEST_FLAG(internal_run_death_test) = internal_run_death_test_;
+     GTEST_FLAG(list_tests) = list_tests_;
+     GTEST_FLAG(output) = output_;
+@@ -199,6 +203,7 @@
+   String death_test_style_;
+   bool death_test_use_fork_;
+   String filter_;
++  String tag_filter_;
+   String internal_run_death_test_;
+   bool list_tests_;
+   String output_;
+@@ -387,6 +392,16 @@
+   static bool FilterMatchesTest(const String &test_case_name,
+                                 const String &test_name);
+ 
++  // Returns true iff all the user specified tags filter matches all
++  // the tags in the test's TestInfo.
++  static bool TagFilterMatchesTags(const TestInfo& info);
++
++  typedef std::map<String,String> TagMapType;
++
++  // Returns a map of key=value pairs given a comma separated argument
++  // such as "key1=value1,key2=value2".
++  static TagMapType ParseTags(const char* tag_string);
++
+ #if GTEST_OS_WINDOWS
+   // Function for supporting the gtest_catch_exception flag.
+ 

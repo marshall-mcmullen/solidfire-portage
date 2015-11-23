@@ -1,0 +1,13 @@
+#UPSTREAM=N/A (Build patch)
+diff --recursive --unified --new-file a/src/symbolize.cc b/src/symbolize.cc
+--- a/src/symbolize.cc	2012-01-12 01:40:58.000000000 -0700
++++ b/src/symbolize.cc	2013-06-17 22:41:17.295373014 -0600
+@@ -232,7 +232,7 @@
+     }
+     char header_name[kMaxSectionNameLen];
+     if (sizeof(header_name) < name_len) {
+-      RAW_LOG(WARNING, "Section name '%s' is too long (%"PRIuS"); "
++      RAW_LOG(WARNING, "Section name '%s' is too long (%" PRIuS "); "
+               "section will not be found (even if present).", name, name_len);
+       // No point in even trying.
+       return false;

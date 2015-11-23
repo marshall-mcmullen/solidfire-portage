@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<repositories version="1.0">
+  <repo priority="50" quality="experimental" status="unofficial">
+    <name>solidfire</name>
+    <description>SolidFire portage tree.</description>
+    <homepage>http://solidfire.com/</homepage>
+    <owner>
+      <email>marshall@solidfire.com</email>
+    </owner>
+    <source type="mercurial">http://hgserve.eng.solidfire.net/hg/portage</source>
+  </repo>
+</repositories>

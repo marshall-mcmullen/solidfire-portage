@@ -1,0 +1,194 @@
+diff --unified --recursive a/include/tbb/concurrent_priority_queue.h b/include/tbb/concurrent_priority_queue.h
+--- a/include/tbb/concurrent_priority_queue.h	2014-04-24 20:37:46.553543185 -0600
++++ b/include/tbb/concurrent_priority_queue.h	2014-04-24 20:05:48.715175894 -0600
+@@ -173,6 +173,13 @@
+             throw_exception(eid_bad_alloc);
+     }
+ 
++    void push(value_type&& elem) {
++        cpq_operation op_data(std::move(elem), PUSH_MOVE_OP);
++        my_aggregator.execute(&op_data);
++        if (op_data.status == FAILED) // exception thrown
++            throw_exception(eid_bad_alloc);
++    }
++
+     //! Gets a reference to and removes highest priority element
+     /** If a highest priority element was found, sets elem and returns true,
+         otherwise returns false.
+@@ -206,7 +213,7 @@
+     allocator_type get_allocator() const { return data.get_allocator(); }
+ 
+  private:
+-    enum operation_type {INVALID_OP, PUSH_OP, POP_OP};
++    enum operation_type {INVALID_OP, PUSH_OP, POP_OP, PUSH_MOVE_OP};
+     enum operation_status { WAIT=0, SUCCEEDED, FAILED };
+ 
+     class cpq_operation : public aggregated_operation<cpq_operation> {
+@@ -218,6 +225,8 @@
+         };
+         cpq_operation(const_reference e, operation_type t) :
+             type(t), elem(const_cast<value_type*>(&e)) {}
++        cpq_operation(value_type&& e, operation_type t) :
++            type(t), elem(const_cast<value_type*>(&e)) {}
+         cpq_operation(operation_type t) : type(t) {}
+     };
+ 
+@@ -278,9 +287,14 @@
+             __TBB_ASSERT(op_list->type != INVALID_OP, NULL);
+             tmp = op_list;
+             op_list = itt_hide_load_word(op_list->next);
+-            if (tmp->type == PUSH_OP) {
++            if (tmp->type == PUSH_OP || tmp->type == PUSH_MOVE_OP) {
+                 __TBB_TRY {
+-                    data.push_back(*(tmp->elem));
++                    if (tmp->type == PUSH_OP) {
++                        data.push_back(*(tmp->elem));
++                    }
++                    else {
++                        data.emplace_back(std::move(*(tmp->elem)));
++                    }
+                     __TBB_store_with_release(my_size, my_size+1);
+                     itt_store_word_with_release(tmp->status, uintptr_t(SUCCEEDED));
+                 } __TBB_CATCH(...) {
+diff --unified --recursive a/include/tbb/concurrent_queue.h b/include/tbb/concurrent_queue.h
+--- a/include/tbb/concurrent_queue.h	2014-04-24 20:29:42.648560211 -0600
++++ b/include/tbb/concurrent_queue.h	2014-04-24 20:05:48.715175894 -0600
+@@ -109,6 +109,11 @@
+         this->internal_push( &source );
+     }
+ 
++    //! Enqueue an item at tail of queue.
++    void push( T&& source ) {
++        this->internal_push( std::move(source) );
++    }
++
+     //! Attempt to dequeue an item from head of queue.
+     /** Does not wait for item to become available.
+         Returns true if successful; false otherwise. */
+diff --unified --recursive a/include/tbb/concurrent_vector.h b/include/tbb/concurrent_vector.h
+--- a/include/tbb/concurrent_vector.h	2014-04-24 20:29:42.652560217 -0600
++++ b/include/tbb/concurrent_vector.h	2014-04-24 20:05:48.719175896 -0600
+@@ -722,6 +722,16 @@
+ #endif
+     }
+ 
++    /** Returns iterator pointing to the new element. */
++    iterator push_back( T&& item )
++    {
++        size_type k;
++        void *ptr = internal_push_back(sizeof(T),k);
++        internal_loop_guide loop(1, ptr);
++        loop.init(std::move(item));
++        return iterator(*this, k, ptr);
++    }
++
+     //! Get reference to element at given index.
+     /** This method is thread-safe for concurrent reads, and also while growing the vector,
+         as long as the calling thread has checked that index&lt;size(). */
+@@ -951,6 +961,7 @@
+             : array(static_cast<pointer>(ptr)), n(ntrials), i(0) {}
+         void init() {   for(; i < n; ++i) new( &array[i] ) T(); }
+         void init(const void *src) { for(; i < n; ++i) new( &array[i] ) T(*static_cast<const T*>(src)); }
++        void init(T&& src) { for(; i < n; ++i) new( &array[i] ) T(std::move(src)); }
+         void copy(const void *src) { for(; i < n; ++i) new( &array[i] ) T(static_cast<const T*>(src)[i]); }
+         void assign(const void *src) { for(; i < n; ++i) array[i] = static_cast<const T*>(src)[i]; }
+         //TODO: rename to construct_range
+diff --unified --recursive a/include/tbb/internal/_concurrent_queue_impl.h b/include/tbb/internal/_concurrent_queue_impl.h
+--- a/include/tbb/internal/_concurrent_queue_impl.h	2014-04-24 20:29:42.648560211 -0600
++++ b/include/tbb/internal/_concurrent_queue_impl.h	2014-04-24 20:05:48.715175894 -0600
+@@ -167,6 +167,10 @@
+         new( &get_ref(dst,index) ) T(*static_cast<const T*>(src));
+     }
+ 
++    void move_item( page& dst, size_t index, T&& src ) {
++        new( &get_ref(dst,index) ) T(std::move(src));
++    }
++
+     void copy_item( page& dst, size_t dindex, const page& src, size_t sindex ) {
+         new( &get_ref(dst,dindex) ) T( get_ref(const_cast<page&>(src),sindex) );
+     }
+@@ -174,7 +178,7 @@
+     void assign_and_destroy_item( void* dst, page& src, size_t index ) {
+         T& from = get_ref(src,index);
+         destroyer d(from);
+-        *static_cast<T*>(dst) = from;
++        *static_cast<T*>(dst) = std::move(from);
+     }
+ 
+     void spin_wait_until_my_turn( atomic<ticket>& counter, ticket k, concurrent_queue_rep_base& rb ) const ;
+@@ -204,6 +208,8 @@
+     spin_mutex page_mutex;
+ 
+     void push( const void* item, ticket k, concurrent_queue_base_v3<T>& base ) ;
++    
++    void push( T&& item, ticket k, concurrent_queue_base_v3<T>& base ) ;
+ 
+     bool pop( void* dst, ticket k, concurrent_queue_base_v3<T>& base ) ;
+ 
+@@ -272,6 +278,52 @@
+ }
+ 
+ template<typename T>
++void micro_queue<T>::push( T&& item, ticket k, concurrent_queue_base_v3<T>& base ) {
++    k &= -concurrent_queue_rep_base::n_queue;
++    page* p = NULL;
++    size_t index = modulo_power_of_two( k/concurrent_queue_rep_base::n_queue, base.my_rep->items_per_page);
++    if( !index ) {
++        __TBB_TRY {
++            concurrent_queue_page_allocator& pa = base;
++            p = pa.allocate_page();
++        } __TBB_CATCH (...) {
++            ++base.my_rep->n_invalid_entries;
++            invalidate_page_and_rethrow( k );
++        }
++        p->mask = 0;
++        p->next = NULL;
++    }
++
++    if( tail_counter!=k ) spin_wait_until_my_turn( tail_counter, k, *base.my_rep );
++    call_itt_notify(acquired, &tail_counter);
++
++    if( p ) {
++        spin_mutex::scoped_lock lock( page_mutex );
++        page* q = tail_page;
++        if( is_valid_page(q) )
++            q->next = p;
++        else
++            head_page = p;
++        tail_page = p;
++    } else {
++        p = tail_page;
++    }
++    __TBB_TRY {
++        move_item( *p, index, std::move(item) );
++        // If no exception was thrown, mark item as present.
++        itt_hide_store_word(p->mask,  p->mask | uintptr_t(1)<<index);
++        call_itt_notify(releasing, &tail_counter);
++        tail_counter += concurrent_queue_rep_base::n_queue;
++    } __TBB_CATCH (...) {
++        ++base.my_rep->n_invalid_entries;
++        call_itt_notify(releasing, &tail_counter);
++        tail_counter += concurrent_queue_rep_base::n_queue;
++        __TBB_RETHROW();
++    }
++}
++
++
++template<typename T>
+ bool micro_queue<T>::pop( void* dst, ticket k, concurrent_queue_base_v3<T>& base ) {
+     k &= -concurrent_queue_rep_base::n_queue;
+     if( head_counter!=k ) spin_wait_until_eq( head_counter, k );
+@@ -478,6 +530,13 @@
+         r.choose(k).push( src, k, *this );
+     }
+ 
++    //! Enqueue item at tail of queue
++    void internal_push( T&& src ) {
++        concurrent_queue_rep<T>& r = *my_rep;
++        ticket k = r.tail_counter++;
++        r.choose(k).push( std::move(src), k, *this );
++    }
++
+     //! Attempt to dequeue item from queue.
+     /** NULL if there was no item to dequeue. */
+     bool internal_try_pop( void* dst ) ;

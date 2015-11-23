@@ -1,0 +1,14 @@
+#UPSTREAM=N/A (Integration patch)
+diff --recursive --unified --new-file a/src/logging.cc b/src/logging.cc
+--- a/src/logging.cc	2013-01-22 22:26:35.000000000 -0700
++++ b/src/logging.cc	2013-06-17 22:41:17.187372814 -0600
+@@ -1517,7 +1517,8 @@
+ 
+   // This array maps Google severity levels to syslog levels
+   const int SEVERITY_TO_LEVEL[] = { LOG_INFO, LOG_WARNING, LOG_ERR, LOG_EMERG };
+-  syslog(LOG_USER | SEVERITY_TO_LEVEL[static_cast<int>(data_->severity_)], "%.*s",
++  // don't specify the facility here; use the facility spec'd in openlog()
++  syslog(SEVERITY_TO_LEVEL[static_cast<int>(data_->severity_)], "%.*s",
+          int(data_->num_chars_to_syslog_),
+          data_->message_text_ + data_->num_prefix_chars_);
+   SendToLog();
