@@ -30,6 +30,7 @@ MY_P="${P//-solidfire}"
 MY_PN="${PN//-solidfire}"
 S="${WORKDIR}/${MY_P}"
 PREFIX="/sf/packages/${P}"
+PS="-solidfire-${PVR}"
 
 # The PN matters significantly when inheriting toolchain so temporarily
 # set it while inheriting that eclass. It is the unset thereafter.
