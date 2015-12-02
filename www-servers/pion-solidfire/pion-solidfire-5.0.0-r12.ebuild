@@ -18,7 +18,7 @@ KEYWORDS="~amd64 amd64"
 
 DEPEND="dev-vcs/git
 	=dev-libs/boost-solidfire-1.57.0-r2
-	=sys-devel/gcc-soldifire-4.8.1"
+	=sys-devel/gcc-solidfire-4.8.1"
 RDEPEND="${DEPEND}
 	app-arch/bzip2
 	dev-libs/openssl
