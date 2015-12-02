@@ -86,7 +86,7 @@ need_solidfire() {
 		else
 			append-cppflags "-I/sf/packages/${package}-${version}/include"
 			append-ldflags  "-L/sf/packages/${package}-${version}/lib"
-			append-ldflags  "-Wl,--rpath /sf/packages/${package}-${version}/lib"
+			append-ldflags  "-Wl,--rpath-link=/sf/packages/${package}-${version}/lib"
 		fi
 
 		echo "   CPPFLAGS=${CPPFLAGS}"
@@ -106,9 +106,9 @@ versionize_soname()
 
     for fname in ${files_libtool}; do
 		einfo "Versioning $(basename ${fname})"
-		sed -i -e 's|\(libname_spec\)=["'\'']\+\S\+$|\1="lib\\$name-solidfire-'${PVR}'"|g' \
-			   -e 's|\(library_names_spec\)=["'\'']\+\S\+$|\1="\\$libname\.so"|g'          \
-			   -e 's|\(soname_spec\)=["'\'']\+\S\+$|\1="\\$libname\.so"|g'                 \
+		sed -i -e 's|\(libname_spec\)=["'\'']\+\S\+$|\1="lib\\$name'${PS}'"|g'    \
+			   -e 's|\(library_names_spec\)=["'\'']\+\S\+$|\1="\\$libname\.so"|g' \
+			   -e 's|\(soname_spec\)=["'\'']\+\S\+$|\1="\\$libname\.so"|g'        \
 			${fname} || die
 	done
 
@@ -242,14 +242,6 @@ solidfire-libs_src_prepare()
     local configure_files="configure.ac acinclude.m4 configure.in aclocal.m4 configure config.status config.h.in stamp-h1 Makefile.am aminclude.am Makefile.in Makefile"
     for f in ${configure_files}; do
         find . -name "*$f" -exec touch {} \;
-    done
-
-    ## THIS IS A LAST-DITCH EFFORT TO ABSOLUTELY PREVENT ANY OF THE DAMN AUTO TOOLS FROM
-    ## RE-RUNNING BY TURNING THEM INTO ECHOS :-).
-	for m in $(find . -name Makefile); do
-        for t in ACLOCAL AUTOCONF AUTOHEADER AUTOMAKE; do
-            sed -i -e "s|$t = \(.*\)|$t = echo \1|" ${m}
-        done
     done
 }
 
