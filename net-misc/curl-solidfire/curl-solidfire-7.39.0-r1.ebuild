@@ -3,8 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/dev-cpp/gtest/gtest-1.6.0.ebuild,v 1.10 2012/07/16 12:17:56 blueness Exp $
 
 EAPI=5
-VTAG="solidfire"
-inherit gcc-${VTAG}-4.8.1 versionize
+inherit solidfire-libs
 
 DESCRIPTION="A Client that groks URLs"
 HOMEPAGE="http://curl.haxx.se/"
@@ -18,17 +17,17 @@ RDEPEND="app-misc/ca-certificates
 	dev-libs/openssl
 	>=net-libs/libssh2-1.4.3
 	sys-libs/zlib"
-DEPEND="${RDEPEND}"
+DEPEND="${RDEPEND}
+	=sys-devel/gcc-solidfire-4.8.1"
 
 src_prepare()
 {
-	versionize_src_prepare
 	sed -i -e "s|-lcurl|-l${PF}|g" curl-config.in || die
 }
 
 src_configure()
 {
-	versionize_src_configure      \
+	econf                         \
 		--enable-ares             \
 		--enable-file             \
 		--enable-ftp              \

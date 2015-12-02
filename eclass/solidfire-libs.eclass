@@ -8,39 +8,277 @@
 #
 if [[ ${___ECLASS_ONCE_SFDEV} != "recur -_+^+_- spank" ]] ; then
 ___ECLASS_ONCE_SFDEV="recur -_+^+_- spank"
+## ABOVE IS DUMB... use simpler ifstatement like libtool eclass
 
-inherit base autotools eutils
+inherit base autotools eutils flag-o-matic
+
+EXPORT_FUNCTIONS src_prepare pkg_preinst
 
 DEPEND="app-portage/gentoolkit"
 
-EXPORT_FUNCTIONS pkg_setup src_install
+# Fully version every solidfire-libs package by setting slot to full package version including
+# package revision.
+SLOT="${PVR}"
 
-## FIXME: Need to validate no conflicting slots of packages pulled in.
-solidfire-libs_pkg_setup() {
-    mkdir -p ${S} || die
+# Setup variables to upstream source that doesn't have solidfire in it.
+MY_P="${P//-solidfire}"
+MY_PN="${PN//-solidfire}"
+MY_PF="${PF//-solidfire}"
+PS="-solidfire-${PVR}"
+S="${WORKDIR}/${MY_P}"
+PREFIX="/sf/packages/${PF}"
+DP="${D}/${PREFIX}"
+
+# Global ECONF settings to always pass into econf to ensure proper SolidFire
+# directory structures. Yes, we could have a src_configure function but that's
+# more invasive and less portable.
+EXTRA_ECONF="--prefix=${PREFIX}
+		     --bindir=${PREFIX}/bin
+		     --sbindir=${PREFIX}/sbin
+		     --libexecdir=${PREFIX}/libexec
+		     --sysconfdir=${PREFIX}/etc
+		     --sharedstatedir=${PREFIX}/com
+		     --localstatedir=${PREFIX}/var
+		     --libdir=${PREFIX}/lib
+		     --includedir=${PREFIX}/include
+		     --datarootdir=${PREFIX}/share
+		     --datadir=${PREFIX}/share
+             --infodir=${PREFIX}/share/info
+		     --localedir=${PREFIX}/share/locale
+		     --mandir=${PREFIX}/share/man
+		     --docdir=${PREFIX}/share/doc
+		     --program-suffix=${PS}
+			 --with-pkgversion=\"SolidFire ${MY_PF}\""
+
+#-----------------------------------------------------------------------------
+# DEPENDENCY HELPERS
+#-----------------------------------------------------------------------------
+
+# @FUNCTION: need_solidfire
+# @DESCRIPTION: An ebuild calls this to get the required dependency information
+# for the specified list of packages.
+need_solidfire() {
+
+	echo ">>> Parsing SolidFire library dependencies"
+
+	# Parse solidfire specific dependencies
+	local spec
+	for spec in ${DEPEND}; do
+		[[ ! ${spec} =~ solidfire ]] && continue
+
+		local category_package=$(echo "${spec}" | sed -e 's/=\(.*\)-[0-9]\{1,\}.*$/\1/')
+		local category=${category_package%%/*}
+		local package=${category_package##*/}
+		local package_base=${package%%-solidfire}
+		local version="${spec##=${category_package}-}"
+		einfo "category=[${category}] package=[${package}] version=[${version}]"
+
+		# Set VERSION variable
+		eval "${package_base^^}_VERSION=${version}"
+
+		# Special handling for a few packages
+		if [[ ${package} == gcc-solidfire ]]; then
+			CCC="/sf/packages/${package}-${version}/bin/${package}-${version}"
+			CXX="/sf/packages/${package}-${version}/bin/g++-solidfire-${version}"
+			CC="${CCC}"
+			append-cxxflags "-std=c++11"
+			echo "   CCC=${CCC} CC=${CC} CXX=${CXX}"
+		else
+			append-cppflags "-I/sf/packages/${package}-${version}/include"
+			append-ldflags  "-L/sf/packages/${package}-${version}/lib"
+			append-ldflags  "-Wl,--rpath /sf/packages/${package}-${version}/lib"
+		fi
+
+		echo "   CPPFLAGS=${CPPFLAGS}"
+		echo "   CXXFLAGS=${CXXFLAGS}"
+		echo "   LDFLAGS=${LDFLAGS}"
+	done
 }
 
-solidfire-libs_src_install() {
-    mkdir -p ${D}/opt/solidfire-libs-${PV}/{include,lib,metadata}
-    einfo "Creating opt symlinks for ${RDEPEND} in [/opt/solidfire-libs-${PV}]"
-    local deps=( ${RDEPEND} )
+#-----------------------------------------------------------------------------
+# VERSIONIZE INSTALL HELPERS
+#-----------------------------------------------------------------------------
 
-    for d in ${deps[@]}; do
-         [[ ${d} =~ solidfire ]] || continue
+versionize_soname()
+{
+    local files_libtool=$(find ${S}   \
+		   -type f -name "libtool"	  \
+		-o -type f -name "libtool.m4" \
+		-o -type f -name "aclocal.m4" \
+		-o -type f -name "configure")
+    [[ -n ${files_libtool} ]] || return
 
-        local name="${d#*/}";              [[ -z ${name} ]] && die
-        local base="${name%-solidfire*}";  [[ -z ${base} ]] && die
+    for fname in ${files_libtool}; do
+		einfo "$(basename ${fname})"
+		sed -i -e 's|\(libname_spec\)=["'\'']\+\S\+$|\1="lib\\$name-solidfire-'${PVR}'"|g' \
+			   -e 's|\(library_names_spec\)=["'\'']\+\S\+$|\1="\\$libname\.so"|g'          \
+			   -e 's|\(soname_spec\)=["'\'']\+\S\+$|\1="\\$libname\.so"|g'                 \
+			${fname} || die
+	done
+}
 
-        [[ -e /usr/include/${name} ]] && dosym "/usr/include/${name}" "/opt/solidfire-libs-${PV}/include/${base}"
-        [[ -e /usr/lib/${name} ]]     && dosym "/usr/lib/${name}"     "/opt/solidfire-libs-${PV}/lib/${base}"
+versionize_check()
+{
+	# Verify all libraries are versioned properly
+	echo ">>> SolidFire libs checking versioning"
+
+    # Initial clean-up: Remove all symlinks, all pkgconfig and all *.la files
+	{
+		find ${DP}/{lib,lib32,lib64}/ -type l -delete
+		find ${DP} -type d -name pkgconfig    -exec rm -rf {} \;
+		find ${DP} -type f -name *.la         -delete
+
+	} 2>/dev/null
+
+	local file
+	for file in $(find ${DP}/{lib,lib32,lib64}/*.{so*,a} -type f 2>/dev/null); do
+		
+		# Find basename then find longest .so* or .a* suffix.
+		local dname=$(dirname ${file})
+		local base=$(basename ${file})
+		base="${base%%.so*}"
+		base="${base%%.a*}"
+		local extension=$(basename ${file})
+		extension="${extension:${#base}}"
+		local renamed=0
+		local version="${PS}"
+
+		# Standardize soname extension
+		extension=${extension/.so.*/.so}
+
+		ewarn "base=[${base}] ext=[${extension}] version=[${version}]"
+		
+		# Verify file has expected suffix
+		if [[ ${file} != *"${version}${extension}" ]]; then
+			local newfile="${dname}/${base//${version}*}${version}${extension}"
+			echo -n "   $(basename ${file}) -> $(basename ${newfile})"
+			mv "${file}" "${newfile}"
+			file=${newfile}
+			renamed=1
+		fi
+
+		# If it's a shared object also validate the SONAME
+		if [[ ${extension} == .so ]]; then
+			
+			# Add [] around the expected value to match the output from readelf.
+			local expected="[$(basename ${file})]"
+		
+			# Grab real soname via readelf. This has enclosing [] around the SONAME.
+			local soname=$(readelf -d ${file} | awk '/SONAME/ {print $5}')
+			[[ "${soname}" == "${expected}" ]] || die "SONAME not set properly. Expected '${expected}' and got '${soname}'"
+
+			if [[ ${renamed} -eq 0 ]]; then
+				echo -n "   $(basename ${file})"
+			fi
+
+			echo " ${expected}"
+		
+		elif [[ ${renamed} -eq 1 ]]; then
+			echo
+		fi
+		
+	done
+
+	# If lib64 exists but no lib create a symlink for easier compatibility
+	if [[ -e ${DP}/lib64 && ! -e ${DP}/lib ]]; then
+		ln --symbolic --relative ${DP}/lib64 ${DP}/lib
+	fi
+}
+
+#-----------------------------------------------------------------------------
+# Inject `into` before all of the do* ebuild helper methods to ensure
+# code is always installed into the correct application specific package dir.
+#-----------------------------------------------------------------------------
+
+# Disable dodoc because we don't need multiple ones for every slotted library
+dodoc()
+{ :; }
+
+# Inject our own wrapper versions around some key ebuild install functions to ensure
+# we install files where we want them.
+for cmd in dobin newbin dosbin newsbin doman newman doinfo; do
+	eval "${cmd}_real=$(which ${cmd})"
+	eval "${cmd}() { into ${PREFIX}; \${${cmd}_real} \$@; }"
+done
+
+doheader()
+{
+	INSDESTTREE="${PREFIX}/include/" doins "$@"
+}
+
+dolib()
+{
+	insinto "${PREFIX}/lib"
+	doins "$@"
+}
+
+dolib.so()
+{
+	into "${PREFIX}"
+	$(which dolib.so) "$@"
+}
+
+dolib.a()
+{
+	into "${PREFIX}"
+	$(which dolib.a) "$@"
+}
+
+#-----------------------------------------------------------------------------
+# SolidFire Libs public ebuild methods
+#-----------------------------------------------------------------------------
+
+solidfire-libs_src_prepare()
+{
+	# Apply patches
+	base_src_prepare
+
+	need_solidfire
+
+	echo ">>> SolidFire libs versioning ..."
+    versionize_soname
+
+    local configure_files="configure.ac acinclude.m4 configure.in aclocal.m4 configure config.status config.h.in stamp-h1 Makefile.am aminclude.am Makefile.in Makefile"
+    for f in ${configure_files}; do
+        find . -name "*$f" -exec touch {} \;
     done
 
-	## METADATA ##
-	local metadata="${D}/opt/solidfire-libs-${PV}/metadata"
-	env > ${metadata}/env.info
-	emerge --info =${PF} > ${metadata}/emerge.info
-	equery --no-color depgraph --depth 2 =${PF} -l > ${metadata}/depgraph.info
+    ## THIS IS A LAST-DITCH EFFORT TO ABSOLUTELY PREVENT ANY OF THE DAMN AUTO TOOLS FROM
+    ## RE-RUNNING BY TURNING THEM INTO ECHOS :-).
+    #makefiles=$(find . -name "Makefile")
+    #for m in ${makefiles}; do 
+    #    for t in ACLOCAL AUTOCONF AUTOHEADER AUTOMAKE; do
+    #        sed -i -e "s|$t = \(.*\)|$t = echo \1|" ${m}
+    #    done
+    #done
+}
+
+solidfire-libs_pkg_preinst()
+{
+	# Make sure no files got installed outside ${PREFIX}
+	einfo "Looking for SolidFire sandbox violations"
+	local violations=( $(find ${D} -path ${D}sf/packages -prune -o -path ${D}sf -o -path ${D} -o -print) )
+
+	if [[ -n ${SOLIDFIRE_LIBS_SANDBOX_VIOLATIONS_ALLOWED} ]]; then
+		local idx
+		for idx in ${!violations[@]}; do
+			local violation=${violations[$idx]}
+			local path
+			for path in "${SOLIDFIRE_LIBS_SANDBOX_VIOLATIONS_ALLOWED}"; do
+				if [[ "${D%%/}${path}" == ${violation}* ]]; then
+					ewarn "Allowing ${violation#${D}}"
+					unset violations[$idx]
+				fi
+			done
+		done
+	fi
+
+	if (( ${#violations[@]} > 0 )); then
+		die "SolidFire sandbox violations:\n${violations[@]}"
+	fi
+
+	# Verify all libraries are versioned properly
+	versionize_check
 }
 
 fi
-

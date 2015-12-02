@@ -1,14 +1,16 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.8.1-r1.ebuild,v 1.12 2014/09/24 10:29:00 blueness Exp $
+# $Id$
 
-EAPI="2"
+EAPI="5"
 
-DESCRIPTION="The GNU Compiler Collection"
+PATCH_VER="1.2"
+UCLIBC_VER="1.0"
 
-LICENSE="GPL-3+ LGPL-3+ || ( GPL-3+ libgcc libstdc++ gcc-runtime-library-exception-3.1 ) FDL-1.3+"
+# Forcibly set use flags
+USE="cxx multilib nls nptl openmp sanitize -fortran -hardened"
 
-KEYWORDS="alpha amd64 arm hppa ia64 m68k mips ppc ppc64 s390 sh sparc x86 amd64-fbsd x86-fbsd"
+KEYWORDS="alpha amd64 arm hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 -amd64-fbsd -x86-fbsd"
 
 RDEPEND=""
 DEPEND="${RDEPEND}
@@ -19,37 +21,33 @@ if [[ ${CATEGORY} != cross-* ]] ; then
 	PDEPEND="${PDEPEND} elibc_glibc? ( >=sys-libs/glibc-2.8 )"
 fi
 
-## PATCH / CLIBC VERSIONS ##
-PATCH_VER="1.2"
-UCLIBC_VER="1.0"
+# Fully version every solidfire-libs package by setting slot to full package version including
+# package revision.
+SLOT="${PVR}"
 
-## Hardened GCC ##
-PIE_VER="0.5.7"
-SPECS_VER="0.2.0"
-SPECS_GCC_VER="4.4.3"
-# arch/libc configurations known to be stable with {PIE,SSP}-by-default
-PIE_GLIBC_STABLE="x86 amd64 mips ppc ppc64 arm ia64"
-PIE_UCLIBC_STABLE="x86 arm amd64 mips ppc ppc64"
-SSP_STABLE="amd64 x86 mips ppc ppc64 arm"
-# uclibc need tls and nptl support for SSP support
-# uclibc need to be >= 0.9.33
-SSP_UCLIBC_STABLE="x86 amd64 mips ppc ppc64 arm"
+# Setup variables to upstream source that doesn't have solidfire in it.
+MY_P="${P//-solidfire}"
+MY_PN="${PN//-solidfire}"
+S="${WORKDIR}/${MY_P}"
+PREFIX="/sf/packages/${P}"
 
-## VERSIONING ##
-inherit eutils toolchain
-CTARGET="x86_64-pc-linux-gnu"
-PREFIX=/usr
-LIBPATH=${PREFIX}/lib/gcc-solidfire/${CTARGET}/${GCC_CONFIG_VER}
-INCLUDEPATH=${LIBPATH}/include
-BINPATH=${PREFIX}/${CTARGET}/gcc-solidfire-bin/${GCC_CONFIG_VER}
-DATAPATH=${PREFIX}/share/gcc-solidfire-data/${CTARGET}/${GCC_CONFIG_VER}
+# The PN matters significantly when inheriting toolchain so temporarily
+# set it while inheriting that eclass. It is the unset thereafter.
+#inherit solidfire-libs
+PN=${MY_PN} inherit eutils toolchain
+
+# Versioning
+PREFIX=/sf/packages/${P}
+CTARGET=x86_64-pc-linux-gnu
+LIBPATH=${PREFIX}/lib
+INCLUDEPATH=${PREFIX}/include
+BINPATH=${PREFIX}/bin
+DATAPATH=${PREFIX}/share/data
 STDCXX_INCDIR=${LIBPATH}/include/g++-v${GCC_BRANCH_VER/\.*/}
+EXTRA_ECONF="--program-suffix=${PS}"
 
-EXTRA_ECONF="--libdir=${PREFIX}/lib/gcc-solidfire
-			 --libexecdir=${PREFIX}/libexec/gcc-solidfire
-			 --with-slibdir=${PREFIX}/lib/gcc-solidfire"
-
-src_prepare() {
+src_prepare()
+{
 	if has_version '<sys-libs/glibc-2.12' ; then
 		ewarn "Your host glibc is too old; disabling automatic fortify."
 		ewarn "Please rebuild gcc after upgrading to >=glibc-2.12 #362315"
@@ -64,25 +62,52 @@ src_prepare() {
 }
 
 # We NEVER want to blindly change system compiler to internal SolidFire version
-should_we_gcc_config() {
-	if [[ ${EBUILD_PHASE} == *"inst" ]] ; then
-		einfo "NOT setting SolidFire GCC as system default."
-		einfo "If you would like to do so, do the following:"
-		einfo "gcc-config ${CTARGET}-${GCC_CONFIG_VER}"
-		einfo "source /etc/profile"
-		echo
-	fi
+should_we_gcc_config()
+{
 	return 1
 }
 
-## Need to post-process to rename binaries. Can't do it via --program-suffix or it breaks toolchain.eclass
-src_install() {
+# Need to post-process to rename binaries. Can't do it via --program-suffix or it breaks toolchain.eclass
+# TODO? Alternative here if this keeps sucking is to remove all the files which start with
+# ${CTARGET} and get rid of the symlinks... e.g.:
+# 1. Remove all symlinks
+# 2. Rename all things to remove CTARGET, e.g. mv ${CTARGET}-g++ g++-solidfire-4.8.1
+#
+# OR... look at dosym and see if it makes this less painful. 
+#
+# OR... see why we can't use econf extra args to change program suffix properly...
+src_install()
+{
+	is_crosscompile()
+	{
+		return 0
+	}
+
 	toolchain_src_install
-  
-	einfo $(ls ${D}${PREFIX}/bin)
-	pushd ${D}${PREFIX}/bin
-	for f in $(ls .); do
-		mv ${f} ${f/-${GCC_CONFIG_VER}/-solidfire-${GCC_CONFIG_VER}} || die "Failed to rename ${f}"
+}
+
+src_install_off()
+{
+	toolchain_src_install
+ 
+	einfo "Versioning binaries"
+	local file
+	for file in $(find ${D}${PREFIX}/bin -type f -o -type l | sort) ; do
+
+		local suffix="solidfire-${GCC_CONFIG_VER}"
+		local dname=$(dirname ${file})
+		local fname=$(basename ${file})
+		local oname="${fname/-${GCC_CONFIG_VER}}"
+		local newfname="${oname}-${suffix}"
+		echo "    ${fname} -> ${newfname}"
+
+		# If it's a file, just move it. If it's a symlink to one of the files in this directory
+		# then update it.
+		if [[ -f "${dname}/${fname}" ]]; then
+			mv ${dname}/${fname} ${dname}/${newfname} || die "Failed to rename ${dname}/${fname} -> ${dname}/${newfname}"
+		elif [[ -L "${dname}/${fname}" ]]; then
+			rm -f ${dname}/${fname} || die "Failed to remove symlink ${dname}/${fname}"
+			ln --relative --symbolic ${dname}/${oname}-${suffix} ${dname}/${newfname} || die "Failed to symlink ${dname}/${newfname} -> ${dname}/${oname}-${suffix}"
+		fi
 	done
-	popd
 }

@@ -3,8 +3,7 @@
 # $Header: $
 
 EAPI=5
-VTAG="solidfire"
-inherit gcc-${VTAG}-4.8.1 versionize
+inherit solidfire-libs
 
 DESCRIPTION="Google's hash-map implementations"
 HOMEPAGE="http://code.google.com/p/sparsehash/"
@@ -13,8 +12,8 @@ SRC_URI="http://${MY_PN}.googlecode.com/files/${MY_P}.tar.gz"
 LICENSE="BSD"
 KEYWORDS="~amd64 amd64"
 
-GPERFTOOLS_VERSION="2.1-r1"
-DEPEND="=dev-util/gperftools-solidfire-${GPERFTOOLS_VERSION}"
+DEPEND="=dev-util/gperftools-solidfire-2.1-r1
+	=sys-devel/gcc-solidfire-4.8.1"
 RDEPEND="${DEPEND}"
 
 ## PATCHES ##
@@ -40,19 +39,18 @@ src_configure()
 		configure || die
 
 	append-cxxflags "-g -O2"
-	versionize_src_configure
+	econf
 }
 
 src_install()
 {
-	versionize_src_install
+	default
 
 	# Include dir has all header files duplicated in 'google' dir. Silly Google. Make legacy backpointer for it.
-	rm -rf    "${D}/usr/include/${PF}/google" || die
-	doincdir_symlink_self "google"
+	rm -rf "${DP}/include/google" || die
 	
 	for f in sparsehash sparsetable type_traits.h; do
-		sed -i -e "s|#\(\s*\)include <google/$f|#\1include <sparsehash/$f|g" $(find $(idirv include) -type f) \
+		sed -i -e "s|#\(\s*\)include <google/$f|#\1include <sparsehash/$f|g" $(find $(${DP}/include) -type f) \
 			|| die "include path munging failed"
 	done
 }

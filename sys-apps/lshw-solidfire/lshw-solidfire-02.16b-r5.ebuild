@@ -3,8 +3,7 @@
 # $Header: $
 
 EAPI=5
-VTAG="solidfire"
-inherit versionize
+inherit solidfire-libs
 
 DESCRIPTION="Hardware Lister"
 HOMEPAGE="http://ezix.org/project/wiki/HardwareLister"
@@ -14,15 +13,26 @@ SRC_URI="http://ezix.org/software/files/${MY_P}.tar.gz"
 LICENSE="GPL-2"
 KEYWORDS="~amd64 amd64"
 
-DEPEND=""
+DEPEND="=sys-devel/gcc-solidfire-4.8.1"
 RDEPEND="${DEPEND}"
 
 PATCHES=( 
-	"${FILESDIR}/${PV}-gentoo.patch" 
 	"${FILESDIR}/disable_scan_partitions.patch"
 )
 
 S=${WORKDIR}/${MY_P}
+
+src_configure()
+{
+    sed -i "s|PREFIX?=/usr|PREFIX=${PREFIX}|" src/Makefile ||
+        die "Modifying PREFIX failed"
+
+    sed -i "s|CXX=c++|CXX=g++-${GCC_VERSION}|" src/core/Makefile ||
+        die "Modifying CXX failed"
+
+    sed -i "s|LDFLAGS=\(.*\)|LDFLAGS=${LDFLAGS} \1|" src/Makefile ||
+        die "Modifying LDFLAGS failed"
+}
 
 src_compile()
 {
@@ -31,6 +41,6 @@ src_compile()
 
 src_install()
 {
-	versionize_src_install
-	rm -rf ${D}/usr/share/lshw ${D}/usr/share/locale || die
+	emake DESTDIR="${D}" PREFIX="${PREFIX}" install
+	rm -rf ${D}/share/{lshw,locale} || die
 }

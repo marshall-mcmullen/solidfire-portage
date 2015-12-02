@@ -3,8 +3,7 @@
 # $Header: $
 
 EAPI=5
-VTAG="solidfire"
-inherit gcc-${VTAG}-4.8.1 versionize
+inherit solidfire-libs
 
 DESCRIPTION="The extremely fast LZF compression algorithm"
 HOMEPAGE="http://oldhome.schmorp.de/marc/liblzf.html"
@@ -13,11 +12,10 @@ SRC_URI="http://dist.schmorp.de/liblzf/${MY_P}.tar.gz"
 LICENSE="BSD"
 KEYWORDS="~amd64 amd64"
 
-DEPEND=""
+DEPEND="=sys-devel/gcc-solidfire-4.8.1"
 RDEPEND="${DEPEND}"
 
 src_prepare()
 {
 	sed -i -e 's/\(\$([a-z]*dir)\)/$(DESTDIR)\1/' Makefile.in || die "sed failed"
-	versionize_src_prepare
 }

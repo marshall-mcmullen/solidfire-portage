@@ -3,8 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/dev-cpp/gflags/gflags-2.0-r1.ebuild,v 1.1 2014/02/25 00:44:57 vapier Exp $
 
 EAPI=5
-VTAG="solidfire"
-inherit gcc-${VTAG}-4.8.1 versionize
+inherit solidfire-libs
 
 DESCRIPTION="Google's C++ argument parsing library"
 HOMEPAGE="http://code.google.com/p/gflags/"
@@ -12,6 +11,10 @@ SRC_URI="http://gflags.googlecode.com/files/${MY_P}.tar.gz"
 
 LICENSE="BSD"
 KEYWORDS="amd64 ~amd64"
+
+DEPEND="=sys-devel/gcc-solidfire-4.8.1"
+RDEPEND=""
+
 PATCHES=( 
 	"${FILESDIR}/gcc-4.7_string_literals.patch"
 	"${FILESDIR}/flagfile_notexist.patch" 
@@ -19,9 +22,8 @@ PATCHES=(
 
 src_install()
 {
-	versionize_src_install
+	default_src_install
 	
 	# Include dir has all header files duplicated in 'google' dir. Silly Google.
-	rm -rf "${D}/usr/include/${PF}/google" || die
-	doincdir_symlink_self "google"
+	rm -rf "${DP}/include/google" || die
 }

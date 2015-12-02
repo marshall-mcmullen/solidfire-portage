@@ -2,8 +2,7 @@
 # $Header: $
 
 EAPI=5
-VTAG="solidfire"
-inherit gcc-${VTAG}-4.8.1 versionize
+inherit solidfire-libs
 
 DESCRIPTION="Convert XML to JSON."
 HOMEPAGE="http://solidfire.com"
@@ -12,7 +11,8 @@ SRC_URI=
 LICENSE="public-domain"
 KEYWORDS="amd64 ~amd64"
 DEPEND="dev-perl/JSON-Any
-	dev-perl/XML-LibXML-Simple"
+	dev-perl/XML-LibXML-Simple
+	=sys-devel/gcc-solidfire-4.8.1"
 
 src_unpack()
 {
@@ -22,5 +22,4 @@ src_unpack()
 src_install()
 {
 	dobin ${FILESDIR}/xml2json
-	versionize_src_postinst
 }

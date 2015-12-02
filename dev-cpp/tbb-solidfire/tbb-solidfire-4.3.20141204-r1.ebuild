@@ -3,19 +3,21 @@
 # $Header: $
 
 EAPI=5
-VTAG="solidfire"
-inherit gcc-${VTAG}-4.8.1 versionize
+inherit solidfire-libs versionator
+
+PV1="$(get_version_component_range 1)"
+PV2="$(get_version_component_range 2)"
+PV3="$(get_version_component_range 3)"
+MYP="${MY_PN}${PV1}${PV2}_${PV3}oss"
 
 DESCRIPTION="Intel Threading Building Blocks"
 HOMEPAGE="http://threadingbuildingblocks.org"
-SRC_URI="http://192.168.137.1/libs/distfiles/tbb-4.2.tar.gz"
-#${HOMEPAGE}/sites/default/files/software_releases/source/${MY_PN}${MY_PV//\.}_20130725oss_src"
-
+SRC_URI="http://threadingbuildingblocks.org/sites/default/files/software_releases/source/${MYP}_src.tgz"
 LICENSE="GPL-2-with-exceptions"
 KEYWORDS="~amd64 amd64"
 IUSE=""
 
-DEPEND=""
+DEPEND="=sys-devel/gcc-solidfire-4.8.1"
 RDEPEND="${DEPEND}"
 
 PATCHES=(
@@ -23,12 +25,12 @@ PATCHES=(
 	"${FILESDIR}/move_semantics.patch"
 )
 
+S="${WORKDIR}/${MYP}"
+
 src_prepare()
 {
-	versionize_src_prepare
-
-	sed -i -e "s|soname=\$(BUILDING_LIBRARY)|soname=\$(patsubst %.so.\$(SONAME_SUFFIX),%-${MY_PVR}.so,\$(BUILDING_LIBRARY))|" \
-		   -e "s|CPLUS = g++|CPLUS = ${CXX}|"                                                                                 \
+	sed -i -e "s|soname=\$(BUILDING_LIBRARY)|soname=\$(patsubst %.so.\$(SONAME_SUFFIX),%${PS}.so,\$(BUILDING_LIBRARY))|" \
+		   -e "s|CPLUS = g++|CPLUS = ${CXX}|"                                                                            \
 		build/linux.gcc.inc || die
 
 	sed -i -e "s|default_tbb: \$(TBB.DLL)|default_tbb: \$(TBB.DLL) libtbb.a|" \
@@ -38,15 +40,11 @@ src_prepare()
 
 src_install()
 {
-	# Include files
-	insinto $(dirv include)
-	doins -r include/*
-	rm -rf $(idirv include)/index.html $(idirv include)/serial || die
+	# Header files
+	doheader -r include/*
 
-	# Library files
-	insinto $(dirv lib)
+	# Libraries
 	local tbb_prefix=$(make info | grep tbb_build_prefix | cut -d= -f2)
-	doins -r $(find "build/${tbb_prefix}_release" -name "*.a" -o -name "*.la" -o -name "*.so*" -o -name "*.dylib*")
-	
-	versionize_src_postinst
+	dolib.so build/${tbb_prefix}_release/{libtbb.so.2,libtbbmalloc.so.2,libtbbmalloc_proxy.so.2}
+	dolib.a  build/${tbb_prefix}_release/libtbb.a
 }

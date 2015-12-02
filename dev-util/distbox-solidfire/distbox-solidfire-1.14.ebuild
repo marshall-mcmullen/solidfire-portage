@@ -3,12 +3,11 @@
 # $Header: $
 
 EAPI=5
-VTAG="solidfire"
 inherit mercurial systemd
 
 DESCRIPTION="Allow SolidFire team to share idle resources on your workstation."
 HOMEPAGE="http://solidfire.com"
-MY_PN="${PN/-${VTAG}/}"
+MY_PN="${PN/-solidfire/}"
 EHG_REPO_URI="http://hgserve.eng.solidfire.net/hg/${MY_PN}"
 EHG_REVISION="732943abe4c4"
 

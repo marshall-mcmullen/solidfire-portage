@@ -3,8 +3,7 @@
 # $Header: $
 
 EAPI=5
-VTAG="solidfire"
-inherit gcc-${VTAG}-4.8.1 versionize
+inherit solidfire-libs
 
 DESCRIPTION="Skein hash function family"
 HOMEPAGE="http://www.skein-hash.info"
@@ -14,7 +13,7 @@ LICENSE="public-domain"
 KEYWORDS="~amd64 amd64"
 IUSE=""
 
-DEPEND=""
+DEPEND="=sys-devel/gcc-solidfire-4.8.1"
 RDEPEND="${DEPEND}"
 
 S="${WORKDIR}/NIST/CD/Optimized_64bit"
@@ -22,11 +21,9 @@ S="${WORKDIR}/NIST/CD/Optimized_64bit"
 src_prepare()
 {
 	cp ${FILESDIR}/Makefile . || die
-	versionize_src_prepare
 }
 
 src_install()
 {
-	emake LIBDIR="${D}/$(dirv lib)" INCDIR="${D}/$(dirv include)" install || die
-	versionize_src_postinst
+	emake LIBDIR="${DP}/lib" INCDIR="${DP}/include" install || die
 }

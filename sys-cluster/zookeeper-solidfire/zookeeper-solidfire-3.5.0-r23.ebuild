@@ -3,8 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/dev-libs/jemalloc/jemalloc-3.6.0.ebuild,v 1.1 2014/05/19 14:09:08 anarchy Exp $
 
 EAPI=5
-VTAG="solidfire"
-inherit gcc-${VTAG}-4.8.1 versionize subversion
+inherit solidfire-libs subversion
 
 DESCRIPTION="ZooKeeper is a distributed, open-source coordination service for distributed applications."
 HOMEPAGE="http://zookeeper.apache.org/"
@@ -13,28 +12,25 @@ LICENSE="Apache-2.0"
 KEYWORDS="amd64 ~amd64"
 
 ## DEPENDENCIES ##
-BOOST_VERSION=1.54.0-r1
-JAVA_VERSION=7.2.4.7
 DEPEND="dev-java/ant-core
-	=dev-java/icedtea-solidfire-${JAVA_VERSION}
-	=dev-libs/boost-solidfire-${BOOST_VERSION}
 	dev-libs/libxml2
 	dev-libs/log4cxx
 	dev-util/cppunit
-	dev-vcs/subversion"
-RDEPEND="=dev-java/icedtea-solidfire-${JAVA_VERSION}"
+	dev-vcs/subversion
+	=dev-java/icedtea-solidfire-7.2.6.1-r1
+	=dev-libs/boost-solidfire-1.57.0-r2
+	=sys-devel/gcc-solidfire-4.8.1"
 
 ## PATCHES ##
-PDIR="${FILESDIR}/patches/${PVR}"
 PATCHES=(
-	"${PDIR}/case-120.patch"
-	"${PDIR}/case-3869.patch"
-	"${PDIR}/case-5569.patch"
-	"${PDIR}/ZOOKEEPER-1167.patch"
-	"${PDIR}/ZOOKEEPER-1520.patch"
-	"${PDIR}/ZOOKEEPER-1366.patch"
-	"${PDIR}/ZOOKEEPER-1626.patch"
-	"${PDIR}/bind_local_address.patch"
+	"case-120.patch"
+	"case-3869.patch"
+	"case-5569.patch"
+	"ZOOKEEPER-1167.patch"
+	"ZOOKEEPER-1520.patch"
+	"ZOOKEEPER-1366.patch"
+	"ZOOKEEPER-1626.patch"
+	"bind_local_address.patch"
 )
 
 INSTALL_FILES="{bin,classes,lib,test,${P}*.jar}"
@@ -62,8 +58,6 @@ RESTRICT=test
 
 src_prepare()
 {
-	versionize_src_prepare
-
 	## Update log4j properties file
 	props="${S}/conf/log4j.properties"
 	sed -i -e "s|zookeeper.root.logger=INFO, CONSOLE|zookeeper.root.logger=INFO, CONSOLE, SYSLOGD|" ${props} || die
@@ -106,7 +100,7 @@ configure_c()
 	einfo "Configuring C"
 	pushd ${S}/src/c >/dev/null
 	autoreconf -if || die
-	versionize_src_configure
+	soldifire-libs_src_configure
 	popd >/dev/null
 
 	touch ${CONFIGURED_C}
@@ -122,21 +116,18 @@ configure_zktreeutil()
 	einfo "Configuring zktreeutil"
 	pushd ${S}/src/contrib/zktreeutil >/dev/null
 
-	append-cppflags "-I/usr/include/boost-solidfire-${BOOST_VERSION}"
-	append-ldflags  "-L/usr/lib/boost-solidfire-${BOOST_VERSION}"
-
 	autoreconf -if || die
 	sed -i -e "s|#include <log4cxx/logger.h>|#include <log4cxx/logger.h>\n#include <unistd.h>|" \
 		src/ZkAdaptor.cc || die
 
-	sed -i -e "s|zookeeper_mt|zookeeper_mt-${MY_PVR}|g" 									 \
-		   -e "s|-lzookeeper_mt-${MY_PVR}|-lzookeeper_mt-${MY_PVR} -Wl,-rpath,$(dirv lib)|g" \
+	sed -i -e "s|zookeeper_mt|zookeeper_mt${PS}|g"										   \
+		   -e "s|-lzookeeper_mt${PS}|-lzookeeper_mt${PS} -Wl,-rpath,${PREFIX}/lib|g" \
 		configure.ac || die
 
-	sed -i -e "s|lzookeeper_mt|lzookeeper_mt-${MY_PVR}|g" \
+	sed -i -e "s|lzookeeper_mt|lzookeeper_mt${PS}|g" \
 		configure || die
 
-	versionize_src_configure
+	econf
 	touch ${CONFIGURED_ZKTREEUTIL}
 }
 
@@ -146,9 +137,9 @@ configure_zkpython()
 	configure_jute
 
 	einfo "Configuring zkpython"
-	sed -i -e 's|libraries=|runtime_library_dirs=["'$(dirv lib)'"],libraries=|' \
-		   -e 's|zookeeper_mt|zookeeper_mt-'${MY_PVR}'|g'                         \
-		   -e 's|version = "0.4"|version = "'${MY_PVR}'"|g'                       \
+	sed -i -e 's|libraries=|runtime_library_dirs=["'${PREFIX}/lib'"],libraries=|' \
+		   -e 's|zookeeper_mt|zookeeper_mt-'solidfire-${PVR}'|g'                         \
+		   -e 's|version = "0.4"|version = "'solidfire-${PVR}'"|g'                       \
 		${S}/src/contrib/zkpython/src/python/setup.py || die
 	
 	touch ${CONFIGURED_ZKPYTHON}
@@ -222,7 +213,7 @@ compile_zkpython()
 	DISTUTILS_DEBUG=1 ant compile || die
 
 	pushd ${S}/build/contrib/zkpython/lib.linux-x86_64-2.7 >/dev/null
-	mv zookeeper.so zookeeper-${MY_PVR}.so || die
+	mv zookeeper.so zookeeper${PS}.so || die
 	popd >/dev/null
 
 	touch ${COMPILED_ZKPYTHON}
@@ -288,6 +279,11 @@ src_retest()
 # INSTALL
 #-----------------------------------------------------------------------------
 
+dirv()
+{
+	die "FINISH"
+}
+
 install_java()
 {
 	[[ -f ${INSTALLED_JAVA} ]] && return
@@ -304,7 +300,7 @@ install_java()
 	doins -r ${S}/bin/*.sh
 	for f in $(/bin/ls $(idirv opt)/bin); do
 		fname="$(dirv opt)/bin/$(basename ${f})"
-		dosym "${fname}" /usr/bin/${f}-${MY_PVR}
+		dosym "${fname}" /usr/bin/${f}${PS}
 		sed -i -e "/ZOOBIN=.*/d"                               \
 			   -e "s|ZOOBINDIR=.*|ZOOBINDIR=/$(dirv opt)/bin|" \
 			${D}/${fname} || die
@@ -327,8 +323,8 @@ install_c()
 	emake DESTDIR="${D}" install
 	popd >/dev/null
 
-	mv $(idirv bin)/cli_st-${MY_PVR} $(idirv bin)/zkcli_st-${MY_PVR} || die
-	mv $(idirv bin)/cli_mt-${MY_PVR} $(idirv bin)/zkcli_mt-${MY_PVR} || die
+	mv $(idirv bin)/cli_st${PS} $(idirv bin)/zkcli_st${PS} || die
+	mv $(idirv bin)/cli_mt${PS} $(idirv bin)/zkcli_mt${PS} || die
 
 	touch ${INSTALLED_C}
 }
@@ -342,7 +338,7 @@ install_zktreeutil()
 	pushd ${S}/src/contrib/zktreeutil >/dev/null
 	emake DESTDIR="${D}" install
 	popd >/dev/null
-	mv $(idirv bin)/load_gen-${MY_PVR} $(idirv bin)/zkload_gen-${MY_PVR} || die
+	mv $(idirv bin)/load_gen${PS} $(idirv bin)/zkload_gen${PS} || die
 
 	touch ${INSTALLED_ZKTREEUTIL}
 }
@@ -354,7 +350,7 @@ install_zkpython()
 
 	einfo "Installing zkpython"
 	insinto $(dir lib)/python2.7
-	doins ${S}/build/contrib/zkpython/lib.linux-x86_64-2.7/zookeeper-${MY_PVR}.so
+	doins ${S}/build/contrib/zkpython/lib.linux-x86_64-2.7/zookeeper${PS}.so
 
 	touch ${INSTALLED_ZKPYTHON}
 }
@@ -365,5 +361,4 @@ src_install()
 	install_c
 	install_zktreeutil
 	install_zkpython
-	versionize_src_postinst
 }

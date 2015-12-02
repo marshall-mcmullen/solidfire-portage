@@ -3,12 +3,14 @@
 # $Header: /var/cvsroot/gentoo-x86/dev-libs/jemalloc/jemalloc-3.6.0.ebuild,v 1.1 2014/05/19 14:09:08 anarchy Exp $
 
 EAPI=5
-VTAG="solidfire"
-inherit gcc-${VTAG}-4.8.1 versionize
+inherit solidfire-libs
 
 DESCRIPTION="Jemalloc is a general-purpose scalable concurrent allocator"
 HOMEPAGE="http://www.canonware.com/jemalloc/"
 SRC_URI="http://www.canonware.com/download/${MY_PN//-debug}/${MY_P//-debug}.tar.bz2"
+
+DEPEND="=sys-devel/gcc-solidfire-4.8.1"
+RDEPEND="${DEPEND}"
 
 LICENSE="BSD"
 KEYWORDS="~amd64 amd64"
@@ -16,7 +18,7 @@ HTML_DOCS=( doc/jemalloc.html )
 
 S="${WORKDIR}/${MY_P//-debug}"
 
-src_configure() 
+src_configure()
 {
 	append-cflags 						\
 		-O3 	  						\
@@ -47,7 +49,7 @@ src_configure()
 		   -e 's|jemalloc$(install_suffix)|'${PF}'|'                              \
 		configure || die "Failed to set soname in configure"
 	
-	versionize_src_configure			\
+	econf		                        \
 		--enable-debug                  \
 		--enable-fill                   \
 		--enable-prof                   \
@@ -63,12 +65,8 @@ src_compile()
 
 src_install()
 {
-	versionize_src_install
+	default
 
-	mv $(idir bin)/pprof-${MY_PVR}       $(idir bin)/jemalloc-debug-pprof-${MY_PVR} || die
-	mv $(idir bin)/jemalloc-${MY_PVR}.sh $(idir bin)/jemalloc-debug-${MY_PVR}.sh    || die
-
-	# Remove some directories which collide with non-debug version
-	einfo "Removing usr/share"
-	rm -rf ${D}/usr/share || die
+	mv ${DP}/bin/pprof       ${DP}/bin/jemalloc-debug-pprof${PS} || die
+	mv ${DP}/bin/jemalloc.sh ${DP}/bin/jemalloc-debug${PS}.sh    || die
 }

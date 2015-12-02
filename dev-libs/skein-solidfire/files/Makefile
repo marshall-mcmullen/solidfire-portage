@@ -5,14 +5,14 @@ MKDIR=mkdir
 CP=cp
 AR=ar
 RANLIB=ranlib
-CC=gcc
+CC?=gcc
 
 DEBUG_FLAGS = -g
 OPTIMIZATION_FLAGS = -O2
 
-CFLAGS=$(DEBUG_FLAGS) $(OPTIMIZATION_FLAGS)
+CFLAGS?=$(DEBUG_FLAGS) $(OPTIMIZATION_FLAGS)
 
-DESTDIR = /usr/local
+DESTDIR?=/usr/local
 
 # Link Libraries and Options
 LDLIBSOPTIONS=

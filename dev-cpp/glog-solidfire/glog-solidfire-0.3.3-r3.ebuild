@@ -3,8 +3,7 @@
 # $Header: $
 
 EAPI=5
-VTAG="solidfire"
-inherit gcc-${VTAG}-4.8.1 versionize
+inherit solidfire-libs
 
 DESCRIPTION="Google's C++ logging module"
 HOMEPAGE="http://code.google.com/p/google-glog"
@@ -14,10 +13,9 @@ LICENSE="BSD"
 KEYWORDS="~amd64 amd64"
 IUSE="test"
 
-GFLAGS_VERSION=2.0-r5
-GTEST_VERSION=1.6.0-r7
-DEPEND="=dev-cpp/gflags-${VTAG}-${GFLAGS_VERSION}
-	=dev-cpp/gtest-${VTAG}-${GTEST_VERSION}"
+DEPEND="=sys-devel/gcc-solidfire-4.8.1
+	=dev-cpp/gflags-solidfire-2.0-r5
+	=dev-cpp/gtest-solidfire-1.6.0-r7"
 RDEPEND="${DEPEND}"
 
 PATCHES=(
@@ -29,15 +27,12 @@ PATCHES=(
 src_configure()
 {
 	use test || export ac_cv_prog_GTEST_CONFIG=no
-	sed -i -e "s|gtest-config|gtest-config-${VTAG}-${GTEST_VERSION}|g" 					\
-		   -e "s|\-lgflags|\-lgflags-${VTAG}-${GFLAGS_VERSION}|g"						\
-		   -e "s|\-lgtest|\-lgtest-${VTAG}-${GTEST_VERSION}|g" 							\
-		   -e "s|AC_CHECK_LIB(gflags|AC_CHECK_LIB(gflags-${VTAG}-${GFLAGS_VERSION}|g" 	\
-		   -e "s|AC_CHECK_LIB(gtest|AC_CHECK_LIB(gtest-${VTAG}-${GTEST_VERSION}|g" 		\
+	sed -i -e "s|gtest-config|gtest-config-solidfire-${GTEST_VERSION}|g" 					\
+		   -e "s|\-lgflags|\-lgflags-solidfire-${GFLAGS_VERSION}|g"						    \
+		   -e "s|\-lgtest|\-lgtest-solidfire-${GTEST_VERSION}|g" 							\
+		   -e "s|AC_CHECK_LIB(gflags|AC_CHECK_LIB(gflags-solidfire-${GFLAGS_VERSION}|g" 	\
+		   -e "s|AC_CHECK_LIB(gtest|AC_CHECK_LIB(gtest-solidfire-${GTEST_VERSION}|g" 		\
 		configure || die
 
-	append-cppflags "-I/usr/include/gflags-${VTAG}-${GFLAGS_VERSION} -I/usr/include/gtest-${VTAG}-${GTEST_VERSION}"
-	append-ldflags  "-L/usr/lib/gflags-${VTAG}-${GFLAGS_VERSION}     -L/usr/lib/gtest-${VTAG}-${GTEST_VERSION}"
-	
-	versionize_src_configure
+	econf
 }

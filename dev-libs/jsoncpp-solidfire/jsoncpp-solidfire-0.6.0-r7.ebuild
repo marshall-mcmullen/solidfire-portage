@@ -3,8 +3,7 @@
 # $Header: $
 
 EAPI=5
-VTAG="solidfire"
-inherit gcc-${VTAG}-4.8.1 versionize
+inherit solidfire-libs
 
 DESCRIPTION="C++ JSON reader and writer"
 HOMEPAGE="http://jsoncpp.sourceforge.net"
@@ -15,7 +14,8 @@ S="${WORKDIR}/${MY_P}-rc2"
 LICENSE="public-domain"
 KEYWORDS="~amd64 amd64"
 
-DEPEND="dev-util/scons"
+DEPEND="dev-util/scons
+	=sys-devel/gcc-solidfire-4.8.1"
 RDEPEND=""
 
 PATCHES=(
@@ -42,19 +42,17 @@ src_compile()
 	done
 
 	# create SO
-	cxx_wrapper -Iinclude obj/*.o -shared -fPIC -Wl,-soname,libjson_libmt-${MY_PVR}.so -o libjson_libmt-${MY_PVR}.so || die
-	ar cr libjson_libmt-${MY_PVR}.a obj/*.o || die
+	cxx_wrapper -Iinclude obj/*.o -shared -fPIC -Wl,-soname,libjson_libmt${PS}.so -o libjson_libmt${PS}.so || die
+	ar cr libjson_libmt${PS}.a obj/*.o || die
 }
 
 src_install()
 {
-	versionize_src_install
+	default_src_install
 
 	# Follow Debian, Ubuntu, Arch convention for headers location, bug #452234 .
-	insinto $(dirv include)
-	doins -r include/json/*
+	doheader -r include/json/*
 
-	insinto $(dirv lib)
-	doins libjson_libmt-${MY_PVR}.so
-	doins libjson_libmt-${MY_PVR}.a
+	dolib libjson_libmt${PS}.so
+	dolib libjson_libmt${PS}.a
 }

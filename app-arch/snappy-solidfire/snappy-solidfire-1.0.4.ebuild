@@ -3,8 +3,7 @@
 # $Header: $
 
 EAPI=5
-VTAG="solidfire"
-inherit gcc-${VTAG}-4.8.1 versionize
+inherit solidfire-libs
 
 DESCRIPTION="A high-speed compression/decompression library by Google"
 HOMEPAGE="https://code.google.com/p/snappy/"
@@ -13,12 +12,12 @@ SRC_URI="http://snappy.googlecode.com/files/${MY_P}.tar.gz"
 LICENSE="BSD"
 KEYWORDS="~amd64 amd64"
 
-DEPEND=""
+DEPEND="=sys-devel/gcc-solidfire-4.8.1"
 RDEPEND="${DEPEND}"
 
 src_configure()
 {
-	versionize_src_configure \
-		--without-gflags     \
+	econf                    \
+		-without-gflags		 \
 		--disable-gtest
 }
