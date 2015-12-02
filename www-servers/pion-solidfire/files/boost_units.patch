@@ -1,0 +1,10 @@
+--- a/include/pion/error.hpp	2012-10-31 23:50:46.000000000 -0600
++++ b/include/pion/error.hpp	2014-12-09 00:23:48.336173748 -0700
+@@ -19,6 +19,7 @@
+ #include <boost/exception/info.hpp>
+ #include <boost/exception/error_info.hpp>
+ #include <boost/exception/get_error_info.hpp>
++#include <boost/units/detail/utility.hpp>
+ #include <pion/config.hpp>
+ 
+ 

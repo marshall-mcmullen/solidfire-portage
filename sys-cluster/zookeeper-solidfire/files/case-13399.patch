@@ -1,0 +1,52 @@
+diff --unified --recursive a/src/java/main/org/apache/zookeeper/server/ZooKeeperServer.java b/src/java/main/org/apache/zookeeper/server/ZooKeeperServer.java
+--- a/src/java/main/org/apache/zookeeper/server/ZooKeeperServer.java	2013-12-05 10:36:44.000000000 -0700
++++ b/src/java/main/org/apache/zookeeper/server/ZooKeeperServer.java	2014-09-23 09:02:27.236681202 -0600
+@@ -851,13 +858,21 @@
+         long sessionId = connReq.getSessionId();
+         if (sessionId == 0) {
+             LOG.info("Client attempting to establish new session at "
+-                    + cnxn.getRemoteSocketAddress());
++                    + cnxn.getRemoteSocketAddress()
++                    + "; client last zxid is 0x"
++                    + Long.toHexString(connReq.getLastZxidSeen())
++                    + "; server last zxid is 0x"
++                    + Long.toHexString(getZKDatabase().getDataTreeLastProcessedZxid()));
+             createSession(cnxn, passwd, sessionTimeout);
+         } else {
+             long clientSessionId = connReq.getSessionId();
+             LOG.info("Client attempting to renew session 0x"
+                     + Long.toHexString(clientSessionId)
+-                    + " at " + cnxn.getRemoteSocketAddress());
++                    + " at " + cnxn.getRemoteSocketAddress()
++                    + "; client last zxid is 0x"
++                    + Long.toHexString(connReq.getLastZxidSeen())
++                    + "; server last zxid is 0x"
++                    + Long.toHexString(getZKDatabase().getDataTreeLastProcessedZxid()));
+             serverCnxnFactory.closeSession(sessionId);
+             cnxn.setSessionId(sessionId);
+             reopenSession(cnxn, sessionId, passwd, sessionTimeout);
+diff --unified --recursive a/src/c/src/zookeeper.c b/src/c/src/zookeeper.c
+--- a/src/c/src/zookeeper.c	2013-12-05 10:36:44.000000000 -0700
++++ b/src/c/src/zookeeper.c	2014-09-22 14:18:38.595973680 -0600
+@@ -1881,6 +1881,10 @@
+     req.timeOut = zh->recv_timeout;
+     req.lastZxidSeen = zh->last_zxid;
+     hlen = htonl(len);
++
++    LOG_INFO(LOGCALLBACK(zh), "Priming connection to [%s]: last_zxid=0x%x", 
++            format_endpoint_info(&zh->addr_cur), zh->last_zxid);
++
+     /* We are running fast and loose here, but this string should fit in the initial buffer! */
+     rc=zookeeper_send(zh->fd, &hlen, sizeof(len));
+     serialize_prime_connect(&req, buffer_req);
+@@ -2664,6 +2741,10 @@
+             }
+ 
+             if (hdr.xid != PING_XID && hdr.zxid > 0) {
++                if (hdr.zxid < zh->last_zxid) {
++                    LOG_ERROR(LOGCALLBACK(zh), "zxid from response went backwards! hdr.zxid=0x%x last_zxid=0x%x",
++                             hdr.zxid, zh->last_zxid);
++                }
+                 // Update last_zxid only when it is a request response
+                 zh->last_zxid = hdr.zxid;
+             }

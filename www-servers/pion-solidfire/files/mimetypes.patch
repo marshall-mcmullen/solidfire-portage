@@ -1,0 +1,12 @@
+--- a/services/FileService.cpp	2015-04-17 18:37:03.395217260 +0000
++++ b/services/FileService.cpp	2015-04-17 18:42:43.765927907 +0000
+@@ -696,7 +696,8 @@
+     mime_types["png"] = "image/png";
+     mime_types["jpg"] = "image/jpeg";
+     mime_types["jpeg"] = "image/jpeg";
+-    // ...
++    mime_types["json"] = "application/json";
++    mime_types["svg"] = "image/svg+xml";
+ 
+     // set the static pointer
+     m_mime_types_ptr = &mime_types;
