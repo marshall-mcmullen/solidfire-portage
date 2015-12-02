@@ -101,20 +101,18 @@ need_solidfire() {
 
 versionize_soname()
 {
-    local files_libtool=$(find ${S}   \
-		   -type f -name "libtool"	  \
-		-o -type f -name "libtool.m4" \
-		-o -type f -name "aclocal.m4" \
-		-o -type f -name "configure")
-    [[ -n ${files_libtool} ]] || return
+	local files_libtool=$(find ${S} -type f \( -name libtool -o -name libtool.m4 -o -name aclocal.m4 -o -name configure \) || die)
+	echo ">>> SolidFire libs versioning"
 
     for fname in ${files_libtool}; do
-		einfo "$(basename ${fname})"
+		einfo "Versioning $(basename ${fname})"
 		sed -i -e 's|\(libname_spec\)=["'\'']\+\S\+$|\1="lib\\$name-solidfire-'${PVR}'"|g' \
 			   -e 's|\(library_names_spec\)=["'\'']\+\S\+$|\1="\\$libname\.so"|g'          \
 			   -e 's|\(soname_spec\)=["'\'']\+\S\+$|\1="\\$libname\.so"|g'                 \
 			${fname} || die
 	done
+
+	eend
 }
 
 versionize_check()
@@ -197,19 +195,23 @@ dodoc()
 # Inject our own wrapper versions around some key ebuild install functions to ensure
 # we install files where we want them.
 for cmd in dobin newbin dosbin newsbin doman newman doinfo; do
-	eval "${cmd}_real=$(which ${cmd})"
-	eval "${cmd}() { into ${PREFIX}; \${${cmd}_real} \$@; }"
+	eval "${cmd}() { into ${PREFIX}; $(which ${cmd}) \$@; }"
+done
+
+for cmd in doins newins; do
+	eval "${cmd}() { insinto ${PREFIX}; $(which ${cmd}) \$@; }"
 done
 
 doheader()
 {
-	INSDESTTREE="${PREFIX}/include/" doins "$@"
+	insinto "${PREFIX}/include"
+	$(which doins) "$@"
 }
 
 dolib()
 {
 	insinto "${PREFIX}/lib"
-	doins "$@"
+	$(which doins) "$@"
 }
 
 dolib.so()
@@ -235,7 +237,6 @@ solidfire-libs_src_prepare()
 
 	need_solidfire
 
-	echo ">>> SolidFire libs versioning ..."
     versionize_soname
 
     local configure_files="configure.ac acinclude.m4 configure.in aclocal.m4 configure config.status config.h.in stamp-h1 Makefile.am aminclude.am Makefile.in Makefile"
@@ -245,12 +246,11 @@ solidfire-libs_src_prepare()
 
     ## THIS IS A LAST-DITCH EFFORT TO ABSOLUTELY PREVENT ANY OF THE DAMN AUTO TOOLS FROM
     ## RE-RUNNING BY TURNING THEM INTO ECHOS :-).
-    #makefiles=$(find . -name "Makefile")
-    #for m in ${makefiles}; do 
-    #    for t in ACLOCAL AUTOCONF AUTOHEADER AUTOMAKE; do
-    #        sed -i -e "s|$t = \(.*\)|$t = echo \1|" ${m}
-    #    done
-    #done
+	for m in $(find . -name Makefile); do
+        for t in ACLOCAL AUTOCONF AUTOHEADER AUTOMAKE; do
+            sed -i -e "s|$t = \(.*\)|$t = echo \1|" ${m}
+        done
+    done
 }
 
 solidfire-libs_pkg_preinst()
@@ -280,5 +280,23 @@ solidfire-libs_pkg_preinst()
 	# Verify all libraries are versioned properly
 	versionize_check
 }
+
+#-----------------------------------------------------------------------------
+# MISC HELPERS
+#-----------------------------------------------------------------------------
+
+pushd()
+{
+	builtin pushd "${@}" >/dev/null || die "Failed: pushd $@"
+}
+
+popd()
+{
+	builtin popd "${@}" >/dev/null || die "Failed: popd $@"
+}
+
+#-----------------------------------------------------------------------------
+# END
+#-----------------------------------------------------------------------------
 
 fi

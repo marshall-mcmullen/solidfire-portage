@@ -3,7 +3,6 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
 
 DESCRIPTION="SolidFire 3rd Party Libraries"
 HOMEPAGE="http://www.solidfire.com"
