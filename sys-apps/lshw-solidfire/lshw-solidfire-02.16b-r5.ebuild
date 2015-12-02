@@ -24,14 +24,12 @@ S=${WORKDIR}/${MY_P}
 
 src_configure()
 {
-    sed -i "s|PREFIX?=/usr|PREFIX=${PREFIX}|" src/Makefile ||
-        die "Modifying PREFIX failed"
+    sed -i -e "s|PREFIX?=/usr|PREFIX=${PREFIX}|"        \
+		   -e "s|LDFLAGS=\(.*\)|LDFLAGS=${LDFLAGS} \1|" \
+		src/Makefile || die "Modifying Makefile failed"
 
-    sed -i "s|CXX=c++|CXX=g++-${GCC_VERSION}|" src/core/Makefile ||
+    sed -i "s|CXX=c++|CXX=${CXX}|" src/core/Makefile ||
         die "Modifying CXX failed"
-
-    sed -i "s|LDFLAGS=\(.*\)|LDFLAGS=${LDFLAGS} \1|" src/Makefile ||
-        die "Modifying LDFLAGS failed"
 }
 
 src_compile()
