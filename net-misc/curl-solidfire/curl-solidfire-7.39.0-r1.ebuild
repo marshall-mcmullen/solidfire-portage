@@ -23,6 +23,7 @@ DEPEND="${RDEPEND}
 src_prepare()
 {
 	sed -i -e "s|-lcurl|-l${PF}|g" curl-config.in || die
+	solidfire-libs_src_prepare
 }
 
 src_configure()
