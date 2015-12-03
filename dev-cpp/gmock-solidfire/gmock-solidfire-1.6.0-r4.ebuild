@@ -20,23 +20,18 @@ DEPEND="app-arch/unzip
 
 src_configure()
 {
-	rm -f ${S}/gmock/{Makefile,configure}* || die
+	rm -f gmock/{Makefile,configure}* || die
 	sed -i -e "/^install-(data|exec)-local:/s|^.*$|&\ndisabled-&|" \
 		Makefile.in || die 
-
-	sed -i -e "s|gtest-config|gtest-config-solidfire-${GTEST_VERSION}|g" 				 \
-		   -e "s|\-lgflags|\-lgflags-solidfire-${GFLAGS_VERSION}|g"						 \
-		   -e "s|AC_CHECK_LIB(gflags|AC_CHECK_LIB(gflags-solidfire-${GFLAGS_VERSION}|g"  \
-		configure || die
-
-	econf
-
-	sed -i -e "s|# This library was specified with -dlpreopen.|if [[ \"\${name}\" -eq 'gmock' ]]; then name='${PF}'; fi\n    # This library was specified with -dlpreopen.|" \
-		libtool || die
+	
+	econf	
 	
 	sed -i -e "s|lib/libgmock.la|lib/${PF}/lib${PF}.la|g"                    \
 		   -e "s|gmock_libs=\"-l\${name}|gmock_libs=\"-l\${name}${PS}|" \
 		scripts/gmock-config || die
+
+	sed -i -e "s|\(# This library was specified with -dlpreopen.\)|if [[ \"\${name}\" -eq 'gmock' ]]; then name='${PF}'; fi\n\1|" \
+		libtool || die
 }
 
 src_install()
