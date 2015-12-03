@@ -44,6 +44,8 @@ src_prepare()
 	mkdir m4
 	autoreconf -ifs
 
+	solidfire-libs_src_prepare
+
 	# Patch configure script
 	sed -i -e "s|\$BOOST_CPPFLAGS|\$BOOST_CPPFLAGS ${CXXFLAGS} -isystem /sf/packages/boost-solidfire-${BOOST_VERSION}/include -DBOOST_FILESYSTEM_VERSION=3 -DBOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS|g"  \
 		   -e "s|BOOST_FILESYSTEM_VERSION=2|BOOST_FILESYSTEM_VERSION=3|g"                               																						              \
@@ -64,8 +66,6 @@ src_prepare()
 	# Set pion version in pion.pc.in
 	sed -i -e "s|-lpion|-l${PF}|g" pion.pc.in \
 		|| die "Failed to set -lpion in pion.pc.in"
-
-	solidfire-libs_src_prepare
 }
 
 src_configure()
