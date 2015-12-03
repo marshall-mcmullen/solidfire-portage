@@ -143,8 +143,7 @@ versionize_check()
 
 		# Standardize soname extension
 		extension=${extension/.so.*/.so}
-
-		ewarn "base=[${base}] ext=[${extension}] version=[${version}]"
+		echo "base=[${base}] ext=[${extension}] version=[${version}]"
 		
 		# Verify file has expected suffix
 		if [[ ${file} != *"${version}${extension}" ]]; then
@@ -258,7 +257,7 @@ solidfire-libs_pkg_preinst()
 			local path
 			for path in "${SOLIDFIRE_LIBS_SANDBOX_VIOLATIONS_ALLOWED}"; do
 				if [[ "${D%%/}${path}" == ${violation}* ]]; then
-					ewarn "Allowing ${violation#${D}}"
+					ewarn "Allowing SolidFire sandbox violation ${violation#${D}}"
 					unset violations[$idx]
 				fi
 			done
