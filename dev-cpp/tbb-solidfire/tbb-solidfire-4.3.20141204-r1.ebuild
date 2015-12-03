@@ -20,9 +20,7 @@ IUSE=""
 DEPEND="=sys-devel/gcc-solidfire-4.8.1"
 RDEPEND="${DEPEND}"
 
-PATCHES=(
-	"${FILESDIR}/case-413-4.3.patch"
-)
+PATCHES="case-413-4.3.patch"
 
 S="${WORKDIR}/${MYP}"
 

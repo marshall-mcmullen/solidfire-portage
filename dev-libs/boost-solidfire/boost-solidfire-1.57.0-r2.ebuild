@@ -22,10 +22,8 @@ RDEPEND="app-arch/bzip2
 	!app-admin/eselect-boost"
 DEPEND="${RDEPEND}"
 
-PATCHES=(
-	"${FILESDIR}/explicit_stored_group.patch"
-	"${FILESDIR}/throw_message.patch"
-)
+PATCHES="explicit_stored_group.patch
+	throw_message.patch"
 
 S="${WORKDIR}/${MY_P}"
 

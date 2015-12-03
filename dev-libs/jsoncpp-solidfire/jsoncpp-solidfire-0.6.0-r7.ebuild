@@ -18,11 +18,9 @@ DEPEND="dev-util/scons
 	=sys-devel/gcc-solidfire-4.8.1"
 RDEPEND=""
 
-PATCHES=(
-	"${FILESDIR}/compact_streaming.patch"
-	"${FILESDIR}/convert_numbers_to_strings.patch"
-	"${FILESDIR}/uint64.patch"
-)
+PATCHES="compact_streaming.patch
+	convert_numbers_to_strings.patch
+	uint64.patch"
 
 cxx_wrapper()
 {

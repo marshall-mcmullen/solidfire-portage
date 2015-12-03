@@ -25,11 +25,9 @@ RDEPEND="${DEPEND}"
 # This also breaks the sparsehash data structure for use with any
 # types that are not trivially copyable, though it will all compile
 # and run, just memcpy'ing objects blindly, causing run-time weirdness.
-PATCHES=(
-	"${FILESDIR}/get_num_deleted_keys.patch"
-	"${FILESDIR}/001-memory_fragmentation.patch"
-	"${FILESDIR}/002-memory_fragmentation.patch"
-)
+PATCHES="get_num_deleted_keys.patch
+	001-memory_fragmentation.patch
+	002-memory_fragmentation.patch"
 
 src_configure()
 {

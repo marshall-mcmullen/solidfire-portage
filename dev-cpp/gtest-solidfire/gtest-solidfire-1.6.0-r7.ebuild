@@ -18,7 +18,7 @@ DEPEND="app-arch/unzip
 	${PYTHON_DEPS}"
 RDEPEND=""
 
-PATCHES=( "${FILESDIR}/tags_filter.patch" )
+PATCHES="tags_filter.patch"
 
 src_configure()
 {

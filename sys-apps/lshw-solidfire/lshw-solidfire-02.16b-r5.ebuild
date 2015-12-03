@@ -16,9 +16,7 @@ KEYWORDS="~amd64 amd64"
 DEPEND="=sys-devel/gcc-solidfire-4.8.1"
 RDEPEND="${DEPEND}"
 
-PATCHES=( 
-	"${FILESDIR}/disable_scan_partitions.patch"
-)
+PATCHES="disable_scan_partitions.patch"
 
 S=${WORKDIR}/${MY_P}
 

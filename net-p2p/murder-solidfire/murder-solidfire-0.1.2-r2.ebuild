@@ -18,9 +18,7 @@ EGIT_REPO_URI="${HOMEPAGE}"
 EGIT_COMMIT="9c59118ce1"
 EGIT_CHECKOUT_DIR=${WORKDIR}/${MY_P}
 
-PATCHES=(
-	"${FILESDIR}/client_interface_improvements.patch"
-)
+PATCHES="client_interface_improvements.patch"
 
 LICENSE="Apache-2.0"
 KEYWORDS="amd64"

@@ -19,7 +19,7 @@ DEPEND="app-text/texlive-core
 	=sys-devel/gcc-solidfire-4.8.1"
 RDEPEND=""
 
-PATCHES=( "${FILESDIR}/makefile_disable_fortify_source.patch" )
+PATCHES="makefile_disable_fortify_source.patch"
 
 src_prepare()
 {

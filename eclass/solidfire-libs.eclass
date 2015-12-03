@@ -29,6 +29,10 @@ S="${WORKDIR}/${MY_P}"
 PREFIX="/sf/packages/${PF}"
 DP="${D}/${PREFIX}"
 
+# Set the directory epatch will look for patches in so we don't have to specify
+# it in every ebuild patch line.
+EPATCH_SOURCE="${FILESDIR}"
+
 # Global ECONF settings to always pass into econf to ensure proper SolidFire
 # directory structures. Yes, we could have a src_configure function but that's
 # more invasive and less portable.

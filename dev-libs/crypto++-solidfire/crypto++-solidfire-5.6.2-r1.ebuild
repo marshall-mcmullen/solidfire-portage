@@ -19,7 +19,7 @@ RDEPEND="${DEPEND}"
 
 S=${WORKDIR}
 
-PATCHES=( "${FILESDIR}/makefile-${PV}.patch" )
+PATCHES="makefile-${PV}.patch"
 
 BUILD_ARGS="INCLUDEDIR=${PREFIX}/include LIBDIR=${PREFIX}/lib BINDIR=${PREFIX}/bin LIBSUFFIX=${PS}"
 

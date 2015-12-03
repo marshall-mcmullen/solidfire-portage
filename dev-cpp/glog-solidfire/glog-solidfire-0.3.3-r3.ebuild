@@ -18,11 +18,9 @@ DEPEND="=sys-devel/gcc-solidfire-4.8.1
 	=dev-cpp/gtest-solidfire-1.6.0-r7"
 RDEPEND="${DEPEND}"
 
-PATCHES=(
-	"${FILESDIR}/case-73.patch"
-	"${FILESDIR}/gcc-4.7_string_literals.patch"
-	"${FILESDIR}/logprefix.patch"
-)
+PATCHES="case-73.patch
+	gcc-4.7_string_literals.patch
+	logprefix.patch"
 
 src_configure()
 {

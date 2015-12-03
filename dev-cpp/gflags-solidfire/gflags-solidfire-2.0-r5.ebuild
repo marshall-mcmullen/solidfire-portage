@@ -15,10 +15,8 @@ KEYWORDS="amd64 ~amd64"
 DEPEND="=sys-devel/gcc-solidfire-4.8.1"
 RDEPEND=""
 
-PATCHES=( 
-	"${FILESDIR}/gcc-4.7_string_literals.patch"
-	"${FILESDIR}/flagfile_notexist.patch" 
-)
+PATCHES="gcc-4.7_string_literals.patch
+	flagfile_notexist.patch"
 
 src_install()
 {

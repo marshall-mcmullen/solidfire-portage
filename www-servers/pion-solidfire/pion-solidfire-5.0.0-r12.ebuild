@@ -7,7 +7,8 @@ inherit solidfire-libs
 
 DESCRIPTION="C++ framework for building light weight HTTP interfaces"
 HOMEPAGE="https://github.com/cloudmeter/pion"
-SRC_URI="pion-5.0.0-ab5e96ea76e676f1f006f0b52a00b371e206e56a.tar.gz"
+CHANGESET="ab5e96ea76e676f1f006f0b52a00b371e206e56a"
+SRC_URI="pion-5.0.0-${CHANGESET}.tar.gz"
 
 LICENSE="Boost-1.0"
 KEYWORDS="~amd64 amd64"
@@ -23,20 +24,18 @@ RDEPEND="${DEPEND}
 LICENSE="Boost-1.0"
 REVISION="0"
 
-PATCHES=(
-	"${FILESDIR}/certificate_chains.patch"
-	"${FILESDIR}/disable_logging.patch"
-	"${FILESDIR}/seteuid.patch"
-	"${FILESDIR}/thread_naming_support.patch"
-	"${FILESDIR}/disable_http_basic_auth_cache.patch"
-	"${FILESDIR}/noexcept.patch"
-	"${FILESDIR}/boost_units.patch"
-	"${FILESDIR}/xss-vulnerability_2.patch"
-	"${FILESDIR}/disable_sslv3.patch"
-	"${FILESDIR}/mimetypes.patch"
-)
+PATCHES="certificate_chains.patch
+	disable_logging.patch
+	seteuid.patch
+	thread_naming_support.patch
+	disable_http_basic_auth_cache.patch
+	noexcept.patch
+	boost_units.patch
+	xss-vulnerability_2.patch
+	disable_sslv3.patch
+	mimetypes.patch"
 
-S="${WORKDIR}/pion-5.0.0-ab5e96ea76e676f1f006f0b52a00b371e206e56a"
+S="${WORKDIR}/pion-5.0.0-${CHANGESET}"
 
 src_prepare()
 {

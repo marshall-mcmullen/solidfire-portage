@@ -17,7 +17,7 @@ RDEPEND="dev-libs/libgcrypt:0
 DEPEND="${RDEPEND}
 	=sys-devel/gcc-solidfire-4.8.1"
 
-PATCHES=( "${FILESDIR}/daemon_pipes_fd_leak.patch" )
+PATCHES="daemon_pipes_fd_leak.patch"
 
 src_configure()
 {
