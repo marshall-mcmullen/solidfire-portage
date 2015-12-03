@@ -84,7 +84,7 @@ need_solidfire() {
 			append-cxxflags "-std=c++11"
 			echo "   CCC=${CCC} CC=${CC} CXX=${CXX}"
 		else
-			append-cppflags "-I/sf/packages/${package}-${version}/include"
+			append-cppflags "-isystem /sf/packages/${package}-${version}/include"
 			append-ldflags  "-L/sf/packages/${package}-${version}/lib"
 			append-ldflags  "-Wl,--rpath-link=/sf/packages/${package}-${version}/lib"
 		fi
