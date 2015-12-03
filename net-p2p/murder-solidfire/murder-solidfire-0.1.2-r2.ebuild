@@ -4,10 +4,10 @@
 
 EAPI=5
 
-VTAG="solidfire"
-MY_P="${P//-${VTAG}}"
-MY_PN="${PN//-${VTAG}}"
-MY_PVR="${VTAG}-${PVR}"
+MY_P="${P//-solidfire}"
+MY_PN="${PN//-solidfire}"
+MY_PF="${PF//-solidfire}"
+PS="-solidfire-${PVR}"
 S="${WORKDIR}/${MY_P}"
 
 inherit base git-r3
@@ -18,18 +18,16 @@ EGIT_REPO_URI="${HOMEPAGE}"
 EGIT_COMMIT="9c59118ce1"
 EGIT_CHECKOUT_DIR=${WORKDIR}/${MY_P}
 
-PATCHES="client_interface_improvements.patch"
-
 LICENSE="Apache-2.0"
+SLOT=0
 KEYWORDS="amd64"
 IUSE=""
-SLOT=0
 
-DEPEND="
-	dev-lang/python:2.7
-"
-
+DEPEND="dev-lang/python:2.7"
 RDEPEND="${DEPEND}"
+
+EPATCH_SOURCE="${FILESDIR}"
+PATCHES="client_interface_improvements.patch"
 
 src_prepare()
 {
@@ -62,7 +60,6 @@ src_prepare()
 
 src_install()
 {
-	einfo "Installing to /usr/lib/python2.7 from ${S}"
 	insinto /usr/lib/python2.7
 	dobin ${S}/dist/murder_{tracker,client,make_torrent}
 	doins -r ${S}/dist/${MY_PN}
