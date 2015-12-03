@@ -21,21 +21,34 @@ DEPEND="=sys-devel/gcc-solidfire-4.8.1"
 RDEPEND="${DEPEND}"
 
 PATCHES=(
-	"${FILESDIR}/case-413-4.1.patch"
-	"${FILESDIR}/move_semantics.patch"
+	"${FILESDIR}/case-413-4.3.patch"
 )
 
 S="${WORKDIR}/${MYP}"
 
 src_prepare()
 {
+	solidfire-libs_src_prepare
+	
 	sed -i -e "s|soname=\$(BUILDING_LIBRARY)|soname=\$(patsubst %.so.\$(SONAME_SUFFIX),%${PS}.so,\$(BUILDING_LIBRARY))|" \
-		   -e "s|CPLUS = g++|CPLUS = ${CXX}|"                                                                            \
 		build/linux.gcc.inc || die
 
 	sed -i -e "s|default_tbb: \$(TBB.DLL)|default_tbb: \$(TBB.DLL) libtbb.a|" \
 		   -e "s|ifneq (,\$(TBB_NO_VERSION.DLL))|libtbb.a: \$(TBB.OBJ) \$(TBB.RES) tbbvars.sh \$(TBB_NO_VERSION.DLL)\n\tar cr \$@ \$(TBB.OBJ)\n\nifneq (,\$(TBB_NO_VERSION.DLL))|" \
 		build/Makefile.tbb || die
+
+	# Disable debug builds
+	sed -i -e '/_debug/d' Makefile
+
+	# Set compiler
+	sed -i -e "s|CPLUS = g++|CPLUS = ${CXX}|g" \
+		build/*.gcc.inc || die
+}
+
+src_compile()
+{
+	emake info
+	emake compiler=gcc tbb_root="${S}" lambdas=1 cpp0x=1
 }
 
 src_install()

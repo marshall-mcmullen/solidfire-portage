@@ -1,0 +1,26 @@
+--- a/src/tbb/concurrent_vector.cpp	2014-12-01 17:37:45.144810748 -0700
++++ b/src/tbb/concurrent_vector.cpp	2014-12-01 17:53:19.470113852 -0700
+@@ -116,10 +116,23 @@
+         segment_t &s;
+         segment_not_used_predicate(segment_t &segment) : s(segment) {}
+         bool operator()() const { return s.load<relaxed>() == segment_not_used ();}
+     };
+     inline static segment_t& acquire_segment(concurrent_vector_base_v3 &v, size_type index, size_type element_size, bool owner) {
++        // Ensure that the previous segment has been fully allocated.  If this is not done,
++        // then size() may not report this segment even after it is fully constructed
++        // bugzilla 184
++        if( index > 0 ) {
++            segment_t &previous_s = v.my_segment[index - 1]; // TODO: pass v.my_segment as argument
++
++            if( previous_s.load<acquire>() == segment_not_used() ) {
++                ITT_NOTIFY(sync_prepare, &previous_s);
++                spin_wait_while(segment_not_used_predicate(previous_s));
++                ITT_NOTIFY(sync_acquired, &previous_s);
++            }
++        }
++
+         segment_t &s = v.my_segment[index]; // TODO: pass v.my_segment as argument
+         if( s.load<acquire>() == segment_not_used() ) { // do not check for segment_allocation_failed state
+             if( owner ) {
+                 enable_segment( v, index, element_size );
+             } else {
