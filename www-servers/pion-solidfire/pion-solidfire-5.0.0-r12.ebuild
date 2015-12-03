@@ -4,14 +4,10 @@
 
 EAPI=5
 inherit solidfire-libs
-#git-r3
 
 DESCRIPTION="C++ framework for building light weight HTTP interfaces"
 HOMEPAGE="https://github.com/cloudmeter/pion"
-SRC_URI="http://bdr-jenkins:/var/www/libs/distfiles/pion-5.0.0-ab5e96ea76e676f1f006f0b52a00b371e206e56a.tar.gz"
-
-#EGIT_REPO_URI="git://github.com/cloudmeter/pion.git"
-#EGIT_COMMIT="ab5e96ea76e676f1f006f0b52a00b371e206e56a"
+SRC_URI="pion-5.0.0-ab5e96ea76e676f1f006f0b52a00b371e206e56a.tar.gz"
 
 LICENSE="Boost-1.0"
 KEYWORDS="~amd64 amd64"
@@ -46,8 +42,6 @@ src_prepare()
 {
 	export AUTOHEADER="/bin/true"
 	mkdir m4
-	#eautoreconf
-	#eautoconf
 	autoreconf -ifs
 
 	# Patch configure script
