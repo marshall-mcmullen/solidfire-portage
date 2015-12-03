@@ -20,8 +20,7 @@ KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k mips ppc ppc64 s390 sh sparc x86 
 DEPEND="app-shells/bash"
 RDEPEND="${DEPEND}"
 
-# SolidFire Libs settings
-SOLIDFIRE_LIBS_SANDBOX_VIOLATIONS_ALLOWED="/usr/local/share/${MY_PF}"
+SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/usr/local/share/${MY_PF}" )
 
 bashutils-solidfire_src_install()
 {

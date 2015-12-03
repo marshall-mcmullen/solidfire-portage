@@ -252,15 +252,16 @@ solidfire-libs_pkg_preinst()
 	einfo "Looking for SolidFire sandbox violations"
 	local violations=( $(find ${D} -path ${D}sf/packages -prune -o -path ${D}sf -o -path ${D} -o -print) )
 
-	if [[ -n ${SOLIDFIRE_LIBS_SANDBOX_VIOLATIONS_ALLOWED} ]]; then
+	if [[ ${#SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED[@]} -gt 0 ]]; then
 		local idx
 		for idx in ${!violations[@]}; do
 			local violation=${violations[$idx]}
 			local path
-			for path in "${SOLIDFIRE_LIBS_SANDBOX_VIOLATIONS_ALLOWED}"; do
+			for path in ${SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED[@]}; do
 				if [[ "${D%%/}${path}" == ${violation}* ]]; then
 					ewarn "Allowing SolidFire sandbox violation ${violation#${D}}"
 					unset violations[$idx]
+					break
 				fi
 			done
 		done
