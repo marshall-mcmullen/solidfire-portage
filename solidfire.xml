@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <repositories version="1.0">
-  <repo priority="50" quality="experimental" status="unofficial">
+  <repo priority="50" quality="experimental" status="official">
     <name>solidfire</name>
     <description>SolidFire portage tree.</description>
     <homepage>http://solidfire.com/</homepage>
