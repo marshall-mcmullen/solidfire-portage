@@ -117,6 +117,8 @@ versionize_soname()
 
 versionize_check()
 {
+	debug-print-function $FUNCNAME $*
+
 	# Verify all libraries are versioned properly
 	echo ">>> SolidFire libs checking versioning"
 
@@ -143,7 +145,7 @@ versionize_check()
 
 		# Standardize soname extension
 		extension=${extension/.so.*/.so}
-		echo "base=[${base}] ext=[${extension}] version=[${version}]"
+		debug-print $FUNCNAME "base=[${base}] ext=[${extension}] version=[${version}]"
 		
 		# Verify file has expected suffix
 		if [[ ${file} != *"${version}${extension}" ]]; then
