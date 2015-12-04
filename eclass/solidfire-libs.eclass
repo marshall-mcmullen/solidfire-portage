@@ -89,7 +89,9 @@ need_solidfire() {
 			append-cxxflags "-std=c++11"
 			echo "   CCC=${CCC} CC=${CC} CXX=${CXX}"
 		elif [[ ${package} =~ icedtea ]]; then
-			JAVAC="/sf/packages/${package}-${version}/bin/javac-solidfire-${version}"
+			JAVA_HOME="/sf/packages/${package}-${version}"
+			JAVAC="${JAVA_HOME}/bin/javac-solidfire-${version}"
+			echo "   JAVA_HOME=${JAVA_HOME}"
 			echo "   JAVAC=${JAVAC}"
 		else
 			append-cppflags "-isystem /sf/packages/${package}-${version}/include"
