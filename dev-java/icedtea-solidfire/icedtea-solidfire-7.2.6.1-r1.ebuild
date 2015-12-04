@@ -59,6 +59,7 @@ RDEPEND="
 # Only ant-core-1.8.1 has fixed ant -diagnostics when xerces+xalan are not present.
 # ca-certificates, perl and openssl are used for the cacerts keystore generation
 DEPEND="${RDEPEND}
+	>=net-print/cups-1.2.12
 	|| (
 		>=dev-java/gcj-jdk-4.3
 		dev-java/icedtea-bin:7
