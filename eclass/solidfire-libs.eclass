@@ -74,6 +74,7 @@ need_solidfire() {
 		local category=${category_package%%/*}
 		local package=${category_package##*/}
 		local package_base=${package%%-solidfire}
+		package_base=${package_base//-/_}
 		local version="${spec##=${category_package}-}"
 		einfo "category=[${category}] package=[${package}] version=[${version}]"
 
@@ -87,6 +88,9 @@ need_solidfire() {
 			CC="${CCC}"
 			append-cxxflags "-std=c++11"
 			echo "   CCC=${CCC} CC=${CC} CXX=${CXX}"
+		elif [[ ${package} =~ icedtea ]]; then
+			JAVAC="/sf/packages/${package}-${version}/bin/javac-${version}"
+			echo "   JAVAC=${JAVAC}"
 		else
 			append-cppflags "-isystem /sf/packages/${package}-${version}/include"
 			append-ldflags  "-L/sf/packages/${package}-${version}/lib"
