@@ -49,6 +49,7 @@ src_prepare() {
 			jre/lib/$(get_system_arch)/{xawt,libsplashscreen.*}	\
 			{,jre/}bin/policytool bin/appletviewer				\
 			{,jre/}bin/javaws									\
+			{,jre/}bin/itweb-settings                           \
 			jre/lib/$(get_system_arch)/libjavagtk.*				\
 		|| die
 
