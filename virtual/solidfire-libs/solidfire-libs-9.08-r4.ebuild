@@ -23,6 +23,7 @@ RDEPEND="
 	=dev-cpp/jemalloc-solidfire-3.6.0
 	=dev-cpp/sparsehash-solidfire-2.0.2-r6
 	=dev-cpp/tbb-solidfire-4.3.20141204-r1
+	=dev-java/icedtea-bin-solidfire-7.2.6.2
 	=dev-libs/boost-solidfire-1.57.0-r2
 	=dev-libs/crypto++-solidfire-5.6.2-r1
 	=dev-libs/jsoncpp-solidfire-0.6.0-r7

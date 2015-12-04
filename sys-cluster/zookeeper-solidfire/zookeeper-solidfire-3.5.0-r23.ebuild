@@ -16,7 +16,7 @@ DEPEND="dev-java/ant-core
 	dev-libs/log4cxx
 	dev-util/cppunit
 	dev-vcs/subversion
-	=dev-java/icedtea-solidfire-7.2.6.1-r1
+	=dev-java/icedtea-solidfire-7.2.6.2
 	=dev-libs/boost-solidfire-1.57.0-r2
 	=sys-devel/gcc-solidfire-4.8.1"
 
