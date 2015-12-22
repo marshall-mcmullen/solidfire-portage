@@ -10,7 +10,7 @@
 if [[ -z ${_BASHUTILS_ECLASS} ]]; then
 _BASHUTILS_ECLASS=1
 
-inherit solidfire-libs mercurial
+inherit solidfire-libs
 
 EXPORT_FUNCTIONS src_install
 

@@ -7,5 +7,4 @@ inherit bashutils-solidfire
 
 DESCRIPTION="Collection of bash utilities for simpler and more robust bash programming"
 HOMEPAGE="http://solidfire.com"
-EHG_REPO_URI="http://hgserve.eng.solidfire.net/hg/bashutils"
-EHG_REVISION="19e941f6254e"
+SRC_URI="${PF}.tgz"
