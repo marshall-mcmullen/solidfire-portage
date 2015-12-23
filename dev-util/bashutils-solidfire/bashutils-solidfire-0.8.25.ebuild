@@ -7,4 +7,4 @@ inherit bashutils-solidfire
 
 DESCRIPTION="Collection of bash utilities for simpler and more robust bash programming"
 HOMEPAGE="http://solidfire.com"
-SRC_URI="${PF}.tgz"
+SRC_URI="${MY_PF}.tgz"

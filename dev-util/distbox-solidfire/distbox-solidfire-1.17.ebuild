@@ -7,8 +7,7 @@ inherit distbox-solidfire
 
 DESCRIPTION="Allow SolidFire team to share idle resources on your workstation."
 HOMEPAGE="http://solidfire.com"
-EHG_REPO_URI="http://hgserve.eng.solidfire.net/hg/${MY_PN}"
-EHG_REVISION="492939e8d691"
+SRC_URI="${MY_PF}.tgz"
 
 DEPEND="=dev-util/bashutils-solidfire-1.1.4
 		dev-util/debootstrap
