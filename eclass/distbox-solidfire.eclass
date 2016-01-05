@@ -21,10 +21,12 @@ SLOT="0"
 KEYWORDS="amd64"
 IUSE=""
 
+# Setup variables to upstream source that doesn't have solidfire in it.
 MY_P="${P//-solidfire}"
 MY_PN="${PN//-solidfire}"
 MY_PF="${PF//-solidfire}"
 PS="-solidfire-${PVR}"
+S="${WORKDIR}/${MY_P}"
 
 #-----------------------------------------------------------------------------
 # SolidFire Distbox Public ebuild methods
