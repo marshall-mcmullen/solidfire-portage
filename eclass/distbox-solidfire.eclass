@@ -12,7 +12,7 @@ _DISTBOX_ECLASS=1
 
 EAPI=5
 
-inherit mercurial systemd
+inherit systemd
 
 EXPORT_FUNCTIONS src_unpack src_prepare src_install pkg_postinst
 
@@ -35,15 +35,13 @@ distbox-solidfire_src_unpack()
 	# To use a local copy of the distbox repository, simply export
 	# SOLIDFIRE_DISTBOX_LOCAL_PATH to the local path on your filesystem.
 	if [[ -n ${SOLIDFIRE_DISTBOX_LOCAL_PATH} ]]; then
-		unset EHG_REPO_URL
-		unset EHG_REVISION
 		SRC_URI=""
 
 		pushd ${SOLIDFIRE_DISTBOX_LOCAL_PATH}
 		tar cf - . --exclude .hg --transform 's#./#'${PF}'/#' | (cd ${WORKDIR} ; tar xf -)
 		popd
 	else
-		mercurial_src_unpack
+		default
 	fi
 }
 
