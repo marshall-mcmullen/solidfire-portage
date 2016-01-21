@@ -34,17 +34,7 @@ S="${WORKDIR}/${MY_P}"
 
 distbox-solidfire_src_unpack()
 {
-	# To use a local copy of the distbox repository, simply export
-	# SOLIDFIRE_DISTBOX_LOCAL_PATH to the local path on your filesystem.
-	if [[ -n ${SOLIDFIRE_DISTBOX_LOCAL_PATH} ]]; then
-		SRC_URI=""
-
-		pushd ${SOLIDFIRE_DISTBOX_LOCAL_PATH}
-		tar cf - . --exclude .hg --transform 's#./#'${PF}'/#' | (cd ${WORKDIR} ; tar xf -)
-		popd
-	else
-		default
-	fi
+	default
 }
 
 distbox-solidfire_src_prepare()
