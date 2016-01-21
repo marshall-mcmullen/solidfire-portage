@@ -12,8 +12,7 @@ EGIT_REPO_URI="git@bitbucket.org:solidfire/distbox.git"
 EGIT_BRANCH=${SOLIDFIRE_DISTBOX_BRANCH:-master}
 EGIT_CHECKOUT_DIR=${WORKDIR}/${MY_P}
 
-DEPEND="=dev-util/bashutils-solidfire-1.1.14
-		dev-util/debootstrap
+DEPEND="dev-util/debootstrap
 		app-portage/gentoolkit
 		virtual/jre
 		net-misc/curl
@@ -37,5 +36,9 @@ src_unpack()
 	else
 		git-r3_src_unpack
 	fi
+
+	source ${S}/package.exports || die "Unable to source distbox's package.exports"
+	[[ -d /var/db/pkg/dev-util/bashutils-solidfire-${BASHUTILS_VERSION} ]] \
+		|| die "Required bashutils version ${BASHUTILS_VERSION} is not installed."
 }
 

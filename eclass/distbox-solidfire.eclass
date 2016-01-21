@@ -14,7 +14,7 @@ EAPI=5
 
 inherit systemd
 
-EXPORT_FUNCTIONS src_unpack src_prepare src_install pkg_postinst
+EXPORT_FUNCTIONS src_prepare src_install pkg_postinst
 
 LICENSE="Apache-2.0"
 SLOT="0"
@@ -32,16 +32,9 @@ S="${WORKDIR}/${MY_P}"
 # SolidFire Distbox Public ebuild methods
 #-----------------------------------------------------------------------------
 
-distbox-solidfire_src_unpack()
-{
-	default
-}
-
 distbox-solidfire_src_prepare()
 {
-	local BASHUTILS_VERSION=$(echo "${DEPEND}"			\
-		| grep -o "=dev-util/bashutils-solidfire-\S\+"	\
-		| awk -F- '{print $NF}'; )
+	source ${S}/package.exports || die "Failed to source distbox package exports."
 
 	sed -i ${S}/bin/distbox* -e 's|${DISTBOX_VERSION}|'${PVR}'|g'
 	sed -i ${S}/bin/distbox* -e 's|${BASHUTILS_VERSION}|'${BASHUTILS_VERSION}'|g'
