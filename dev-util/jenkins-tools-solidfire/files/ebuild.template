@@ -15,5 +15,3 @@ DEPEND="=dev-util/bashutils-solidfire-__BASHUTILS_VERSION__
 		net-misc/openssh
 		app-text/xmlstarlet
 		app-misc/jq"
-
-ewarn "MY_PF=${MY_PF}
