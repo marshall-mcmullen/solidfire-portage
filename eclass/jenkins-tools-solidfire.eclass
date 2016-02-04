@@ -12,20 +12,14 @@ JENKINS_TOOLS_ECLASS=1
 
 inherit solidfire-libs
 
-EXPORT_FUNCTIONS src_prepare src_install
+EXPORT_FUNCTIONS src_install
 
 LICENSE="Apache-2.0"
 KEYWORDS="amd64"
 
-jenkins-tools-solidfire_src_prepare()
-{
-	${S}/.forge/install || die "Unable to call .forge/install"
-}
-
 jenkins-tools-solidfire_src_install()
 {
-	insinto ${PREFIX}
-    doins ${S}/.forge/work/image/*
+	DESTDIR=${DP} ${S}/.forge/install || die "Unable to call .forge/install"
 }
 
 fi
