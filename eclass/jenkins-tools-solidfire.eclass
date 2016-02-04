@@ -25,3 +25,5 @@ jenkins-tools-solidfire_src_install()
 	insinto ${PREFIX}
     doins ${S}/.forge/work/image/*
 }
+
+fi
