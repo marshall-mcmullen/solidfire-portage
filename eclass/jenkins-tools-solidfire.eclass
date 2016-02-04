@@ -12,6 +12,8 @@ JENKINS_TOOLS_ECLASS=1
 
 inherit solidfire-libs
 
+EXPORT_FUNCTIONS src_prepare src_install
+
 LICENSE="Apache-2.0"
 KEYWORDS="amd64"
 
