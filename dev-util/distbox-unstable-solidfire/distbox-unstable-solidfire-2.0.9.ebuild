@@ -3,7 +3,6 @@
 # $Header: $
 
 EAPI=5
-inherit distbox-solidfire
 
 DESCRIPTION="Allow SolidFire team to share idle resources on your workstation."
 HOMEPAGE="http://solidfire.com"
@@ -22,3 +21,8 @@ DEPEND="=dev-util/bashutils-solidfire-1.3.1
 		app-misc/jq"
 
 RDEPEND="${DEPEND}"
+
+src_install()
+{
+	DESTDIR=${D} PV=${PV} ${S}/.forge/install
+}
