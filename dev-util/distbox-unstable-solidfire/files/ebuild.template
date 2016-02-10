@@ -3,11 +3,23 @@
 # $Header: $
 
 EAPI=5
-inherit distbox-solidfire
 
 DESCRIPTION="Allow SolidFire team to share idle resources on your workstation."
 HOMEPAGE="http://solidfire.com"
+
+# Setup variables to upstream source that doesn't have solidfire in it.
+MY_P="${P//-solidfire}"
+MY_PN="${PN//-solidfire}"
+MY_PF="${PF//-solidfire}"
+PS="-solidfire-${PVR}"
+S="${WORKDIR}/${MY_P}"
+
 SRC_URI="${MY_PF}.tgz"
+
+LICENSE="Apache-2.0"
+SLOT="0"
+KEYWORDS="amd64"
+IUSE=""
 
 DEPEND="=dev-util/bashutils-solidfire-__BASHUTILS_VERSION__
         =dev-util/jenkins-tools-solidfire-__JENKINS_TOOLS_VERSION__
@@ -22,3 +34,13 @@ DEPEND="=dev-util/bashutils-solidfire-__BASHUTILS_VERSION__
 		app-misc/jq"
 
 RDEPEND="${DEPEND}"
+
+src_install()
+{
+	DESTDIR=${D}/sf/packages/${P} PV=${PV} ${S}/.forge/install || die
+}
+
+pkg_postinst()
+{
+	/sf/packages/${P}/.forge/postinst || die
+}

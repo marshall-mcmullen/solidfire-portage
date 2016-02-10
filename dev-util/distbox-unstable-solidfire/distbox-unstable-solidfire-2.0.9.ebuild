@@ -6,7 +6,20 @@ EAPI=5
 
 DESCRIPTION="Allow SolidFire team to share idle resources on your workstation."
 HOMEPAGE="http://solidfire.com"
+
+# Setup variables to upstream source that doesn't have solidfire in it.
+MY_P="${P//-solidfire}"
+MY_PN="${PN//-solidfire}"
+MY_PF="${PF//-solidfire}"
+PS="-solidfire-${PVR}"
+S="${WORKDIR}/${MY_P}"
+
 SRC_URI="${MY_PF}.tgz"
+
+LICENSE="Apache-2.0"
+SLOT="0"
+KEYWORDS="amd64"
+IUSE=""
 
 DEPEND="=dev-util/bashutils-solidfire-1.3.1
         =dev-util/jenkins-tools-solidfire-1.0.4
@@ -24,5 +37,10 @@ RDEPEND="${DEPEND}"
 
 src_install()
 {
-	DESTDIR=${D} PV=${PV} ${S}/.forge/install
+	DESTDIR=${D}/sf/packages/${P} PV=${PV} ${S}/.forge/install
+}
+
+pkg_postinst()
+{
+	/sf/packages/${P}/.forge/postinst
 }
