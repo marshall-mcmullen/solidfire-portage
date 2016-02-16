@@ -30,7 +30,9 @@ src_install()
 {
     DESTDIR=${D}/sf/packages/${P} PV=${PV} ${S}/.forge/install || die
 
+	ewarn "PVL=${PVL} PN=${PN} PV=${PV}"
+
     # Setup backwards compatible symlinks into /usr/local/share/bashutils*
     mkdir -p ${D}/usr/local/share/
-    ln -sf /sf/packages/${PN}-solidfire-${PVL} ${D}/usr/local/share/${PF} || die
+    ln -sf /sf/packages/${PN}-${PV} ${D}/usr/local/share/${MY_PN}-${PV} || die
 }
