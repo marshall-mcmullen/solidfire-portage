@@ -5,6 +5,7 @@
 EAPI=5
 
 # Setup variables to upstream source that doesn't have solidfire in it.
+SLOT="${PVR}"
 MY_P="${P//-solidfire}"
 MY_PN="${PN//-solidfire}"
 MY_PF="${PF//-solidfire}"
