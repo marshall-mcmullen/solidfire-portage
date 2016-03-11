@@ -17,7 +17,6 @@ HOMEPAGE="http://solidfire.com"
 SRC_URI="${MY_PF}.tgz"
 
 LICENSE="Apache-2.0"
-SLOT="0"
 KEYWORDS="amd64"
 IUSE=""
 

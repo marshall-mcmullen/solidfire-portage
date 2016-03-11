@@ -5,7 +5,6 @@
 EAPI=5
 
 # Setup variables to upstream source that doesn't have solidfire in it.
-SLOT="${PVR}"
 MY_P="${P//-solidfire}"
 MY_PN="${PN//-solidfire}"
 MY_PF="${PF//-solidfire}"
@@ -17,7 +16,7 @@ HOMEPAGE="http://solidfire.com"
 SRC_URI="${MY_PF}.tgz"
 
 LICENSE="Apache-2.0"
-SLOT="0"
+SLOT="${PVR}"
 KEYWORDS="amd64"
 IUSE=""
 
