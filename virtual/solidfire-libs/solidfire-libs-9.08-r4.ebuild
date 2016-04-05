@@ -31,7 +31,7 @@ RDEPEND="
 	=dev-libs/skein-solidfire-121508-r5
 	=dev-util/gperftools-solidfire-2.1-r1
 	>=dev-util/distbox-solidfire-1.2
-	=net-dns/c-ares-1.10.0
+	>=net-dns/c-ares-1.10.0
 	=net-libs/libmicrohttpd-solidfire-0.9.32-r2
 	=net-misc/curl-solidfire-7.39.0-r1
 	sys-apps/dmidecode

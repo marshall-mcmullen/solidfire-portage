@@ -6,9 +6,8 @@
 # Original Author: root
 # Purpose: 
 #
-if [[ ${___ECLASS_ONCE_SFDEV} != "recur -_+^+_- spank" ]] ; then
-___ECLASS_ONCE_SFDEV="recur -_+^+_- spank"
-## ABOVE IS DUMB... use simpler ifstatement like libtool eclass
+if [[ -z ${_SOLIDFIRE_LIBS_ECLASS} ]]; then
+_SOLIDFIRE_LIBS_ECLASS=1
 
 inherit base autotools eutils flag-o-matic
 
@@ -206,35 +205,35 @@ dodoc()
 # Inject our own wrapper versions around some key ebuild install functions to ensure
 # we install files where we want them.
 for cmd in dobin newbin dosbin newsbin doman newman doinfo; do
-	eval "${cmd}() { into ${PREFIX}; $(which ${cmd}) \$@; }"
+	eval "${cmd}() { into ${PREFIX}; $(which ${cmd} 2>/dev/null) \$@; }"
 done
 
 for cmd in doins newins; do
-	eval "${cmd}() { insinto ${PREFIX}; $(which ${cmd}) \$@; }"
+	eval "${cmd}() { insinto ${PREFIX}; $(which ${cmd} 2>/dev/null) \$@; }"
 done
 
 doheader()
 {
 	insinto "${PREFIX}/include"
-	$(which doins) "$@"
+	$(which doins 2>/dev/null) "$@"
 }
 
 dolib()
 {
 	insinto "${PREFIX}/lib"
-	$(which doins) "$@"
+	$(which doins 2>/dev/null) "$@"
 }
 
 dolib.so()
 {
 	into "${PREFIX}"
-	$(which dolib.so) "$@"
+	$(which dolib.so 2>/dev/null) "$@"
 }
 
 dolib.a()
 {
 	into "${PREFIX}"
-	$(which dolib.a) "$@"
+	$(which dolib.a 2>/dev/null) "$@"
 }
 
 #-----------------------------------------------------------------------------
