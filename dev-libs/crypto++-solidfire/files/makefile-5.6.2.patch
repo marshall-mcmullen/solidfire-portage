@@ -1,7 +1,5 @@
-#UPSTREAM=N/A (Build patch)
-diff --recursive --unified --new-file a/GNUmakefile b/GNUmakefile
---- a/GNUmakefile	2013-02-20 15:30:52.000000000 -0700
-+++ b/GNUmakefile	2013-06-17 22:40:52.523326977 -0600
+--- GNUmakefile.orig	2016-04-07 05:36:35.526949228 +0000
++++ GNUmakefile	2016-04-07 05:36:55.316948082 +0000
 @@ -1,14 +1,13 @@
 -CXXFLAGS = -DNDEBUG -g -O2
 -# -O3 fails to link on Cygwin GCC version 4.5.3
@@ -23,7 +21,16 @@ diff --recursive --unified --new-file a/GNUmakefile b/GNUmakefile
  EGREP = egrep
  UNAME = $(shell uname)
  ISX86 = $(shell uname -m | $(EGREP) -c "i.86|x86|i86|amd64")
-@@ -79,8 +78,11 @@
+@@ -38,8 +37,6 @@
+ ifneq ($(GCC42_OR_LATER),0)
+ ifeq ($(UNAME),Darwin)
+ CXXFLAGS += -arch x86_64 -arch i386
+-else
+-CXXFLAGS += -march=native
+ endif
+ endif
+ 
+@@ -79,8 +76,11 @@
  LDLIBS += -lws2_32
  endif
  
@@ -35,7 +42,7 @@ diff --recursive --unified --new-file a/GNUmakefile b/GNUmakefile
  ifneq ($(shell uname -i | $(EGREP) -c "(_64|d64)"),0)
  M32OR64 = -m64
  endif
-@@ -127,7 +129,7 @@
+@@ -127,7 +127,7 @@
  endif
  
  OBJS = $(SRCS:.cpp=.o)
@@ -44,7 +51,7 @@ diff --recursive --unified --new-file a/GNUmakefile b/GNUmakefile
  TESTOBJS = bench.o bench2.o test.o validat1.o validat2.o validat3.o adhoc.o datatest.o regtest.o fipsalgt.o dlltest.o
  LIBOBJS = $(filter-out $(TESTOBJS),$(OBJS))
  
-@@ -136,44 +138,36 @@
+@@ -136,44 +136,36 @@
  LIBIMPORTOBJS = $(LIBOBJS:.o=.import.o)
  TESTIMPORTOBJS = $(TESTOBJS:.o=.import.o)
  DLLTESTOBJS = dlltest.dllonly.o
@@ -104,7 +111,7 @@ diff --recursive --unified --new-file a/GNUmakefile b/GNUmakefile
  
  cryptopp.dll: $(DLLOBJS)
  	$(CXX) -shared -o $@ $(CXXFLAGS) $(DLLOBJS) $(LDFLAGS) $(LDLIBS) -Wl,--out-implib=libcryptopp.dll.a
-@@ -182,10 +176,10 @@
+@@ -182,10 +174,10 @@
  	$(AR) $(ARFLAGS) $@ $(LIBIMPORTOBJS)
  	$(RANLIB) $@
  
