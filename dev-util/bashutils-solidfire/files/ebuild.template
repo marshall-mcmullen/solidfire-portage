@@ -34,3 +34,8 @@ src_install()
     mkdir -p ${D}/usr/local/share/
     ln -sf /sf/packages/${PN}-${PV} ${D}/usr/local/share/${MY_PN}-${PV} || die
 }
+
+src_compile()
+{
+    true
+}
