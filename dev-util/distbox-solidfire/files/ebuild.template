@@ -10,6 +10,7 @@ HOMEPAGE="http://solidfire.com"
 SRC_URI="${MY_PF}.tgz"
 
 DEPEND="=dev-util/bashutils-solidfire-__BASHUTILS_VERSION__
+        =dev-util/jenkins-tools-solidfire-__JENKINS_TOOLS_VERSION__
 		dev-util/debootstrap
 		app-portage/gentoolkit
 		virtual/jre
