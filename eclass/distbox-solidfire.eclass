@@ -38,6 +38,8 @@ distbox-solidfire_src_prepare()
 
 	sed -i ${S}/bin/distbox* -e 's|${DISTBOX_VERSION}|'${PVR}'|g'
 	sed -i ${S}/bin/distbox* -e 's|${BASHUTILS_VERSION}|'${BASHUTILS_VERSION}'|g'
+	sed -i ${S}/bin/distbox* -e 's|${JENKINS_TOOLS_VERSION}|'${JENKINS_TOOLS_VERSION}'|g'
+	sed -i ${S}/bin/distbox* -e 's|${JENKINS_TOOLS_HOME}|'${JENKINS_TOOLS_HOME}'|g'
 }
 
 distbox-solidfire_src_install()
