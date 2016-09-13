@@ -59,8 +59,7 @@ distbox-solidfire_src_install()
 distbox-solidfire_pkg_postinst()
 {
 	[[ -e /etc/distbox/user.conf ]] || touch /etc/distbox/user.conf
-	/usr/local/bin/distbox install_cron
-	/usr/local/bin/distbox fix_sudoers
+	/usr/local/bin/distbox install
 }
 
 fi
