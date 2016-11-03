@@ -25,9 +25,6 @@ src_configure()
     sed -i -e "s|PREFIX?=/usr|PREFIX=${PREFIX}|"        \
 		   -e "s|LDFLAGS=\(.*\)|LDFLAGS=${LDFLAGS} \1|" \
 		src/Makefile || die "Modifying Makefile failed"
-
-    sed -i "s|CXX=c++|CXX=${CXX}|" src/core/Makefile ||
-        die "Modifying CXX failed"
 }
 
 src_compile()
