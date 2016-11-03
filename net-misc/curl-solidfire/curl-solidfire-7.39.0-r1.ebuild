@@ -17,8 +17,7 @@ RDEPEND="app-misc/ca-certificates
 	dev-libs/openssl
 	>=net-libs/libssh2-1.4.3
 	sys-libs/zlib"
-DEPEND="${RDEPEND}
-	=sys-devel/gcc-solidfire-4.8.1"
+DEPEND="${RDEPEND}"
 
 src_prepare()
 {

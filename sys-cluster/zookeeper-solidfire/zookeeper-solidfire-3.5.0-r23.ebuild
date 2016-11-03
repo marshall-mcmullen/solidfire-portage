@@ -17,8 +17,7 @@ DEPEND="dev-java/ant-core
 	dev-util/cppunit
 	dev-vcs/subversion
 	=dev-java/icedtea-bin-solidfire-7.2.6.2
-	=dev-libs/boost-solidfire-1.57.0-r2
-	=sys-devel/gcc-solidfire-4.8.1"
+	=dev-libs/boost-solidfire-1.57.0-r2"
 
 PATCHES="case-120.patch
 	case-3869.patch

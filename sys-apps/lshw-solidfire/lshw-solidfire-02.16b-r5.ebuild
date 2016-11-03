@@ -13,7 +13,7 @@ SRC_URI="http://ezix.org/software/files/${MY_P}.tar.gz"
 LICENSE="GPL-2"
 KEYWORDS="~amd64 amd64"
 
-DEPEND="=sys-devel/gcc-solidfire-4.8.1"
+DEPEND=""
 RDEPEND="${DEPEND}"
 
 PATCHES="disable_scan_partitions.patch"

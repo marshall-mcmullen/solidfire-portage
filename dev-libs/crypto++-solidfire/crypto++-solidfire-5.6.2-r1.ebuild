@@ -13,7 +13,6 @@ LICENSE="Boost-1.0"
 KEYWORDS="~amd64 amd64"
 
 DEPEND="app-arch/unzip
-	=sys-devel/gcc-solidfire-4.8.1
 	sys-devel/libtool"
 RDEPEND="${DEPEND}"
 

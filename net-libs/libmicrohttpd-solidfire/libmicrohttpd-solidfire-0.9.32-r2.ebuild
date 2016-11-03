@@ -14,8 +14,7 @@ KEYWORDS="~amd64 amd64"
 
 RDEPEND="dev-libs/libgcrypt:0
 	net-libs/gnutls"
-DEPEND="${RDEPEND}
-	=sys-devel/gcc-solidfire-4.8.1"
+DEPEND="${RDEPEND}"
 
 PATCHES="daemon_pipes_fd_leak.patch"
 

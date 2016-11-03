@@ -18,7 +18,6 @@ KEYWORDS="amd64"
 
 RDEPEND="app-arch/bzip2
 	sys-libs/zlib
-	=sys-devel/gcc-solidfire-4.8.1
 	!app-admin/eselect-boost"
 DEPEND="${RDEPEND}"
 

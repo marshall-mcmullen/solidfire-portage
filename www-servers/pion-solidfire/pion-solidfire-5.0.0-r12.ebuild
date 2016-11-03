@@ -14,8 +14,7 @@ LICENSE="Boost-1.0"
 KEYWORDS="~amd64 amd64"
 
 DEPEND="dev-vcs/git
-	=dev-libs/boost-solidfire-1.57.0-r2
-	=sys-devel/gcc-solidfire-4.8.1"
+	=dev-libs/boost-solidfire-1.57.0-r2"
 RDEPEND="${DEPEND}
 	app-arch/bzip2
 	dev-libs/openssl

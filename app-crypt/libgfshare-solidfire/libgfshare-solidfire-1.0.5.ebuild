@@ -12,5 +12,5 @@ SRC_URI="http://www.digital-scurf.org/files/libgfshare/${MY_P}.tar.bz2"
 LICENSE="public-domain"
 KEYWORDS="~amd64 amd64"
 
-DEPEND="=sys-devel/gcc-solidfire-4.8.1"
+DEPEND=""
 RDEPEND="${DEPEND}"

@@ -13,7 +13,7 @@ LICENSE="public-domain"
 KEYWORDS="~amd64 amd64"
 IUSE=""
 
-DEPEND="=sys-devel/gcc-solidfire-4.8.1"
+DEPEND=""
 RDEPEND="${DEPEND}"
 
 S="${WORKDIR}/NIST/CD/Optimized_64bit"

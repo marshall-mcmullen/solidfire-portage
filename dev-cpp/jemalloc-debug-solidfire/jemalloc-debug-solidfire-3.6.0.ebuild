@@ -9,7 +9,7 @@ DESCRIPTION="Jemalloc is a general-purpose scalable concurrent allocator"
 HOMEPAGE="http://www.canonware.com/jemalloc/"
 SRC_URI="http://www.canonware.com/download/${MY_PN//-debug}/${MY_P//-debug}.tar.bz2"
 
-DEPEND="=sys-devel/gcc-solidfire-4.8.1"
+DEPEND=""
 RDEPEND="${DEPEND}"
 
 LICENSE="BSD"

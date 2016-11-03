@@ -14,8 +14,7 @@ S="${WORKDIR}/${MY_P}-rc2"
 LICENSE="public-domain"
 KEYWORDS="~amd64 amd64"
 
-DEPEND="dev-util/scons
-	=sys-devel/gcc-solidfire-4.8.1"
+DEPEND="dev-util/scons"
 RDEPEND=""
 
 PATCHES="compact_streaming.patch

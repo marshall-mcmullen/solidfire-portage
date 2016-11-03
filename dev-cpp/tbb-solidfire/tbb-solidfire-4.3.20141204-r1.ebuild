@@ -17,7 +17,7 @@ LICENSE="GPL-2-with-exceptions"
 KEYWORDS="~amd64 amd64"
 IUSE=""
 
-DEPEND="=sys-devel/gcc-solidfire-4.8.1"
+DEPEND=""
 RDEPEND="${DEPEND}"
 
 PATCHES="case-413-4.3.patch"

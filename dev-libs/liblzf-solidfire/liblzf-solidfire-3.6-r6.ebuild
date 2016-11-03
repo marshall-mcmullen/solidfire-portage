@@ -12,7 +12,7 @@ SRC_URI="http://dist.schmorp.de/liblzf/${MY_P}.tar.gz"
 LICENSE="BSD"
 KEYWORDS="~amd64 amd64"
 
-DEPEND="=sys-devel/gcc-solidfire-4.8.1"
+DEPEND=""
 RDEPEND="${DEPEND}"
 
 src_prepare()

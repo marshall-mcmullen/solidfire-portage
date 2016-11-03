@@ -15,8 +15,7 @@ LICENSE="MIT"
 KEYWORDS="~amd64 amd64"
 IUSE=""
 
-DEPEND="app-text/texlive-core
-	=sys-devel/gcc-solidfire-4.8.1"
+DEPEND="app-text/texlive-core"
 RDEPEND=""
 
 PATCHES="makefile_disable_fortify_source.patch"
