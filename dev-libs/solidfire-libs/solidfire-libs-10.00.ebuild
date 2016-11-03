@@ -22,7 +22,7 @@ RDEPEND="
 	=dev-cpp/jemalloc-solidfire-3.6.0
 	=dev-cpp/sparsehash-solidfire-2.0.2-r6
 	=dev-cpp/tbb-solidfire-4.3.20141204-r1
-	=dev-java/icedtea-bin-solidfire-7.2.6.2
+	=dev-java/icedtea-bin-7.2.6.7
 	=dev-libs/boost-solidfire-1.57.0-r2
 	=dev-libs/crypto++-solidfire-5.6.2-r1
 	=dev-libs/jsoncpp-solidfire-0.6.0-r7
@@ -37,7 +37,6 @@ RDEPEND="
 	sys-apps/iproute2
 	=sys-apps/lshw-solidfire-02.16b-r5
 	=sys-cluster/zookeeper-solidfire-3.5.0-r23
-	=sys-devel/gcc-solidfire-4.8.1
 	>=sys-devel/gdb-7.6.2
 	=sys-libs/libunwind-solidfire-1.1.1-r1
 	=www-servers/pion-solidfire-5.0.0-r12"

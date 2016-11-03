@@ -37,10 +37,6 @@ src_prepare()
 
 	# Disable debug builds
 	sed -i -e '/_debug/d' Makefile
-
-	# Set compiler
-	sed -i -e "s|CPLUS = g++|CPLUS = ${CXX}|g" \
-		build/*.gcc.inc || die
 }
 
 src_compile()
