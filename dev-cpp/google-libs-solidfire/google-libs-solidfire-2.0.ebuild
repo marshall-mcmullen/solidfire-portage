@@ -36,7 +36,6 @@ ebanner()
 
 src_prepare()
 {
-	append-cxxflags "-std=c++11"
 	append-cppflags "-I${S}/gflags/src -I${S}/gtest/include -I${S}/gmock/include -I${S}/glog/include"
 	append-ldflags  "-L${S}/gflags/.libs -L${S}/gtest/lib/.libs -L${S}/gmock/lib/.libs -L${S}/glog/.libs"
 	append-ldflags  "-Wl,--rpath=/sf/packages/${PF}/lib"

@@ -200,6 +200,9 @@ solidfire-libs_src_prepare()
     for f in ${configure_files}; do
         find . -name "*$f" -exec touch {} \;
     done
+
+	# Ensure we build any C++ code with newer c++11 standard by default.
+	append-cxxflags "-std=c++11"
 }
 
 solidfire-libs_pkg_preinst()
