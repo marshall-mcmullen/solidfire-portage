@@ -16,7 +16,7 @@ DEPEND="dev-java/ant-core
 	dev-libs/log4cxx
 	dev-util/cppunit
 	dev-vcs/subversion
-	=virtual/jdk-1.7.0-r2
+	=dev-java/icedtea-bin-7.2.6.7
 	=dev-libs/boost-solidfire-1.57.0-r2"
 
 PATCHES="case-120.patch
