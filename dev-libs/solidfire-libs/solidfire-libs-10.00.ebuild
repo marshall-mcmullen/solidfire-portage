@@ -7,18 +7,17 @@ EAPI=5
 DESCRIPTION="SolidFire 3rd Party Libraries"
 HOMEPAGE="http://www.solidfire.com"
 
+LICENSE="metapackage"
 SLOT="${PVR}"
 KEYWORDS="~amd64 amd64"
+IUSE=""
 
 RDEPEND="
 	>=app-misc/jq-1.4
 	=app-arch/snappy-solidfire-1.0.4
 	=app-text/xml2json-solidfire-1.0
 	=app-crypt/libgfshare-solidfire-1.0.5
-	=dev-cpp/gflags-solidfire-2.0-r5
-	=dev-cpp/glog-solidfire-0.3.3-r3
-	=dev-cpp/gmock-solidfire-1.6.0-r4
-	=dev-cpp/gtest-solidfire-1.6.0-r7
+	=dev-cpp/google-libs-solidfire-2.0
 	=dev-cpp/jemalloc-debug-solidfire-3.6.0
 	=dev-cpp/jemalloc-solidfire-3.6.0
 	=dev-cpp/sparsehash-solidfire-2.0.2-r6
@@ -42,5 +41,3 @@ RDEPEND="
 	>=sys-devel/gdb-7.6.2
 	=sys-libs/libunwind-solidfire-1.1.1-r1
 	=www-servers/pion-solidfire-5.0.0-r12"
-
-DEPEND="${RDEPEND}"

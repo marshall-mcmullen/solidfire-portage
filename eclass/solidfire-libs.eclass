@@ -54,57 +54,6 @@ EXTRA_ECONF="--prefix=${PREFIX}
 			 --with-pkgversion=\"SolidFire ${MY_PF}\""
 
 #-----------------------------------------------------------------------------
-# DEPENDENCY HELPERS
-#-----------------------------------------------------------------------------
-
-# @FUNCTION: need_solidfire
-# @DESCRIPTION: An ebuild calls this to get the required dependency information
-# for the specified list of packages.
-need_solidfire() {
-
-	echo ">>> Parsing SolidFire library dependencies"
-
-	# Parse solidfire specific dependencies
-	local spec
-	for spec in ${DEPEND}; do
-		[[ ! ${spec} =~ solidfire ]] && continue
-
-		local category_package=$(echo "${spec}" | sed -e 's/=\(.*\)-[0-9]\{1,\}.*$/\1/')
-		local category=${category_package%%/*}
-		local package=${category_package##*/}
-		local package_base=${package%%-solidfire}
-		package_base=${package_base//-/_}
-		local version="${spec##=${category_package}-}"
-		einfo "category=[${category}] package=[${package}] version=[${version}]"
-
-		# Set VERSION variable
-		eval "${package_base^^}_VERSION=${version}"
-
-		# Special handling for a few packages
-		if [[ ${package} == gcc-solidfire ]]; then
-			CCC="/sf/packages/${package}-${version}/bin/${package}-${version}"
-			CXX="/sf/packages/${package}-${version}/bin/g++-solidfire-${version}"
-			CC="${CCC}"
-			append-cxxflags "-std=c++11"
-			echo "   CCC=${CCC} CC=${CC} CXX=${CXX}"
-		elif [[ ${package} =~ icedtea ]]; then
-			JAVA_HOME="/sf/packages/${package}-${version}"
-			JAVAC="${JAVA_HOME}/bin/javac-solidfire-${version}"
-			echo "   JAVA_HOME=${JAVA_HOME}"
-			echo "   JAVAC=${JAVAC}"
-		else
-			append-cppflags "-isystem /sf/packages/${package}-${version}/include"
-			append-ldflags  "-L/sf/packages/${package}-${version}/lib"
-			append-ldflags  "-Wl,--rpath-link=/sf/packages/${package}-${version}/lib"
-		fi
-
-		echo "   CPPFLAGS=${CPPFLAGS}"
-		echo "   CXXFLAGS=${CXXFLAGS}"
-		echo "   LDFLAGS=${LDFLAGS}"
-	done
-}
-
-#-----------------------------------------------------------------------------
 # VERSIONIZE INSTALL HELPERS
 #-----------------------------------------------------------------------------
 
@@ -244,8 +193,6 @@ solidfire-libs_src_prepare()
 {
 	# Apply patches
 	base_src_prepare
-
-	need_solidfire
 
     versionize_soname
 
