@@ -207,11 +207,17 @@ solidfire-libs_src_prepare()
 	# Apply patches
 	base_src_prepare
 
-    versionize_soname
+	# If there is no configure file then try to create it
+	if [[ ! -e configure ]]; then
+		eautoreconf
+	fi
 
-    local configure_files="configure.ac acinclude.m4 configure.in aclocal.m4 configure config.status config.h.in stamp-h1 Makefile.am aminclude.am Makefile.in Makefile"
-    for f in ${configure_files}; do
-        find . -name "*$f" -exec touch {} \;
+	# Version our SONAME and then we have to touch all the autoconf related files otherwise later on in the configure
+	# and compile proces they get regenerated and clobber our soname versioning.
+    versionize_soname
+    local fname="" configure_files="configure.ac acinclude.m4 configure.in aclocal.m4 configure config.status config.h.in stamp-h1 Makefile.am aminclude.am Makefile.in Makefile"
+    for fname in ${configure_files}; do
+        find . -name "*${fname}" -exec touch {} \;
     done
 
 	# Ensure we build any C++ code with newer c++11 standard by default.

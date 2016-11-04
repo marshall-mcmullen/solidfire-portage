@@ -66,9 +66,6 @@ src_prepare()
 			   -e "s|subdirs=.*|subdirs=\"\"|g"                                       					\
 		 configure* Makefile*
 
-		eautoreconf
-		solidfire-libs_src_prepare
-
 		# google-libs expects python2 but their scripts don't lock that down.
 		echo ">>> Updating python files to explicitly use python2"	
 		local pyfile
@@ -77,6 +74,8 @@ src_prepare()
 			sed -i -e 's|^#!/usr/bin/env python$|#!/usr/bin/env python2|' "${pyfile}"
 		done
 
+		solidfire-libs_src_prepare
+		
 		popd
 	done
 }
