@@ -3,11 +3,13 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit git-r3 solidfire-libs
 
 DESCRIPTION="The extremely fast LZF compression algorithm"
 HOMEPAGE="http://oldhome.schmorp.de/marc/liblzf.html"
-SRC_URI="http://dist.schmorp.de/liblzf/${MY_P}.tar.gz"
+EGIT_REPO_URI="https://bitbucket.org/solidfire/liblzf.git"
+EGIT_CHECKOUT_DIR="${WORKDIR}/${MY_P}"
+EGIT_COMMIT="solidfire/${PVR}"
 
 LICENSE="BSD"
 KEYWORDS="~amd64 amd64"
@@ -17,5 +19,10 @@ RDEPEND="${DEPEND}"
 
 src_prepare()
 {
-	sed -i -e 's/\(\$([a-z]*dir)\)/$(DESTDIR)\1/' Makefile.in || die "sed failed"
+	eautoreconf
+}
+
+src_install()
+{
+	emake install DESTDIR="${D}"
 }
