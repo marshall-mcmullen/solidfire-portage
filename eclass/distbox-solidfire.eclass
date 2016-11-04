@@ -37,6 +37,7 @@ distbox-solidfire_src_prepare()
 	source ${S}/package.exports || die "Failed to source distbox package exports."
 
 	sed -i ${S}/bin/distbox* -e 's|${DISTBOX_VERSION}|'${PVR}'|g'
+	sed -i ${S}/bin/distbox* -e 's|${DISTBOX_HOME}|/etc/distbox|g'
 	sed -i ${S}/bin/distbox* -e 's|${BASHUTILS}|'${BASHUTILS}'|g'
 	sed -i ${S}/bin/distbox* -e 's|${BASHUTILS_VERSION}|'${BASHUTILS_VERSION}'|g'
 	sed -i ${S}/bin/distbox* -e 's|${JENKINS_TOOLS_VERSION}|'${JENKINS_TOOLS_VERSION}'|g'
