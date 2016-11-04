@@ -10,18 +10,21 @@
 if [[ -z ${_ZOOKEEPER_ECLASS} ]]; then
 _ZOOKEEPER_ECLASS=1
 
-inherit subversion solidfire-libs
+inherit git-r3 solidfire-libs
 EXPORT_FUNCTIONS src_unpack src_prepare src_configure src_compile src_install src_test pkg_preinst
+
+# Automatically setup EGIT settings for this package.
+EGIT_REPO_URI="https://bitbucket.org/solidfire/zookeeper.git"
+EGIT_CHECKOUT_DIR="${WORKDIR}/${MY_P}"
+EGIT_COMMIT="solidfire/${PVR/-r/-p}"
 
 zookeeper-solidfire_src_unpack()
 {
-	subversion_src_unpack
+	git-r3_src_unpack
 }
 
 zookeeper-solidfire_src_prepare()
 {
-	subversion_src_prepare
-
 	# Set ivy path to not be /root/.ivy or else we get a sandbox violation
 	sed -i -e 's|<property name="ivy.home" value="${user.home}/.ant"|<property name="ivy.home" value="'${WORKDIR}'/ant"|g' \
 		build.xml

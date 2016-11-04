@@ -34,7 +34,7 @@ RDEPEND="
 	>=sys-apps/hdparm-9.43
 	sys-apps/iproute2
 	=sys-apps/lshw-solidfire-02.16b-r5
-	=sys-cluster/zookeeper-solidfire-3.5.0-r23
+	=sys-cluster/zookeeper-solidfire-3.5.0-r28
 	>=sys-devel/gdb-7.6.2
 	=sys-libs/libunwind-solidfire-1.1.1-r1
 	=www-servers/pion-solidfire-5.0.0-r12"

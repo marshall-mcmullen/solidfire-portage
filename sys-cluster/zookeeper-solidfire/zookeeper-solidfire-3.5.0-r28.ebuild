@@ -7,26 +7,14 @@ inherit zookeeper-solidfire
 
 DESCRIPTION="ZooKeeper is a distributed, open-source coordination service for distributed applications."
 HOMEPAGE="http://zookeeper.apache.org/"
-ESVN_REPO_URI="https://svn.apache.org/repos/asf/zookeeper/trunk@1547702"
+
 LICENSE="Apache-2.0"
 KEYWORDS="amd64 ~amd64"
 
 DEPEND="dev-java/ant-core
+	dev-libs/boost
 	dev-libs/libxml2
 	dev-libs/log4cxx
 	dev-util/cppunit
 	dev-vcs/subversion
-	=dev-java/icedtea-bin-7.2.6.7
-	=dev-libs/boost-solidfire-1.57.0-r2"
-
-PATCHES="case-120.patch
-	case-3869.patch
-	case-5569.patch
-	ZOOKEEPER-1167.patch
-	ZOOKEEPER-1520.patch
-	ZOOKEEPER-1366.patch
-	ZOOKEEPER-1626.patch
-	case-13068.patch
-	case-13399.patch
-	ZOOKEEPER-1865-nanoTime.patch
-	ZOOKEEPER-1863.patch"
+	=dev-java/icedtea-bin-7.2.6.7"
