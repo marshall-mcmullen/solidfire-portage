@@ -18,6 +18,9 @@ IUSE=""
 DEPEND=""
 RDEPEND=""
 
+# SolidFire Libs Settings                                                                                               
+SOLIDFIRE_WANT_EAUTORECONF=1
+
 src_prepare()
 {
 	solidfire-libs_src_prepare
