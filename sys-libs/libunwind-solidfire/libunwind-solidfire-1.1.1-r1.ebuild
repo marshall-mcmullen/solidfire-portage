@@ -3,13 +3,13 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs git-r3
+inherit git-r3 solidfire-libs
 
 DESCRIPTION="Portable and efficient API to determine the call-chain of a program"
 HOMEPAGE="http://savannah.nongnu.org/projects/libunwind"
-EGIT_REPO_URI="git://git.sv.gnu.org/${MY_PN}"
-EGIT_COMMIT="781d5d526361504143e4b19c3e911fc71fca95ba"
+EGIT_REPO_URI="https://bitbucket.org/solidfire/${MY_PN}.git"
 EGIT_CHECKOUT_DIR="${WORKDIR}/${MY_P}"
+EGIT_COMMIT="solidfire/${PVR/-r/-p}"
 
 LICENSE="MIT"
 KEYWORDS="~amd64 amd64"
@@ -18,11 +18,8 @@ IUSE=""
 DEPEND=""
 RDEPEND=""
 
-PATCHES="makefile_disable_fortify_source.patch"
-
 src_prepare()
 {
-	eautoreconf
 	solidfire-libs_src_prepare
 
 	# Disable doc from subdirs to avoid trying to build the documentation since we don't need or want it.
