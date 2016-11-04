@@ -32,7 +32,7 @@ src_configure()
 		boostcpp.jam || die
 
 	# SET COMPILER AND COMPILER FLAGS
-	echo "using gcc : : g++ : <compileflags>\"${CXXFLAGS}\" <linkflags>\"${LDFLAGS}\" ;" > user-config.jam
+	echo "using gcc : : ${CXX} : <compileflags>\"${CXXFLAGS}\" <linkflags>\"${LDFLAGS}\" ;" > user-config.jam
 	
 	export BOOST_ROOT="${S}"
 	./bootstrap.sh || die "bootstrapp.sh failed"
