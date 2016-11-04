@@ -22,6 +22,10 @@ zookeeper-solidfire_src_prepare()
 {
 	subversion_src_prepare
 
+	# Set ivy path to not be /root/.ivy or else we get a sandbox violation
+	sed -i -e 's|<property name="ivy.home" value="${user.home}/.ant"|<property name="ivy.home" value="'${WORKDIR}'/ant"|g' \
+		build.xml
+
 	# Prepare Jute
 	ant compile_jute || die
 
