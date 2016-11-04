@@ -21,13 +21,6 @@ PATCHES="compact_streaming.patch
 	convert_numbers_to_strings.patch
 	uint64.patch"
 
-cxx_wrapper()
-{
-	set -- ${CXX} ${CXXFLAGS} ${CPPFLAGS} ${LDFLAGS} "$@"
-	echo "$@"
-	"$@"
-}
-
 src_configure()
 { :; }
 
@@ -35,11 +28,11 @@ src_compile()
 {
 	mkdir obj
 	for f in $(ls src/lib_json/*.cpp); do
-		cxx_wrapper -Iinclude -fPIC -c ${f} -o obj/$(basename ${f} .cpp).o || die "Failed to compile ${f}"
+		g++ ${CXXFLAGS} ${CPPFLAGS} ${LDFLAGS} -Iinclude -fPIC -c ${f} -o obj/$(basename ${f} .cpp).o || die "Failed to compile ${f}"
 	done
 
 	# create SO
-	cxx_wrapper -Iinclude obj/*.o -shared -fPIC -Wl,-soname,libjson_libmt${PS}.so -o libjson_libmt${PS}.so || die
+	g++ ${CXXFLAGS} ${CPPFLAGS} ${LDFLAGS} -Iinclude obj/*.o -shared -fPIC -Wl,-soname,libjson_libmt${PS}.so -o libjson_libmt${PS}.so || die
 	ar cr libjson_libmt${PS}.a obj/*.o || die
 }
 
