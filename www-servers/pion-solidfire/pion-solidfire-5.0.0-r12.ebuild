@@ -45,8 +45,11 @@ src_prepare()
 
 	solidfire-libs_src_prepare
 
-	# Append boost specific CPP flags
+	# Append boost specific flags
 	append-cppflags "-DBOOST_FILESYSTEM_VERSION=3 -DBOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS"
+	append-cppflags "-I/sf/packages/boost-solidfire-${BOOST_VERSION}/include"
+	append-ldflags  "-L/sf/packages/boost-solidfire-${BOOST_VERSION}/lib"
+	append-ldflags  "-Wl,--rpath=/sf/packages/boost-solidfire-${BOOST_VERSION}/lib"
 }
 
 src_configure()
