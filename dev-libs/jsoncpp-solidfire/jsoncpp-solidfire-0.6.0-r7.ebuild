@@ -26,13 +26,15 @@ src_configure()
 
 src_compile()
 {
+	append-cxxflags -Iinclude -fPIC
+
 	mkdir obj
 	for f in $(ls src/lib_json/*.cpp); do
-		g++ ${CXXFLAGS} ${CPPFLAGS} ${LDFLAGS} -Iinclude -fPIC -c ${f} -o obj/$(basename ${f} .cpp).o || die "Failed to compile ${f}"
+		$(tc-getCXX) ${CXXFLAGS} ${CPPFLAGS} ${LDFLAGS} -c ${f} -o obj/$(basename ${f} .cpp).o || die "Failed to compile ${f}"
 	done
 
 	# create SO
-	g++ ${CXXFLAGS} ${CPPFLAGS} ${LDFLAGS} -Iinclude obj/*.o -shared -fPIC -Wl,-soname,libjson_libmt${PS}.so -o libjson_libmt${PS}.so || die
+	$(tc-getCXX) ${CXXFLAGS} ${CPPFLAGS} ${LDFLAGS} obj/*.o -shared -Wl,-soname,libjson_libmt${PS}.so -o libjson_libmt${PS}.so || die
 	ar cr libjson_libmt${PS}.a obj/*.o || die
 }
 
