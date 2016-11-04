@@ -19,6 +19,9 @@ IUSE=""
 DEPEND="${PYTHON_DEPS}"
 RDEPEND="${DEPEND}"
 
+# SolidFire Libs Settings
+SOLIDFIRE_WANT_EAUTORECONF=1
+
 # Versions of all packages that this metapackage installs
 MODULES="gflags gtest gmock glog"
 GFLAGS_VERSION="2.0-p5"
