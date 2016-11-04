@@ -13,8 +13,9 @@ SRC_URI="pion-5.0.0-${CHANGESET}.tar.gz"
 LICENSE="Boost-1.0"
 KEYWORDS="~amd64 amd64"
 
+BOOST_VERSION="1.57.0-r2"
 DEPEND="dev-vcs/git
-	=dev-libs/boost-solidfire-1.57.0-r2"
+	=dev-libs/boost-solidfire-${BOOST_VERSION}"
 RDEPEND="${DEPEND}
 	app-arch/bzip2
 	dev-libs/openssl
