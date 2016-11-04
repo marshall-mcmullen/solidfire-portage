@@ -15,7 +15,7 @@ LICENSE="MIT"
 KEYWORDS="~amd64 amd64"
 IUSE=""
 
-DEPEND="app-text/texlive-core"
+DEPEND=""
 RDEPEND=""
 
 PATCHES="makefile_disable_fortify_source.patch"
@@ -24,6 +24,9 @@ src_prepare()
 {
 	eautoreconf
 	solidfire-libs_src_prepare
+
+	# Disable doc from subdirs to avoid trying to build the documentation since we don't need or want it.
+	sed -i -e '/^SUBDIRS/s:doc::' Makefile.in || die
 }
 
 src_configure()
