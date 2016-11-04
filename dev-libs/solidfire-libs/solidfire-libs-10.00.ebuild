@@ -28,7 +28,7 @@ RDEPEND="
 	=dev-libs/liblzf-solidfire-3.6-r6
 	=dev-libs/skein-solidfire-121508-r5
 	>=net-dns/c-ares-1.10.0
-	=net-libs/libmicrohttpd-solidfire-0.9.32-r2
+	=net-libs/libmicrohttpd-solidfire-0.9.32-r4
 	=net-misc/curl-solidfire-7.39.0-r1
 	sys-apps/dmidecode
 	>=sys-apps/hdparm-9.43
