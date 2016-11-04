@@ -18,6 +18,9 @@ RDEPEND="dev-libs/libgcrypt:0
 	net-libs/gnutls"
 DEPEND="${RDEPEND}"
 
+# SolidFire Libs Settings
+SOLIDFIRE_WANT_EAUTORECONF=1
+
 src_configure()
 {
 	econf --disable-curl
