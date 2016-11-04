@@ -11,7 +11,7 @@ _SOLIDFIRE_LIBS_ECLASS=1
 
 inherit base autotools eutils flag-o-matic
 
-EXPORT_FUNCTIONS src_prepare pkg_preinst
+EXPORT_FUNCTIONS src_unpack src_prepare pkg_preinst
 
 DEPEND="app-portage/gentoolkit"
 
@@ -188,6 +188,19 @@ dolib.a()
 #-----------------------------------------------------------------------------
 # SolidFire Libs public ebuild methods
 #-----------------------------------------------------------------------------
+
+solidfire-libs_src_unpack()
+{
+	if [[ -n "${EGIT_REPO_URI}" ]]; then
+		git-r3_src_unpack
+	elif [[ -n "${EHG_REPO_URI}" ]]; then
+		mercurial_src_unpack
+	elif [[ -n "${ESVN_REPO_URI}" ]]; then
+		svn_src_unpack
+	else
+		default_src_unpack
+	fi
+}
 
 solidfire-libs_src_prepare()
 {
