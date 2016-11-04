@@ -3,26 +3,20 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs versionator
-
-PV1="$(get_version_component_range 1)"
-PV2="$(get_version_component_range 2)"
-PV3="$(get_version_component_range 3)"
-MYP="${MY_PN}${PV1}${PV2}_${PV3}oss"
+inherit git-r3 solidfire-libs
 
 DESCRIPTION="Intel Threading Building Blocks"
 HOMEPAGE="http://threadingbuildingblocks.org"
-SRC_URI="http://threadingbuildingblocks.org/sites/default/files/software_releases/source/${MYP}_src.tgz"
+EGIT_REPO_URI="https://bitbucket.org/solidfire/${MY_PN}.git"
+EGIT_CHECKOUT_DIR="${WORKDIR}/${MY_P}"
+EGIT_COMMIT="solidfire/${PVR}"
+
 LICENSE="GPL-2-with-exceptions"
 KEYWORDS="~amd64 amd64"
 IUSE=""
 
 DEPEND=""
 RDEPEND="${DEPEND}"
-
-PATCHES="case-413-4.3.patch"
-
-S="${WORKDIR}/${MYP}"
 
 src_prepare()
 {
