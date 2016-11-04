@@ -42,7 +42,7 @@ src_prepare()
 src_compile()
 {
 	emake info
-	emake compiler="$(tc-getCXX)" tbb_root="${S}" lambdas=1 cpp0x=1
+	emake compiler=gcc tbb_root="${S}" lambdas=1 cpp0x=1
 }
 
 src_install()
