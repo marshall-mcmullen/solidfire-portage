@@ -11,7 +11,7 @@ if [[ -z ${_ZOOKEEPER_ECLASS} ]]; then
 _ZOOKEEPER_ECLASS=1
 
 inherit subversion solidfire-libs
-EXPORT_FUNCTIONS src_unpack src_prepare src_configure src_compile src_install pkg_preinst
+EXPORT_FUNCTIONS src_unpack src_prepare src_configure src_compile src_install src_test pkg_preinst
 
 zookeeper-solidfire_src_unpack()
 {
