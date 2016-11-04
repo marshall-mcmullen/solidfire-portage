@@ -23,8 +23,10 @@ S=${WORKDIR}/${MY_P}
 src_configure()
 {
     sed -i -e "s|PREFIX?=/usr|PREFIX=${PREFIX}|"        \
+		   -e "s|CXX?=c++|CXX=$(tc-getCXX)|"            \
+		   -e "s|CXX=c++|CXX=$(tc-getCXX)|"             \
 		   -e "s|LDFLAGS=\(.*\)|LDFLAGS=${LDFLAGS} \1|" \
-		src/Makefile || die "Modifying Makefile failed"
+		src/{,core,gui}/Makefile || die "Modifying Makefile failed"
 }
 
 src_compile()
