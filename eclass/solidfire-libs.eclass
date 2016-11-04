@@ -207,8 +207,8 @@ solidfire-libs_src_prepare()
 	# Apply patches
 	base_src_prepare
 
-	# If there is no Makefile and no configure then try to create then
-	if [[ ! -e Makefile && ! -e configure ]]; then
+	# If requested run eautoreconf
+	if [[ ${SOLIDFIRE_WANT_EAUTORECONF} -eq 1 ]]; then
 		eautoreconf
 	fi
 
