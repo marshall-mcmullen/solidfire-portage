@@ -3,12 +3,13 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit git-r3 solidfire-libs
 
 DESCRIPTION="Hardware Lister"
 HOMEPAGE="http://ezix.org/project/wiki/HardwareLister"
-MY_P="${MY_PN}-B.${PV/b}"
-SRC_URI="http://ezix.org/software/files/${MY_P}.tar.gz"
+EGIT_REPO_URI="https://bitbucket.org/solidfire/${MY_PN}.git"
+EGIT_CHECKOUT_DIR="${WORKDIR}/${MY_P}"
+EGIT_COMMIT="solidfire/${PVR}"
 
 LICENSE="GPL-2"
 KEYWORDS="~amd64 amd64"
@@ -16,9 +17,7 @@ KEYWORDS="~amd64 amd64"
 DEPEND=""
 RDEPEND="${DEPEND}"
 
-PATCHES="disable_scan_partitions.patch"
-
-S=${WORKDIR}/${MY_P}
+S="${WORKDIR}/${MY_P}/src"
 
 src_configure()
 {
@@ -26,7 +25,7 @@ src_configure()
 		   -e "s|CXX?=c++|CXX=$(tc-getCXX)|"            \
 		   -e "s|CXX=c++|CXX=$(tc-getCXX)|"             \
 		   -e "s|LDFLAGS=\(.*\)|LDFLAGS=${LDFLAGS} \1|" \
-		src/{,core,gui}/Makefile || die "Modifying Makefile failed"
+		{.,core,gui}/Makefile || die "Modifying Makefile failed"
 }
 
 src_compile()
