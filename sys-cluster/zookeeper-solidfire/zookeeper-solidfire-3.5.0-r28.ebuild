@@ -7,6 +7,7 @@ inherit zookeeper-solidfire
 
 DESCRIPTION="ZooKeeper is a distributed, open-source coordination service for distributed applications."
 HOMEPAGE="http://zookeeper.apache.org/"
+SRC_URI="https://bitbucket.org/solidfire/${MY_PN}/get/solidfire/${PVR}.tar.bz2 -> ${PF}.tar.bz2"
 
 LICENSE="Apache-2.0"
 KEYWORDS="amd64 ~amd64"

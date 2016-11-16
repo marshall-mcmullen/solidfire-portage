@@ -199,6 +199,13 @@ solidfire-libs_src_unpack()
 		svn_src_unpack
 	else
 		default_src_unpack
+
+		# Automatically fix our library distfiles to extract to the expected ${S}. 
+		local tardir=$(tar -tf "${DISTDIR}/${A}" | head -1 | sed -e 's/\/.*//')
+		if [[ "${tardir}" != "${A}" ]]; then
+		    echo "    $(basename "${WORKDIR}/${tardir}") -> $(basename "${S}")"
+		    mv "${WORKDIR}/${tardir}" "${S}" || die "Failed to mv ${WORKDIR}/${tardir} -> ${S}"
+		fi
 	fi
 }
 
