@@ -7,6 +7,6 @@
     <owner>
       <email>marshall@solidfire.com</email>
     </owner>
-    <source type="rsync">platform-gentoo.corp.solidfire.net::solidfire-portage</source>
+    <source type="rsync">platform-gentoo.hq.netapp.com::solidfire-portage</source>
   </repo>
 </repositories>
