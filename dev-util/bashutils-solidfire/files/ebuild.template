@@ -12,9 +12,19 @@ SRC_URI="https://bitbucket.org/solidfire/${MY_PN}/get/${MY_PN}-${PVR}.tar.bz2 ->
 LICENSE="Apache-2.0"
 KEYWORDS="amd64"
 
-DEPEND="net-misc/curl
+DEPEND="
+        app-admin/sudo
+        app-arch/cpio
+        || ( app-arch/lbzip2 app-arch/bzip2 )
+        || ( app-arch/pigz app-arch/gzip )
+        app-arch/xz-utils
+        app-cdr/cdrtools
         app-misc/jq
-        sys-apps/lsb-release"
+        net-misc/curl
+        sys-apps/lsb-release
+        sys-apps/util-linux
+        sys-fs/squashfs-tools
+        "
 
 RDEPEND="${DEPEND}"
 
