@@ -1,0 +1,36 @@
+--- otpw-1.5/Makefile	2017-01-13 22:42:40.220000000 +0000
++++ otpw-1.5/Makefile	2017-01-13 22:45:24.164000000 +0000
+@@ -6,8 +6,10 @@
+ 
+ VERSION=1.5
+ 
+-CC=gcc
+-CFLAGS=-O -ggdb -W -Wall -Wno-unused-result -fPIC
++CC?=gcc
++CFLAGS?=-O -ggdb -W -Wall -Wno-unused-result -fPIC
++LD?=ld
++LDFLAGS?=
+ 
+ %.gz: %
+ 	gzip -9c $< >$@
+@@ -17,9 +19,9 @@
+ all: $(TARGETS)
+ 
+ otpw-gen: otpw-gen.o rmd160.o md.o otpw.o
+-	$(CC) -o $@ $+
++	$(CC) $(LDFLAGS) -o $@ $+
+ demologin: demologin.o otpw.o rmd160.o md.o
+-	$(CC) -o $@ $+ -lcrypt
++	$(CC) $(LDFLAGS) -o $@ $+ -lcrypt
+ 
+ otpw-gen.o: otpw-gen.c md.h otpw.h
+ otpw.o: otpw.c otpw.h md.h
+@@ -28,7 +30,7 @@
+ otpw-l.o: otpw-l.c otpw.c otpw.h md.h
+ pam_otpw.o: pam_otpw.c otpw.h md.h
+ pam_otpw.so: pam_otpw.o otpw-l.o rmd160.o md.o
+-	ld --shared -o $@ $+ -lcrypt -lpam -lpam_misc
++	$(LD) $(LDFLAGS) --shared -o $@ $+ -lcrypt -lpam -lpam_misc
+ 
+ distribution:
+ 	git archive --prefix otpw-$(VERSION)/ -o otpw-$(VERSION).tar.gz v$(VERSION)
