@@ -13,7 +13,7 @@ HOMEPAGE="https://github.com/solidfire/solidfire-sdk-python"
 SRC_URI="https://github.com/solidfire/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="Apache-2.0"
-KEYWORDS="~amd64"
+KEYWORDS="amd64 hppa ppc ppc64 x86"
 SLOT="0"
 IUSE="dev docs examples release test"
 
