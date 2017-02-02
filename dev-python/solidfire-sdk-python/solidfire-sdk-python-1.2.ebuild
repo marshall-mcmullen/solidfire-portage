@@ -21,7 +21,6 @@ DEPEND="dev-python/setuptools"
 RDEPEND=">=dev-libs/enum34-1.1.6
 	>=dev-libs/future-0.15.2
 	>=dev-libs/requests-2.9.1
-	>=dev-libs/setuptools-19.2
 	dev-python/setuptools
 	dev? ( dev-libs/check-manifest )
 	docs? ( >=dev-libs/sphinx-1.3.5 )
