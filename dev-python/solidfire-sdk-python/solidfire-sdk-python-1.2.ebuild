@@ -22,7 +22,7 @@ RDEPEND=">=dev-python/enum34-1.1.6
 	>=dev-python/future-0.15.2
 	>=dev-python/requests-2.9.1
 	dev-python/setuptools
-	dev? ( dev-libs/check-manifest )
+	dev? ( dev-python/check-manifest )
 	docs? (
 		>=dev-python/sphinx-1.3.5 
 		>=dev-python/sphinx-rtd-theme-0.1.9
