@@ -1,0 +1,11 @@
+DEFINED_PHASES=install postinst
+DEPEND==dev-util/bashutils-solidfire-1.3.1 =dev-util/jenkins-tools-solidfire-1.0.4 dev-util/debootstrap app-portage/gentoolkit virtual/jre net-misc/curl net-misc/openssh app-admin/sudo sys-apps/lsb-release app-text/xmlstarlet app-misc/jq
+DESCRIPTION=Allow SolidFire team to share idle resources on your workstation.
+EAPI=5
+HOMEPAGE=http://solidfire.com
+KEYWORDS=amd64
+LICENSE=Apache-2.0
+RDEPEND==dev-util/bashutils-solidfire-1.3.1 =dev-util/jenkins-tools-solidfire-1.0.4 dev-util/debootstrap app-portage/gentoolkit virtual/jre net-misc/curl net-misc/openssh app-admin/sudo sys-apps/lsb-release app-text/xmlstarlet app-misc/jq
+SLOT=0
+SRC_URI=distbox-unstable-2.0.15.tgz
+_md5_=7c193c68cac70784f31b47015d30797b
