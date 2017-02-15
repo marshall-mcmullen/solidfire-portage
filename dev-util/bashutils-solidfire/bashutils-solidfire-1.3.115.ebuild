@@ -20,7 +20,6 @@ DEPEND="
         app-arch/xz-utils
         app-cdr/cdrtools
         app-misc/jq
-        net-dns/bind-tools
         net-misc/curl
         sys-apps/lsb-release
         sys-apps/util-linux
