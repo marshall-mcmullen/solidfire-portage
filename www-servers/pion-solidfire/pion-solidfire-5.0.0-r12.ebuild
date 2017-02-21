@@ -3,13 +3,11 @@
 # $Header: $
 
 EAPI=5
-inherit git-r3 solidfire-libs
+inherit solidfire-libs
 
 DESCRIPTION="C++ framework for building light weight HTTP interfaces"
 HOMEPAGE="https://github.com/cloudmeter/pion"
-EGIT_REPO_URI="https://bitbucket.org/solidfire/${MY_PN}.git"
-EGIT_CHECKOUT_DIR="${WORKDIR}/${MY_P}"
-EGIT_COMMIT="solidfire/${PVR}"
+SRC_URI="https://bitbucket.org/solidfire/pion/get/solidfire/${PVR}.tar.bz2 -> ${PF}.tar.bz2"
 
 LICENSE="Boost-1.0"
 KEYWORDS="~amd64 amd64"
