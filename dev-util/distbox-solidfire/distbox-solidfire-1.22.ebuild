@@ -7,7 +7,7 @@ inherit distbox-solidfire
 
 DESCRIPTION="Allow SolidFire team to share idle resources on your workstation."
 HOMEPAGE="http://solidfire.com"
-SRC_URI="${MY_PF}.tgz"
+SRC_URI="https://bitbucket.org/solidfire/${MY_PN}/get/${MY_PN}-${PVR}.tar.bz2 -> ${PF}.tar.bz2"
 
 DEPEND="=dev-util/bashutils-solidfire-1.1.14
 		dev-util/debootstrap
