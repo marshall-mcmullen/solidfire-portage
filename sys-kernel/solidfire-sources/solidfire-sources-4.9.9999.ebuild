@@ -7,6 +7,7 @@ detect_arch
 
 KEYWORDS="amd64"
 HOMEPAGE="https://solidfire.com"
+RESTRICT="bindist"
 
 DESCRIPTION="Full sources for the Linux kernel with Solidfire patches"
 
