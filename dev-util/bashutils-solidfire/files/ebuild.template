@@ -25,6 +25,7 @@ DEPEND="
         net-misc/curl
         sys-apps/lsb-release
         sys-apps/util-linux
+        sys-fs/archivemount
         sys-fs/squashfs-tools
         "
 
