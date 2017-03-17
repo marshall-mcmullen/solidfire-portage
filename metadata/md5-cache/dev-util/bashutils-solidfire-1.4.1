@@ -1,0 +1,12 @@
+DEFINED_PHASES=compile configure install preinst prepare unpack
+DEPEND=app-admin/sudo app-arch/cpio || ( app-arch/lbzip2 app-arch/bzip2 ) || ( app-arch/pigz app-arch/gzip ) app-arch/xz-utils app-cdr/cdrtools app-misc/jq dev-util/dialog net-dns/bind-tools net-misc/curl sys-apps/lsb-release sys-apps/util-linux sys-fs/squashfs-tools !<sys-devel/gettext-0.18.1.1-r3 || ( >=sys-devel/automake-1.15:1.15 ) >=sys-devel/autoconf-2.69 >=sys-devel/libtool-2.4 app-portage/gentoolkit
+DESCRIPTION=Collection of bash utilities for simpler and more robust bash programming
+EAPI=5
+HOMEPAGE=https://bitbucket.org/solidfire/bashutils
+KEYWORDS=amd64
+LICENSE=Apache-2.0
+RDEPEND=app-admin/sudo app-arch/cpio || ( app-arch/lbzip2 app-arch/bzip2 ) || ( app-arch/pigz app-arch/gzip ) app-arch/xz-utils app-cdr/cdrtools app-misc/jq dev-util/dialog net-dns/bind-tools net-misc/curl sys-apps/lsb-release sys-apps/util-linux sys-fs/squashfs-tools
+SLOT=1.4.1
+SRC_URI=https://bitbucket.org/solidfire/bashutils/get/bashutils-1.4.1.tar.bz2 -> bashutils-solidfire-1.4.1.tar.bz2
+_eclasses_=autotools	7027963e8e8cc12c91117bdb9225dc26	base	df2aa567b3f0595aae0d0923889f7631	eutils	3c847a0129fed780bd709b98e426f89c	flag-o-matic	61cad4fb5d800b29d484b27cb033f59b	libtool	48b1b9f6194d2842456514d1184ca72e	multilib	0236be304ee52e7f179ed2f337075515	solidfire-libs	ca150c5a5c96e6ef31efa2511663ed9b	toolchain-funcs	6eb35f81556258a4bc9182ad3dfd58ee
+_md5_=d89300ce36a77a5c6290faf700ca801b
