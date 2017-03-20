@@ -7,8 +7,7 @@ inherit solidfire-libs
 
 DESCRIPTION="C++ framework for building light weight HTTP interfaces"
 HOMEPAGE="https://github.com/cloudmeter/pion"
-CHANGESET="ab5e96ea76e676f1f006f0b52a00b371e206e56a"
-SRC_URI="pion-5.0.0-${CHANGESET}.tar.gz"
+SRC_URI="https://bitbucket.org/solidfire/pion/get/solidfire/${PVR}.tar.bz2 -> ${PF}.tar.bz2"
 
 LICENSE="Boost-1.0"
 KEYWORDS="~amd64 amd64"
@@ -23,19 +22,6 @@ RDEPEND="${DEPEND}
 
 LICENSE="Boost-1.0"
 REVISION="0"
-
-PATCHES="certificate_chains.patch
-	disable_logging.patch
-	seteuid.patch
-	thread_naming_support.patch
-	disable_http_basic_auth_cache.patch
-	noexcept.patch
-	boost_units.patch
-	xss-vulnerability_2.patch
-	disable_sslv3.patch
-	mimetypes.patch"
-
-S="${WORKDIR}/pion-5.0.0-${CHANGESET}"
 
 src_prepare()
 {
