@@ -91,6 +91,8 @@ src_compile()
 
 		if [[ ${module} == gtest ]]; then
 			econf --enable-static --with-pthreads
+		elif [[ ${module} == gmock ]]; then
+			econf --enable-static --with-gtest=$PWD/../gtest
 		else
 			econf --enable-static
 		fi
