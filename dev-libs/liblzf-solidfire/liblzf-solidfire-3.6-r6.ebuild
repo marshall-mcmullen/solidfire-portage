@@ -3,13 +3,11 @@
 # $Header: $
 
 EAPI=5
-inherit git-r3 solidfire-libs
+inherit solidfire-libs
 
 DESCRIPTION="The extremely fast LZF compression algorithm"
 HOMEPAGE="http://oldhome.schmorp.de/marc/liblzf.html"
-EGIT_REPO_URI="https://bitbucket.org/solidfire/liblzf.git"
-EGIT_CHECKOUT_DIR="${WORKDIR}/${MY_P}"
-EGIT_COMMIT="solidfire/${PVR}"
+SRC_URI="http://bitbucket.org/solidfire/liblzf/get/solidfire/${PVR}.tar.bz2 -> ${PF}.tar.bz2"
 
 LICENSE="BSD"
 KEYWORDS="~amd64 amd64"

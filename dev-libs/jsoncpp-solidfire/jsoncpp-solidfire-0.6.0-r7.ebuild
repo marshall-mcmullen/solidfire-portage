@@ -3,13 +3,11 @@
 # $Header: $
 
 EAPI=5
-inherit git-r3 solidfire-libs
+inherit solidfire-libs
 
 DESCRIPTION="C++ JSON reader and writer"
 HOMEPAGE="http://jsoncpp.sourceforge.net"
-EGIT_REPO_URI="https://bitbucket.org/solidfire/jsoncpp.git"
-EGIT_CHECKOUT_DIR="${WORKDIR}/${MY_P}"
-EGIT_COMMIT="solidfire/${PVR/-r/-p}"
+SRC_URI="https://bitbucket.org/solidfire/${MY_PN}/get/solidfire/${PVR}.tar.bz2 -> ${PF}.tar.bz2"
 
 LICENSE="public-domain"
 KEYWORDS="~amd64 amd64"
