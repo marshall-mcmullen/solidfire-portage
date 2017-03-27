@@ -7,7 +7,7 @@ inherit solidfire-libs
 
 DESCRIPTION="A small C library that makes it easy to run an HTTP server as part of another application."
 HOMEPAGE="http://www.gnu.org/software/libmicrohttpd/"
-EGIT_REPO_URI="https://bitbucket.org/solidfire/${MY_PN}/get/solidfire/${PVR}.tar.bz2 -> ${PF}.tar.bz2"
+SRC_URI="https://bitbucket.org/solidfire/${MY_PN}/get/solidfire/${PVR}.tar.bz2 -> ${PF}.tar.bz2"
 
 LICENSE="LGPL-2.1"
 KEYWORDS="~amd64 amd64"
