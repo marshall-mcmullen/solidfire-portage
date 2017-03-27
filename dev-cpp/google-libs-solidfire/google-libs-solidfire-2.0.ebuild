@@ -10,6 +10,7 @@ DESCRIPTION="Collection of google libraries packaged by SolidFire."
 HOMEPAGE="http://www.solidfire.com"
 SRC_URI="http://bitbucket.org/solidfire/${MY_PN}/get/solidfire/${PVR}.tar.bz2 -> ${PF}.tar.bz2"
 
+LICENSE="BSD"
 SLOT="${PVR}"
 KEYWORDS="~amd64 amd64"
 IUSE=""
