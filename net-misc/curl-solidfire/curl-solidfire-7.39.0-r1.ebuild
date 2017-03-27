@@ -7,7 +7,7 @@ inherit solidfire-libs
 
 DESCRIPTION="A Client that groks URLs"
 HOMEPAGE="http://curl.haxx.se/"
-SRC_URI="http://bitbucket.org/solidfire/${MY_PN}/get/solidfire/${PVR}.tar.bz2 -> ${PF}.tar.bz2"
+SRC_URI="http://curl.haxx.se/download/${MY_P}.tar.gz"
 
 LICENSE="MIT"
 KEYWORDS="amd64 ~amd64"
