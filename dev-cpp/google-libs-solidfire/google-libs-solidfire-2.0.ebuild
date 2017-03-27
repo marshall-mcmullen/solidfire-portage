@@ -4,14 +4,12 @@
 
 EAPI=5
 PYTHON_COMPAT=( python{2_6,2_7} )
-inherit python-any-r1 solidfire-libs git-r3
+inherit python-any-r1 solidfire-libs
 
 DESCRIPTION="Collection of google libraries packaged by SolidFire."
 HOMEPAGE="http://www.solidfire.com"
-EGIT_REPO_URI="https://bitbucket.org/solidfire/google-libs.git"
-EGIT_CHECKOUT_DIR="${WORKDIR}/${MY_P}"
+SRC_URI="http://bitbucket.org/solidfire/${MY_PN}/get/solidfire/${PVR}.tar.bz2 -> ${PF}.tar.bz2"
 
-LICENSE="BSD"
 SLOT="${PVR}"
 KEYWORDS="~amd64 amd64"
 IUSE=""
