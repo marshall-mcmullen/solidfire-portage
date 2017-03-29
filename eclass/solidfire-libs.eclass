@@ -207,15 +207,18 @@ solidfire-libs_src_unpack()
 		mkdir -p "${S}"
 
 		# Automatically fix our library distfiles to extract to the expected ${S}. 
-		local base fname ext
+		local base fname ext sbase tardir dest
 		for fname in ${A}; do
 			base="$(shopt -s extglob; echo "${fname%%@($(archive_suffixes))}")"
 			ext="${fname:${#base} + 1}"
+			sbase=$(basename "${S}")
+			tardir=$(tar -tf "${DISTDIR}/${fname}" | head -1 | sed -e 's/\/.*//')
 
-			local tardir=$(tar -tf "${DISTDIR}/${fname}" | head -1 | sed -e 's/\/.*//')
-			if [[ "${tardir}" != $(basename "${S}") ]]; then
-			    echo "    $(basename "${WORKDIR}/${tardir}") -> ${S}/${base}"
-			    mv "${WORKDIR}/${tardir}" "${S}/${base}" || die "Failed to mv ${WORKDIR}/${tardir} -> ${S}/${base}"
+			if [[ "${tardir}" != "${sbase}" ]]; then
+				dest="${S}"
+				[[ "${base}" != "${sbase}" ]] && dest+="/${base}"
+			    echo "    $(basename "${WORKDIR}/${tardir}") -> $(basename ${dest})"
+			    cp -a "${WORKDIR}/${tardir}/." "${dest}" || die "Failed to mv ${WORKDIR}/${tardir} -> ${dest}"
 			fi
 		done
 	fi
