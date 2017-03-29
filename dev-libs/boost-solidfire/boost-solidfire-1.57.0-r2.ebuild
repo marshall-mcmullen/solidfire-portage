@@ -7,7 +7,6 @@ PYTHON_COMPAT=( python{2_6,2_7,3_2,3_3} )
 inherit versionator solidfire-libs
 
 MY_P="${MY_PN}_$(replace_all_version_separators _)"
-MAJOR_V="$(get_version_component_range 1-2)"
 
 DESCRIPTION="Boost Libraries for C++"
 HOMEPAGE="http://www.boost.org/"
@@ -23,8 +22,6 @@ DEPEND="${RDEPEND}"
 
 PATCHES="explicit_stored_group.patch
 	throw_message.patch"
-
-S="${WORKDIR}/${MY_P}"
 
 src_configure()
 {
