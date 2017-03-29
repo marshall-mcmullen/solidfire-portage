@@ -60,7 +60,7 @@ EXTRA_ECONF="--prefix=${PREFIX}
 versionize_soname()
 {
 	local files_libtool=$(find ${S} -type f \( -name libtool -o -name libtool.m4 -o -name aclocal.m4 -o -name configure \) || die)
-	echo ">>> SolidFire libs versioning"
+	phase "SolidFire libs versioning"
 
     for fname in ${files_libtool}; do
 		einfo "Versioning $(basename ${fname})"
@@ -78,7 +78,7 @@ versionize_check()
 	debug-print-function $FUNCNAME $*
 
 	# Verify all libraries are versioned properly
-	echo ">>> SolidFire libs checking versioning"
+	phase "SolidFire libs checking versioning"
 
     # Initial clean-up: Remove all symlinks, all pkgconfig and all *.la files
 	{
@@ -189,6 +189,11 @@ dolib.a()
 # SolidFire Libs public ebuild methods
 #-----------------------------------------------------------------------------
 
+archive_suffixes()
+{
+    echo -n ".tar|.tar.gz|.tgz|.taz|.tar.bz2|.tz2|.tbz2|.tbz|.tar.xz|.txz|.tar.lz|.tlz"
+}
+
 solidfire-libs_src_unpack()
 {
 	if [[ -n "${EGIT_REPO_URI}" ]]; then
@@ -199,13 +204,20 @@ solidfire-libs_src_unpack()
 		svn_src_unpack
 	else
 		default_src_unpack
+		mkdir -p "${S}"
 
 		# Automatically fix our library distfiles to extract to the expected ${S}. 
-		local tardir=$(tar -tf "${DISTDIR}/${A}" | head -1 | sed -e 's/\/.*//')
-		if [[ "${tardir}" != "$(basename ${S})" ]]; then
-		    echo "    $(basename "${WORKDIR}/${tardir}") -> $(basename "${S}")"
-		    mv "${WORKDIR}/${tardir}" "${S}" || die "Failed to mv ${WORKDIR}/${tardir} -> ${S}"
-		fi
+		local base fname ext
+		for fname in ${A}; do
+			base="$(shopt -s extglob; echo "${fname%%@($(archive_suffixes))}")"
+			ext="${fname:${#base} + 1}"
+
+			local tardir=$(tar -tf "${DISTDIR}/${fname}" | head -1 | sed -e 's/\/.*//')
+			if [[ "${tardir}" != $(basename "${S}") ]]; then
+			    echo "    $(basename "${WORKDIR}/${tardir}") -> ${S}/${base}"
+			    mv "${WORKDIR}/${tardir}" "${S}/${base}" || die "Failed to mv ${WORKDIR}/${tardir} -> ${S}/${base}"
+			fi
+		done
 	fi
 }
 
@@ -263,6 +275,22 @@ solidfire-libs_pkg_preinst()
 #-----------------------------------------------------------------------------
 # MISC HELPERS
 #-----------------------------------------------------------------------------
+
+ebanner()
+{
+	local cols=${COLUMNS:-80}
+	cols=$((cols-2))
+	eval "local str=\$(printf -- '-%.0s' {1..${cols}})"
+	printf "\n+${str}+\n|\n| $@\n|\n+${str}+\n"
+}
+
+phase()
+{
+	tput bold
+	tput setaf 2
+	echo -en ">>\033[0m "
+	echo "$@"
+}
 
 pushd()
 {
