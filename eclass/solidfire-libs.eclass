@@ -206,10 +206,11 @@ solidfire-libs_src_unpack()
 	elif [[ -n "${ESVN_REPO_URI}" ]]; then
 		svn_src_unpack
 	else
-		default_src_unpack
 		rm --recursive --force --one-file-system "${MY_S}"
 		mkdir -p "${MY_S}"
 		local srcs=( ${A} )
+		
+		default_src_unpack
 
 		# Automatically fix our library distfiles to extract to the expected ${WORKDIR}/${MY_P}. If there is a single
 		# source tarball, this is 
