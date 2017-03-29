@@ -9,10 +9,10 @@ inherit python-any-r1 solidfire-libs
 DESCRIPTION="Collection of google libraries packaged by SolidFire."
 HOMEPAGE="http://www.solidfire.com"
 MODULES="gflags gtest gmock glog"
-GFLAGS_VERSION="2.0-p5"
-GTEST_VERSION="1.6.0-p7"
-GMOCK_VERSION="1.6.0-p4"
-GLOG_VERSION="0.3.3-p3"
+GFLAGS_VERSION="2.0-r5"
+GTEST_VERSION="1.6.0-r7"
+GMOCK_VERSION="1.6.0-r4"
+GLOG_VERSION="0.3.3-r3"
 SRC_URI="http://bitbucket.org/solidfire/gflags/get/solidfire/${GFLAGS_VERSION}.tar.bz2 -> gflags-${GFLAGS_VERSION}.tar.bz2
          http://bitbucket.org/solidfire/gtest/get/solidfire/${GTEST_VERSION}.tar.bz2   -> gtest-${GTEST_VERSION}.tar.bz2
 		 http://bitbucket.org/solidfire/gmock/get/solidfire/${GMOCK_VERSION}.tar.bz2   -> gmock-${GMOCK_VERSION}.tar.bz2
