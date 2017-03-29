@@ -16,8 +16,6 @@ LICENSE="BSD"
 KEYWORDS="~amd64 amd64"
 HTML_DOCS=( doc/jemalloc.html )
 
-S="${WORKDIR}/${MY_P//-debug}"
-
 src_configure()
 {
 	append-cflags 						\
