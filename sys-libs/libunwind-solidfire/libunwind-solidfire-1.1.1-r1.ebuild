@@ -3,13 +3,11 @@
 # $Header: $
 
 EAPI=5
-inherit git-r3 solidfire-libs
+inherit solidfire-libs
 
 DESCRIPTION="Portable and efficient API to determine the call-chain of a program"
 HOMEPAGE="http://savannah.nongnu.org/projects/libunwind"
-EGIT_REPO_URI="https://bitbucket.org/solidfire/${MY_PN}.git"
-EGIT_CHECKOUT_DIR="${WORKDIR}/${MY_P}"
-EGIT_COMMIT="solidfire/${PVR/-r/-p}"
+SRC_URI="http://bitbucket.org/solidfire/${MY_PN}/get/solidfire/${PVR}.tar.bz2 -> ${PF}.tar.bz2"
 
 LICENSE="MIT"
 KEYWORDS="~amd64 amd64"

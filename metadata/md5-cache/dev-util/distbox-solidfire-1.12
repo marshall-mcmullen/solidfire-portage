@@ -7,6 +7,6 @@ KEYWORDS=amd64
 LICENSE=Apache-2.0
 RDEPEND==dev-util/bashutils-solidfire-0.8.20 app-portage/gentoolkit dev-vcs/mercurial app-arch/pigz virtual/jre net-misc/curl >=net-p2p/murder-solidfire-0.1.2-r2 app-misc/jq net-misc/openssh sys-devel/make sys-devel/distcc app-admin/sudo app-text/xmlstarlet
 SLOT=0
-SRC_URI=distbox-1.12.tgz
+SRC_URI=https://bitbucket.org/solidfire/distbox/get/distbox-1.12.tar.bz2 -> distbox-solidfire-1.12.tar.bz2
 _eclasses_=distbox-solidfire	ae056f9f4a31f87d87142cfc4dfb3bd9	multilib	0236be304ee52e7f179ed2f337075515	systemd	ec2e9154031d942186c75c0aabb41900	toolchain-funcs	6eb35f81556258a4bc9182ad3dfd58ee
-_md5_=b160b56a3397428dae8900f5f1b4ed29
+_md5_=1d42f3fa2f7f8807ac8db7727b1d73f6

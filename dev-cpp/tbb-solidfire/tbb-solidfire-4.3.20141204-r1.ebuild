@@ -3,13 +3,11 @@
 # $Header: $
 
 EAPI=5
-inherit git-r3 solidfire-libs
+inherit solidfire-libs
 
 DESCRIPTION="Intel Threading Building Blocks"
 HOMEPAGE="http://threadingbuildingblocks.org"
-EGIT_REPO_URI="https://bitbucket.org/solidfire/${MY_PN}.git"
-EGIT_CHECKOUT_DIR="${WORKDIR}/${MY_P}"
-EGIT_COMMIT="solidfire/${PVR}"
+SRC_URI="http://bitbucket.org/solidfire/${MY_PN}/get/solidfire/${PVR}.tar.bz2 -> ${PF}.tar.bz2"
 
 LICENSE="GPL-2-with-exceptions"
 KEYWORDS="~amd64 amd64"
