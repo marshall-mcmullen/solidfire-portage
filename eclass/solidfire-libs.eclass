@@ -24,9 +24,12 @@ MY_P="${P//-solidfire}"
 MY_PN="${PN//-solidfire}"
 MY_PF="${PF//-solidfire}"
 PS="-solidfire-${PVR}"
-S="${WORKDIR}/${MY_P}"
 PREFIX="/sf/packages/${PF}"
 DP="${D}/${PREFIX}"
+
+# Store off original MY_S incase ebuild modifies S.
+MY_S="${WORKDIR}/${MY_P}"
+S="${MY_S}"
 
 # Set the directory epatch will look for patches in so we don't have to specify
 # it in every ebuild patch line.
@@ -204,21 +207,27 @@ solidfire-libs_src_unpack()
 		svn_src_unpack
 	else
 		default_src_unpack
-		mkdir -p "${S}"
+		rm --recursive --force --one-file-system "${MY_S}"
+		mkdir -p "${MY_S}"
+		local srcs=( ${A} )
 
-		# Automatically fix our library distfiles to extract to the expected ${S}. 
-		local base fname ext sbase tardir dest
+		# Automatically fix our library distfiles to extract to the expected ${WORKDIR}/${MY_P}. If there is a single
+		# source tarball, this is 
+		local fname
 		for fname in ${A}; do
-			base="$(shopt -s extglob; echo "${fname%%@($(archive_suffixes))}")"
-			ext="${fname:${#base} + 1}"
-			sbase=$(basename "${S}")
-			tardir=$(tar -tf "${DISTDIR}/${fname}" | head -1 | sed -e 's/\/.*//')
-
-			if [[ "${tardir}" != "${sbase}" ]]; then
-				dest="${S}"
-				[[ "${base}" != "${sbase}" ]] && dest+="/${base}"
-			    echo "    $(basename "${WORKDIR}/${tardir}") -> $(basename ${dest})"
-			    cp -a "${WORKDIR}/${tardir}/." "${dest}" || die "Failed to mv ${WORKDIR}/${tardir} -> ${dest}"
+			local base="$(shopt -s extglob; echo "${fname%%@($(archive_suffixes))}")"
+			local ext="${fname:${#base} + 1}"
+			local tardir=$(tar -tf "${DISTDIR}/${fname}" | head -1 | sed -e 's/\/.*//')
+			local sbase=$(basename "${MY_S}")
+			local dest="${sbase}"
+			if [[ ${#srcs[@]} -gt 1 ]]; then
+				dest+="/$(basename ${base})"
+			fi
+				
+			if [[ "${tardir}" != ${dest} ]]; then
+				echo "    $(basename "${WORKDIR}/${tardir}") -> ${dest}"
+				cp --archive --link "${WORKDIR}/${tardir}/." "${dest}" || die "Failed to mv ${WORKDIR}/${tardir} -> ${dest}"
+				rm --recursive --force --one-file-system "${WORKDIR}/${tardir}" || die "Failed to rmdir ${WORKDIR}/${tardir}"
 			fi
 		done
 	fi
