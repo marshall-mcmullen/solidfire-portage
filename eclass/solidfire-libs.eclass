@@ -143,6 +143,39 @@ versionize_check()
 	if [[ -e ${DP}/lib64 && ! -e ${DP}/lib ]]; then
 		ln --symbolic --relative ${DP}/lib64 ${DP}/lib
 	fi
+
+	# Reparent include and lib directories if needed. For solidfire-libs purposes a directory needs to be reparented 
+	# if it is nested twice such as ${PN}/include/${PN}/${PN} -> ${PN}/include/${PN}.
+	local dname
+	for dname in "${DP}/include" "${DP}/lib"; do
+		[[ ! -d "${dname}" ]] && continue
+
+		pushd "${dname}"
+		if [[ -d "${MY_PN}" ]]; then
+			einfo "Fixing nested '${MY_PN}' in ${dname#${D}/}"
+			reparent "${MY_PN}"
+		
+		# Make a "self pointer" symlink to ourselves for proper -I inclusion by non-versioned name
+		elif [[ ! -e "${MY_PN}" ]]; then
+			ln -sn . "${MY_PN}" || die "ln . ${MY_PN} failed[1]"
+		fi
+
+		popd
+	done
+}
+
+# Moves all the files in the specified directory up one and then removes that directory. This essentially reparents 
+# all the contents of that directory up one in the directory tree.
+reparent()
+{
+	local dname=$1
+	[[ -d "${dname}" ]] || die "${dname} is not a directory."
+
+	pushd "${dname}"
+	(shopt -s dotglob; mv -- * ..) || die "reparent failed"
+	popd
+	rmdir "${dname}"    || die "reparent: rmdir ${dname} failed"
+	ln -sn . "${dname}" || die "reparent: ln . ${subdir} failed"
 }
 
 #-----------------------------------------------------------------------------
@@ -281,7 +314,7 @@ solidfire-libs_pkg_preinst()
 		die "SolidFire sandbox violations:\n${violations[@]}"
 	fi
 
-	# Verify all libraries are versioned properly
+	# Verify all headers and libraries are versioned properly
 	versionize_check
 }
 
