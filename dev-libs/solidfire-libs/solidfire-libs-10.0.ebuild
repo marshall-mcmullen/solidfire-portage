@@ -30,7 +30,7 @@ RDEPEND=">=app-misc/jq-1.4
 	=dev-libs/liblzf-solidfire-3.6-r6
 	=dev-libs/skein-solidfire-121508-r6
 	=net-analyzer/net-snmp-5.7.3-r5
-	=net-dns/c-ares-1.10.0
+	=net-dns/c-ares-1.12.0
 	=net-libs/libmicrohttpd-solidfire-0.9.32-r4
 	=net-misc/curl-solidfire-7.39.0-r1
 	=net-nds/openldap-2.4.44
