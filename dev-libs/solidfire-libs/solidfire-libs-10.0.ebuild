@@ -81,7 +81,7 @@ src_install()
 			# If this package is zookeeper we also need to lookup what version of java it depends on.
 			if [[ "${data[pn]}" == "zookeeper-solidfire" ]]; then
 				echo "export ZOOKEEPER_HOME=/sf/packages/${data[pf]}"
-				local javav=$(grep -Po "=dev-java/icedtea-bin\K\S*" "/var/db/pkg/${data[category]}/${data[pf]}/DEPEND")
+				local javav=$(grep -Po "=dev-java/icedtea-bin-\K\S*" "/var/db/pkg/${data[category]}/${data[pf]}/DEPEND")
 				echo "export JAVA_EXE=/opt/icedtea-bin-${javav}/bin/javac"
 			fi
 
@@ -101,6 +101,11 @@ src_install()
 	cat "${DP}/exports.sh"
 }
 
+# Disable pkg_preinst so that we do not delete all the non-versioned symlinks we created above in src_install.
+pkg_preinst()
+{ :; }
+
+# Helper function for testing
 verify()
 {
 	local input="$1"; shift
@@ -118,6 +123,7 @@ verify()
 	done
 }
 
+# Test parse_depend_atom for correctness.
 src_test()
 {
 	verify "=app-text/snappy-solidfire-1.0.1" \
