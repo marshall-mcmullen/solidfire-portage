@@ -36,7 +36,7 @@ SOLIDFIRE_WANT_EAUTORECONF=1
 # google library (or module) in its entirely before building the next one. Because of this, we can't use the piecemeal
 # ebuild functions and instead must do everything in one function. We chose src_prepare to minimize ebuild rule breaking.
 # Because of this, we have to stub out the other real functions so that nothing will happen if they are called.
-for cmd in configure compile test; do eval "src_${cmd}() { :; }"; done
+for cmd in src_configure src_compile src_test pkg_preinst; do eval "${cmd}() { :; }"; done
 src_prepare()
 {
 	for module in ${MODULES}; do
