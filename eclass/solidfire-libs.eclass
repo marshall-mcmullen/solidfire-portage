@@ -315,6 +315,60 @@ popd()
 	builtin popd "${@}" >/dev/null || die "Failed: popd $@"
 }
 
+parse_depend_atom()
+{
+	local input="${1}"
+	local output="${2}"
+
+	local tab=$'\t'
+	local slot_re='(:[A-Za-z0-9_][A-Za-z0-9+_./-]*)'
+	local repo_re='(::[A-Za-z0-9_][A-Za-z0-9_-]*)'                                
+	local atom_versioned_re="^([<>]?=)?([^ ${tab}]+-[^ ${tab}/]+|virtual)/([^ ${tab}/?]+)-(([0-9]+)((\.[0-9]+)*)([a-z]?)((_(pre|p|beta|alpha|rc)[0-9]*)*))*(-(r[0-9.]+))?${slot_re}?${repo_re}?$"
+	local atom_non_versioned_re="^([^ ${tab}]+-[^ ${tab}/]+|virtual)/([^ ${tab}/?]+)$"
+
+	# Temporary variables for holding values before we copy them out
+	local cpn="" cpv="" op="" p="" pn="" pv="" pr="" pvr="" pf="" category="" slot="" subslot=""
+
+	# Versioned atom
+	if [[ "${input}" =~ ${atom_versioned_re} ]]; then
+		op=${BASH_REMATCH[1]}
+		category=${BASH_REMATCH[2]}
+		pn=${BASH_REMATCH[3]}
+		cpn="${category}/${pn}"
+		pv=${BASH_REMATCH[4]}
+		p="${pn}-${pv}"
+		pr=${BASH_REMATCH[13]:-r0}
+		pvr="${BASH_REMATCH[4]}${BASH_REMATCH[12]}"
+		pf="${pn}-${pvr}"
+		slot=${BASH_REMATCH[14]#:}
+		repo=${BASH_REMATCH[15]#::}
+		cpv="${category}/${pn}-${pv}"
+	elif [[ "${input}" =~ ${atom_non_versioned_re} ]]; then
+		op=""
+		category=${BASH_REMATCH[1]}
+		pn=${BASH_REMATCH[2]}
+		cpn="${category}/${pn}"
+		p="${pn}"
+		pr="r0"
+		pf="${pn}"
+		cpv="${category}/${pn}"
+	else
+		die "FAILED TO PARSE ${input}"
+	fi
+
+	if [[ "${slot}" == */* ]]; then
+         subslot=${slot#*/}
+		 slot=${slot%%/*}
+	fi
+
+	# Copy everything out
+	local var="" val=""
+	for var in cpn op p pn pv pr pvr pf category slot subslot; do
+		eval "val=\$${var}"
+		printf -v ${output}[$var] "${val}"
+	done
+}
+
 #-----------------------------------------------------------------------------
 # END
 #-----------------------------------------------------------------------------

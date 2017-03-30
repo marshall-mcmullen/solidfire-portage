@@ -17,5 +17,4 @@ DEPEND="dev-java/ant-core
 	dev-libs/libxml2
 	dev-libs/log4cxx
 	dev-util/cppunit
-	dev-vcs/subversion
 	=dev-java/icedtea-bin-7.2.6.8"
