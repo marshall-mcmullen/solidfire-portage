@@ -81,15 +81,15 @@ src_install()
 			# If this package is zookeeper we also need to lookup what version of java it depends on.
 			if [[ "${data[pn]}" == "zookeeper-solidfire" ]]; then
 				echo "export ZOOKEEPER_HOME=/sf/packages/${data[pf]}"
-				local javav=$(grep -Po "=dev-java/icedtea-bin\K\S*" "/var/db/pkg/${data[category]}/${data[pf]}/DEPENDS")
+				local javav=$(grep -Po "=dev-java/icedtea-bin\K\S*" "/var/db/pkg/${data[category]}/${data[pf]}/DEPEND")
 				echo "export JAVA_EXE=/opt/icedtea-bin-${javav}/bin/javac"
 			fi
 
 			# Now create **relative** symlinks in ${DP}/include and ${DP}/lib. The reason we use relative symlinks 
 			# instead of absolute ones is so that the symlinks will resolve properly outside a chroot to make it easier
 			# to access header files from outside build containers.
-			ln --symbolic "../../../sf/packages/${data[pf]}/include" "${DP}/include/${data[pn]/-solidfire}"
-			ln --symbolic "../../../sf/packages/${data[pf]}/lib"     "${DP}/lib/${data[pn]/-solidfire}"
+			ln --symbolic "../../../../sf/packages/${data[pf]}/include" "${DP}/include/${data[pn]/-solidfire}"
+			ln --symbolic "../../../../sf/packages/${data[pf]}/lib"     "${DP}/lib/${data[pn]/-solidfire}"
 
 		done
 	} | sort > "${DP}/exports.sh"
