@@ -129,6 +129,18 @@ src_prepare()
 			emake DESTDIR="${PORTAGE_BUILDDIR}/image.internal" install
 		fi
 
+		# Create non-versioned symlink for include and header files. 
+		# NOTE: Do this in a subshell so we don't have to use pushd/popd repeatedly.
+		for dname in include lib; do
+		(
+			cd "${PORTAGE_BUILDDIR}/image.internal/${PREFIX}/${dname}"
+			[[ -d "${module}" ]] && cd "${module}"
+			if [[ ! -e "${module}" ]]; then
+				ln -sn . "${module}" || die "ln . ${module} failed in ${PWD}"
+			fi
+		)
+		done
+
 		popd
 	done
 }
