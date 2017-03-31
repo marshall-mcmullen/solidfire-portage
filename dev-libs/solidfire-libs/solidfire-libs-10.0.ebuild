@@ -110,6 +110,8 @@ src_install()
 				echo "export JAVA_VERSION=${pvr_export}"
 				echo "export JAVA_HOME=/opt/icedtea-bin-${pvr_export}"
 				echo "export JAVA_EXE=/opt/icedtea-bin-${pvr_export}/bin/javac"
+			elif [[ "${data[pn]}" == "pion-solidfire" ]]; then
+				echo "export PION_PLUGINS_PATH=/sf/packages/${data[pf]}/share/plugins"
 			fi	
 		done
 	} | sort > "${DP}/exports.sh"
