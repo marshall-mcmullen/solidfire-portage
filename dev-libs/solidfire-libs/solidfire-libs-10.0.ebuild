@@ -76,20 +76,19 @@ src_install()
 				continue
 			fi
 
-			# Export the version number for this package
-			local pn="${data[pn]^^}"
-			pn="${pn//-SOLIDFIRE/}"
-			pn="${pn//-/}"
-			if [[ "${data[pn]}" == "crypto++-solidfire" ]]; then
-				pn="${pn/++/PP}"
-			fi
-			echo "export ${pn}_VERSION=${data[pvr]}"
+			# Deteremine package name and version to use for exports
+			local pn_export="${data[pn]^^}" pvr_export="${data[pvr]}"
+			pn_export="${pn_export//-SOLIDFIRE/}"
+			pn_export="${pn_export//-/}"
+			[[ "${data[pn]}" == "crypto++-solidfire" ]] && pn_export="${pn_export/++/PP}"
+			[[ "${data[pn]}" =~ "solidfire"          ]] && pvr_export="solidfire-${data[pvr]}"
+			echo "export ${pn_export}_VERSION=${pvr_export}"
 
 			# Now create symlinks in ${DP}/include and ${DP}/lib relative to the top of the tree. The reason we use
 			# relative symlinks instead of absolute ones is so that the symlinks will resolve properly outside a
 			# chroot to make it easier to access header files from outside build containers.
 			if [[ "${data[pn]}" =~ "solidfire" ]]; then
-				echo "export ${pn}_HOME=/sf/packages/${data[pf]}"
+				echo "export ${pn_export}_HOME=/sf/packages/${data[pf]}"
 				ln --symbolic "../../../../sf/packages/${data[pf]}/include" "${DP}/include/${data[pn]/-solidfire}"
 				ln --symbolic "../../../../sf/packages/${data[pf]}/lib"     "${DP}/lib/${data[pn]/-solidfire}"
 			fi
@@ -103,16 +102,15 @@ src_install()
 				ln --symbolic "../../../../sf/packages/${data[pf]}/lib"     "${DP}/lib/json"
 			elif [[ "${data[pn]}" == "google-libs-solidfire" ]]; then
 				for module in gflags gtest gmock glog; do
-					echo "export ${module^^}_VERSION=${data[pvr]}"
+					echo "export ${module^^}_VERSION=${pvr_export}"
 					ln --symbolic "../../../../sf/packages/${data[pf]}/include/${module}" "${DP}/include/${module}"
 					ln --symbolic "../../../../sf/packages/${data[pf]}/lib/${module}"     "${DP}/lib/${module}"
 				done
 			elif [[ "${data[pn]}" == "icedtea-bin" ]]; then
-				echo "export JAVA_VERSION=${data[pvr]}"
-				echo "export JAVA_HOME=/opt/icedtea-bin-${data[pvr]}"
-				echo "export JAVA_EXE=/opt/icedtea-bin-${data[pvr]}/bin/javac"
+				echo "export JAVA_VERSION=${pvr_export}"
+				echo "export JAVA_HOME=/opt/icedtea-bin-${pvr_export}"
+				echo "export JAVA_EXE=/opt/icedtea-bin-${pvr_export}/bin/javac"
 			fi	
-
 		done
 	} | sort > "${DP}/exports.sh"
 
