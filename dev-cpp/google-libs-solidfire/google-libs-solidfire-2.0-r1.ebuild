@@ -91,7 +91,6 @@ src_prepare()
 		elif [[ ${module} == gmock ]]; then
 			econf --enable-static --with-gtest=${PWD}/../gtest-${GTEST_VERSION}
 		elif [[ ${module} == glog ]]; then
-			sed -i -e "s|gtest-config|gtest-config-solidfire-${PVR}|g" configure*
 			econf --enable-static --with-gflags=${PWD}/../gflags-${GFLAGS_VERSION}
 		else
 			econf --enable-static
