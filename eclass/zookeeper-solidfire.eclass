@@ -98,7 +98,7 @@ zookeeper-solidfire_src_install()
 	{
 		einfo "Installing Java"
 		doins -r ${S}/conf ${S}/build/{lib,*.jar}
-		mv ${DP}/zookeeper-${PV}.jar ${DP}/lib/${PF}.jar || die
+		mv ${DP}/zookeeper-${PV}.jar ${DP}/${PF}.jar || die
 		
 		local bin
 		for bin in $(find ${S}/bin/*.sh); do
