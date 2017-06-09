@@ -23,8 +23,10 @@ DEPEND="
         dev-util/dialog
         net-dns/bind-tools
         net-misc/curl
+        sys-apps/file
         sys-apps/lsb-release
         sys-apps/util-linux
+        sys-boot/syslinux
         sys-fs/squashfs-tools
         "
 
