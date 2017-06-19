@@ -8,5 +8,5 @@ LICENSE=Apache-2.0
 RDEPEND==dev-util/bashutils-solidfire-1.3.71 =dev-util/jenkins-tools-solidfire-1.0.14 dev-util/debootstrap app-portage/gentoolkit virtual/jre net-misc/curl net-misc/openssh app-admin/sudo sys-apps/lsb-release app-text/xmlstarlet app-misc/jq
 SLOT=0
 SRC_URI=https://bitbucket.org/solidfire/distbox/get/distbox-1.49.tar.bz2 -> distbox-solidfire-1.49.tar.bz2
-_eclasses_=distbox-solidfire	ae056f9f4a31f87d87142cfc4dfb3bd9	multilib	97f470f374f2e94ccab04a2fb21d811e	systemd	e12dd5e3cf1f359292cea2a70abeba5f	toolchain-funcs	6eb35f81556258a4bc9182ad3dfd58ee
+_eclasses_=distbox-solidfire	ae056f9f4a31f87d87142cfc4dfb3bd9	multilib	97f470f374f2e94ccab04a2fb21d811e	systemd	e12dd5e3cf1f359292cea2a70abeba5f	toolchain-funcs	772b26a6baefb4c8c5e0c1fc724508b7
 _md5_=7a3c1f93c36a07c797015fef14eefe3d
