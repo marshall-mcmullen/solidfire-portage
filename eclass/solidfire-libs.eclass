@@ -23,7 +23,14 @@ SLOT="${PVR}"
 MY_P="${P//-solidfire}"
 MY_PN="${PN//-solidfire}"
 MY_PF="${PF//-solidfire}"
-PS="-solidfire-${PVR}"
+
+# The solidfire-libs eclass in ember/20170621 and older used to set the
+# "PS" variable as below, and use it in configure's --program-suffix to
+# rename the ebuild's binaries.  We decided to to skip this, since the
+# package directories have versioned names now.  If you want the old
+# behavior, set PS in your ebuild.
+#PS="-solidfire-${PVR}"
+
 PREFIX="/sf/packages/${PF}"
 DP="${D}/${PREFIX}"
 
