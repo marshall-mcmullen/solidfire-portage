@@ -1,6 +1,9 @@
 # Copyright 2017 Solidfire
 
 EAPI=5
+
+PROGRAM_PREFIX='radian_'
+
 inherit git-r3
 inherit solidfire-libs
 
