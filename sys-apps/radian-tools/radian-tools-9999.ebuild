@@ -14,7 +14,7 @@ HOMEPAGE="http://www.radianmemory.com"
 # on bitbucket.  This ebuild tries to clone from:
 #     file:///root/radian-tools
 EGIT_REPO_URI="file:///root/radian-tools"
-EGIT_BRANCH=${SOLIDFIRE_RADIAN_TOOLS_BRANCH:-master}
+EGIT_BRANCH=${SOLIDFIRE_RADIAN_TOOLS_BRANCH:-solidfire-1.3}
 
 LICENSE="Radian NDA"
 KEYWORDS="~amd64"
