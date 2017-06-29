@@ -14,7 +14,7 @@ EGIT_REPO_URI="file:///root/radian-tools"
 EGIT_BRANCH=${SOLIDFIRE_RADIAN_TOOLS_BRANCH:-master}
 
 LICENSE="Radian NDA"
-KEYWORDS="~amd64 amd64"
+KEYWORDS="~amd64"
 
 DEPEND='dev-libs/libnl'
 
