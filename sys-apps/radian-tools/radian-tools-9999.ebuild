@@ -24,6 +24,11 @@ DEPEND='dev-libs/libnl'
 ENVD_FILE="05${PF}"
 SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/etc" "/etc/env.d" "/etc/env.d/${ENVD_FILE}" )
 
+src_prepare()
+{
+	sed -i -re 's/(dump_log_page)/radian_\1/' utils/dump_log_page.in
+}
+
 src_install()
 {
 	emake DESTDIR="${D}" install
