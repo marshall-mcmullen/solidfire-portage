@@ -1,4 +1,4 @@
-# Copyright 2017 Solidfire
+# Copyright 2017 NetApp, Inc.  All rights reserved.
 
 EAPI=5
 
