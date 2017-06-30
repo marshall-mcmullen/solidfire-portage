@@ -31,6 +31,10 @@ MY_PF="${PF//-solidfire}"
 # behavior, set PS in your ebuild.
 #PS="-solidfire-${PVR}"
 
+# The caller can set PROGRAM_PREFIX, and the string will be prepended
+# to all installed program names.
+#PROGRAM_PREFIX='my-'
+
 PREFIX="/sf/packages/${PF}"
 DP="${D}/${PREFIX}"
 
@@ -61,6 +65,7 @@ EXTRA_ECONF="--prefix=${PREFIX}
 		     --mandir=${PREFIX}/share/man
 		     --docdir=${PREFIX}/share/doc
 		     --program-suffix=${PS}
+		     --program-prefix=${PROGRAM_PREFIX}
 			 --with-pkgversion=\"SolidFire ${MY_PF}\""
 
 #-----------------------------------------------------------------------------
