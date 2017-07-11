@@ -1,0 +1,33 @@
+From d10383b376479c48a0c23c0007563ce10700ca70 Mon Sep 17 00:00:00 2001
+From: Sebastian Kuzminsky <sebastian.kuzminsky@netapp.com>
+Date: Tue, 11 Jul 2017 17:23:39 +0000
+Subject: [PATCH] fixup install paths for solidfire-libs
+
+---
+ Makefile | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 8b0fd24..e8b7d67 100644
+--- a/Makefile
++++ b/Makefile
+@@ -96,10 +96,10 @@ clean:
+ 	rm -f $(OBJ) $(OBJ_PART) $(OBJ_ARCH) makedumpfile makedumpfile.8.gz makedumpfile.conf.5.gz
+ 
+ install:
+-	install -m 755 -d ${DESTDIR}/usr/sbin ${DESTDIR}/usr/share/man/man5 ${DESTDIR}/usr/share/man/man8 ${DESTDIR}/etc
+-	install -m 755 -t ${DESTDIR}/usr/sbin makedumpfile $(VPATH)makedumpfile-R.pl
+-	install -m 644 -t ${DESTDIR}/usr/share/man/man8 makedumpfile.8.gz
+-	install -m 644 -t ${DESTDIR}/usr/share/man/man5 makedumpfile.conf.5.gz
++	install -m 755 -d ${DESTDIR}/sf/packages/${P}/sbin ${DESTDIR}/sf/packages/${P}/share/man/man5 ${DESTDIR}/sf/packages/${P}/share/man/man8 ${DESTDIR}/etc
++	install -m 755 -t ${DESTDIR}/sf/packages/${P}/sbin makedumpfile $(VPATH)makedumpfile-R.pl
++	install -m 644 -t ${DESTDIR}/sf/packages/${P}/share/man/man8 makedumpfile.8.gz
++	install -m 644 -t ${DESTDIR}/sf/packages/${P}/share/man/man5 makedumpfile.conf.5.gz
+ 	install -m 644 -D $(VPATH)makedumpfile.conf ${DESTDIR}/etc/makedumpfile.conf.sample
+-	mkdir -p ${DESTDIR}/usr/share/makedumpfile-${VERSION}/eppic_scripts
+-	install -m 644 -t ${DESTDIR}/usr/share/makedumpfile-${VERSION}/eppic_scripts/ $(VPATH)eppic_scripts/*
++	mkdir -p ${DESTDIR}/sf/packages/${P}/share/makedumpfile-${VERSION}/eppic_scripts
++	install -m 644 -t ${DESTDIR}/sf/packages/${P}/share/makedumpfile-${VERSION}/eppic_scripts/ $(VPATH)eppic_scripts/*
+-- 
+2.10.2
+
