@@ -13,6 +13,8 @@ KEYWORDS="amd64 ~amd64"
 RDEPEND="dev-perl/JSON-Any
 	dev-perl/XML-LibXML-Simple"
 
+ENVD_FILE="05${PF}"
+
 src_unpack()
 {
 	mkdir -p ${S}
@@ -21,4 +23,10 @@ src_unpack()
 src_install()
 {
 	dobin ${FILESDIR}/xml2json
+
+	cat > "${T}/${ENVD_FILE}" <<-EOF
+	PATH="/sf/packages/${PF}/bin"
+	ROOTPATH="/sf/packages/${PF}/bin"
+	EOF
+	doenvd "${T}/${ENVD_FILE}"
 }
