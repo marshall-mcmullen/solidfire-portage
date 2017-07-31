@@ -14,6 +14,7 @@ RDEPEND="dev-perl/JSON-Any
 	dev-perl/XML-LibXML-Simple"
 
 ENVD_FILE="05${PF}"
+SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/etc" "/etc/env.d" "/etc/env.d/${ENVD_FILE}" )
 
 src_unpack()
 {
