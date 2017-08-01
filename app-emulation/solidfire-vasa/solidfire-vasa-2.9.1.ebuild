@@ -13,8 +13,8 @@ KEYWORDS="amd64 ~amd64"
 
 RDEPEND=">=virtual/jre-1.8"
 DEPEND="${DEPEND}
-	>=virtual/jdk-1.8
-	dev-java/gradle-bin"
+    >=virtual/jdk-1.8
+    dev-java/gradle-bin"
 
 src_prepare()
 {
@@ -28,16 +28,16 @@ src_prepare()
 src_compile()
 {
     GRADLE_USER_HOME="${WORKDIR}/.gradle" ./make vasaDeploy
-	java -jar  build/libs/sfvasa-${PVR}-all-${PVR}.jar --version 2>&1 | grep "Vasa Provider Version"
+    java -jar  build/libs/sfvasa-${PVR}-all-${PVR}.jar --version 2>&1 | grep "Vasa Provider Version"
 }
 
 src_install()
 {
-	dolib ${S}/build/libs/*.jar
+    dolib ${S}/build/libs/*.jar
 
-	# Set our version number into the systemd unit file before we install it.
-	mkdir -p "${DP}/systemd"
-	sed \
+    # Set our version number into the systemd unit file before we install it.
+    mkdir -p "${DP}/systemd"
+    sed \
         -e 's#__VASAPROVIDER_VERSION__#'${PVR}'#g' \
         -e 's#__VASAPROVIDER_HOME__#'${PREFIX}'#g' \
         -e 's#__JAVA_HOME__#'${JAVA_HOME}'#g'      \
