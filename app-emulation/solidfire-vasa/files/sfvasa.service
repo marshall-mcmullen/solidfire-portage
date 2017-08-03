@@ -1,0 +1,15 @@
+[Unit]
+Description=SolidFire Vasa Provider
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/sf
+ExecStart=${JAVA_HOME}/bin/java \
+            -javaagent:__VASAPROVIDER_HOME__/sfvasa-__VASAPROVIDER_VERSION__-all-__VASAPROVIDER_VERSION__.jar \
+            -jar __VASAPROVIDER_HOME__/sfvasa-__VASAPROVIDER_VERSION__-all-__VASAPROVIDER_VERSION__.jar \
+            --context-path vasa/services/vasaService
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
