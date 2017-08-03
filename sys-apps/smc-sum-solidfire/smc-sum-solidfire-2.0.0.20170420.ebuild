@@ -18,7 +18,7 @@ SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/etc/env.d/${ENVD_FILE}" )
 
 src_install()
 {
-    doins ${S}/*
+    newins ${S}/sum smc-sum
 
     cat > "${T}/${ENVD_FILE}" <<-EOF
 	PATH="/sf/packages/${PF}"
