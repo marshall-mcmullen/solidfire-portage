@@ -257,12 +257,12 @@ solidfire-libs_src_unpack()
 		
 		default_src_unpack
 
-		# Automatically fix our library distfiles to extract to the expected ${WORKDIR}/${MY_P}. If there is a single
-		# source tarball, this is 
+		# Automatically fix our library distfiles to extract to the expected ${WORKDIR}/${MY_P}.
 		local fname
 		for fname in ${A}; do
 			local base="$(shopt -s extglob; echo "${fname%%@($(archive_suffixes))}")"
 			local ext="${fname:${#base} + 1}"
+			[[ -z "${ext}" ]] && continue
 			local tardir=$(tar -tf "${DISTDIR}/${fname}" | head -1 | sed -e 's/\/.*//')
 			local sbase=$(basename "${MY_S}")
 			local dest="${sbase}"
