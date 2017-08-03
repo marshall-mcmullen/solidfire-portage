@@ -21,7 +21,7 @@ S=${WORKDIR}/${SMC_PKG_NAME}/Linux/64bit
 
 src_install()
 {
-	doins ${S}/*
+    doins ${S}/*
 
     cat > "${T}/${ENVD_FILE}" <<-EOF
 	PATH="/sf/packages/${PF}"
