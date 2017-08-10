@@ -10,7 +10,7 @@
 if [[ -z ${_ZOOKEEPER_ECLASS} ]]; then
 _ZOOKEEPER_ECLASS=1
 
-inherit java-pkg-2 solidfire-libs
+inherit solidfire-libs java-pkg-2
 EXPORT_FUNCTIONS src_prepare src_configure src_compile src_install src_test pkg_preinst
 
 zookeeper-solidfire_src_prepare()
@@ -27,7 +27,7 @@ zookeeper-solidfire_src_prepare()
 
 	# Prepare C code
 	pushd src/c
-	eautoreconf #autoreconf -if || die
+	eautoreconf
 	popd
 
 	# Update log4j properties file
@@ -49,6 +49,7 @@ zookeeper-solidfire_src_prepare()
 
 	} >> ${props}
 	
+	# SolidFire versioning
 	solidfire-libs_src_prepare
 }
 
@@ -105,7 +106,7 @@ zookeeper-solidfire_src_install()
 		
 		local bin
 		for bin in $(find ${S}/bin/*.sh); do
-			newbin ${bin} $(basename ${bin} .sh)${PS}.sh
+			newbin ${bin} $(basename ${bin} .sh).sh
 		done
 	}
 
@@ -116,8 +117,8 @@ zookeeper-solidfire_src_install()
 		emake DESTDIR="${D}" install
 		popd
 
-		mv ${DP}/bin/cli_st${PS} ${DP}/bin/zkcli_st${PS} || die
-		mv ${DP}/bin/cli_mt${PS} ${DP}/bin/zkcli_mt${PS} || die
+		mv ${DP}/bin/cli_st ${DP}/bin/zkcli_st || die
+		mv ${DP}/bin/cli_mt ${DP}/bin/zkcli_mt || die
 	}
 }
 

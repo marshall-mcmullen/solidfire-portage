@@ -65,6 +65,6 @@ src_install()
 {
 	default
 
-	mv ${DP}/bin/pprof       ${DP}/bin/jemalloc-debug-pprof${PS} || die
-	mv ${DP}/bin/jemalloc.sh ${DP}/bin/jemalloc-debug${PS}.sh    || die
+	mv ${DP}/bin/pprof       ${DP}/bin/jemalloc-debug-pprof || die
+	mv ${DP}/bin/jemalloc.sh ${DP}/bin/jemalloc-debug.sh    || die
 }

@@ -53,5 +53,5 @@ src_configure()
 src_install()
 {
 	default_src_install
-	mv ${DP}/bin/pprof ${DP}/bin/jemalloc-pprof${PS} || die
+	mv ${DP}/bin/pprof ${DP}/bin/jemalloc-pprof || die
 }

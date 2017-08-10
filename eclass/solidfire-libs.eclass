@@ -23,18 +23,7 @@ SLOT="${PVR}"
 MY_P="${P//-solidfire}"
 MY_PN="${PN//-solidfire}"
 MY_PF="${PF//-solidfire}"
-
-# The solidfire-libs eclass in ember/20170621 and older used to set the
-# "PS" variable as below, and use it in configure's --program-suffix to
-# rename the ebuild's binaries.  We decided to to skip this, since the
-# package directories have versioned names now.  If you want the old
-# behavior, set PS in your ebuild.
-#PS="-solidfire-${PVR}"
-
-# The caller can set PROGRAM_PREFIX, and the string will be prepended
-# to all installed program names.
-#PROGRAM_PREFIX='my-'
-
+PS="-solidfire-${PVR}"
 PREFIX="/sf/packages/${PF}"
 DP="${D}/${PREFIX}"
 
@@ -45,6 +34,10 @@ S="${MY_S}"
 # Set the directory epatch will look for patches in so we don't have to specify
 # it in every ebuild patch line.
 EPATCH_SOURCE="${FILESDIR}"
+
+# The caller can set PROGRAM_PREFIX or PROGRAM_SUFFIX to prepend or append given strings to the names of the binaries.
+#PROGRAM_PREFIX=""
+#PROGRAM_SUFFIX=""
 
 # Global ECONF settings to always pass into econf to ensure proper SolidFire
 # directory structures. Yes, we could have a src_configure function but that's
@@ -64,8 +57,8 @@ EXTRA_ECONF="--prefix=${PREFIX}
 		     --localedir=${PREFIX}/share/locale
 		     --mandir=${PREFIX}/share/man
 		     --docdir=${PREFIX}/share/doc
-		     --program-suffix=${PS}
 		     --program-prefix=${PROGRAM_PREFIX}
+		     --program-suffix=${PROGRAM_SUFFIX}
 			 --with-pkgversion=\"SolidFire ${MY_PF}\""
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -105,7 +98,7 @@ versionize_check()
 
 	local file
 	for file in $(find ${DP}/{lib,lib32,lib64}/*.{so*,a} -type f 2>/dev/null); do
-		
+
 		# Find basename then find longest .so* or .a* suffix.
 		local dname=$(dirname ${file})
 		local base=$(basename ${file})
