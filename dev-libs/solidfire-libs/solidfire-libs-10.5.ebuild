@@ -18,6 +18,7 @@ RDEPEND=">=app-misc/jq-1.4
 	=app-arch/snappy-solidfire-1.0.4
 	=app-text/xml2json-solidfire-1.0-r2
 	=app-crypt/libgfshare-solidfire-1.0.5
+	=app-emulation/solidfire-vasa-2.9.1
 	=dev-cpp/google-libs-solidfire-2.0-r1
 	=dev-cpp/jemalloc-debug-solidfire-3.6.0
 	=dev-cpp/jemalloc-solidfire-3.6.0
