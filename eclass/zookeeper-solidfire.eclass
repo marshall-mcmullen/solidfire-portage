@@ -120,7 +120,7 @@ zookeeper-solidfire_src_install()
 
 zookeeper-solidfire_pkg_preinst()
 {
-	subversion_pkg_preinst
+	default_pkg_preinst
 	solidfire-libs_pkg_preinst
 }
 
