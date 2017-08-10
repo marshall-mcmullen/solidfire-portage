@@ -1,0 +1,11 @@
+DEFINED_PHASES=compile configure install preinst prepare unpack
+DEPEND=>=app-portage/elt-patches-20170317 !<sys-devel/gettext-0.18.1.1-r3 || ( >=sys-devel/automake-1.15:1.15 ) >=sys-devel/autoconf-2.69 >=sys-devel/libtool-2.4 app-portage/gentoolkit
+DESCRIPTION=Collection of SuperMicro tools for SuperMicro platforms only.
+EAPI=5
+HOMEPAGE=http://www.supermicro.com
+KEYWORDS=~amd64 amd64
+LICENSE=SuperMicro
+SLOT=0
+SRC_URI=http://bdr-jenkins.eng.solidfire.net/libs/distfiles/IPMICFG_1.27.0_build.170620_InternalUse.zip http://bdr-jenkins.eng.solidfire.net/libs/distfiles/sum_2.0.0_Linux_x86_64_20170420.tar.gz
+_eclasses_=autotools	7027963e8e8cc12c91117bdb9225dc26	base	df2aa567b3f0595aae0d0923889f7631	epatch	8233751dc5105a6ae8fcd86ce2bb0247	estack	43ddf5aaffa7a8d0482df54d25a66a1f	eutils	9c113d6a64826c40154cad7be15d95ea	flag-o-matic	08e000dba2ecbfac8f7dfc36affdfacd	libtool	e32ea84bf82cf8987965b574672dba93	ltprune	2770eed66a9b8ef944714cd0e968182e	multilib	97f470f374f2e94ccab04a2fb21d811e	solidfire-libs	239bf44541b43dc2ab54194fb3cc44cb	toolchain-funcs	8fec6b1eb195836560e70b66d98fb163
+_md5_=3af64cc6ee563b2e33cd141eb2db6604
