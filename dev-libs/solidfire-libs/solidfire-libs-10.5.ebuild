@@ -24,7 +24,7 @@ RDEPEND=">=app-misc/jq-1.4
 	=dev-cpp/jemalloc-solidfire-3.6.0
 	=dev-cpp/sparsehash-2.0.3
 	=dev-cpp/tbb-solidfire-4.3.20141204-r1
-	=dev-java/icedtea-bin-7.2.6.8
+	=dev-java/icedtea-bin-3.3.0
 	=dev-libs/boost-solidfire-1.57.0-r2
 	=dev-libs/crypto++-solidfire-5.6.2-r2
 	=dev-libs/jsoncpp-solidfire-0.6.0-r7
