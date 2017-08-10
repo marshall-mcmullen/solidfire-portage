@@ -10,7 +10,7 @@
 if [[ -z ${_ZOOKEEPER_ECLASS} ]]; then
 _ZOOKEEPER_ECLASS=1
 
-inherit solidfire-libs java-pkg-2
+inherit java-pkg-2 solidfire-libs
 EXPORT_FUNCTIONS src_prepare src_configure src_compile src_install src_test pkg_preinst
 
 zookeeper-solidfire_src_prepare()
