@@ -1,7 +1,7 @@
 # Copyright 2017 NetApp, Inc.  All rights reserved.
 
 EAPI=5
-inherit mercurial solidfire-libs
+inherit mercurial java-pkg-2 solidfire-libs
 
 DESCRIPTION="SolidFire VASA (vSphere API for Storage Awareness) Provider"
 HOMEPAGE="http://solidfire.com"
