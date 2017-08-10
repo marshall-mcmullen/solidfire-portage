@@ -3,7 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/dev-libs/jemalloc/jemalloc-3.6.0.ebuild,v 1.1 2014/05/19 14:09:08 anarchy Exp $
 
 EAPI=5
-inherit java-pkg-2 zookeeper-solidfire
+inherit zookeeper-solidfire
 
 DESCRIPTION="ZooKeeper is a distributed, open-source coordination service for distributed applications."
 HOMEPAGE="http://zookeeper.apache.org/"

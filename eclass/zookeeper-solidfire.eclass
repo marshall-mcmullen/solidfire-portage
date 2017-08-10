@@ -10,11 +10,14 @@
 if [[ -z ${_ZOOKEEPER_ECLASS} ]]; then
 _ZOOKEEPER_ECLASS=1
 
-inherit solidfire-libs
+inherit solidfire-libs java-pkg-2
 EXPORT_FUNCTIONS src_prepare src_configure src_compile src_install src_test pkg_preinst
 
 zookeeper-solidfire_src_prepare()
 {
+	# Prepare JAVA
+	java-utils-2_src_prepare
+
 	# Set ivy path to not be /root/.ivy or else we get a sandbox violation
 	sed -i -e 's|<property name="ivy.home" value="${user.home}/.ant"|<property name="ivy.home" value="'${WORKDIR}'/ant"|g' \
 		build.xml
