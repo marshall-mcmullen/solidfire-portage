@@ -7,8 +7,8 @@ Type=simple
 User=root
 WorkingDirectory=/sf
 ExecStart=__JAVA__ \
-            -javaagent:__SFVASA_HOME__/solidfire-vasa-__SFVASA_VERSION__-all-__SFVASA_VERSION__.jar \
-            -jar __SFVASA_HOME__/solidfire-vasa-__SFVASA_VERSION__-all-__SFVASA_VERSION__.jar \
+            -javaagent:__SFVASA_HOME__/solidfire-vasa-__PV__-all-__PVR__.jar \
+            -jar __SFVASA_HOME__/solidfire-vasa-__PV__-all-__PVR__.jar \
             --context-path vasa/services/vasaService
 Restart=always
 

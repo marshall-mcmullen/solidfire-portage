@@ -36,8 +36,9 @@ src_install()
 
     # Set our version number into the systemd unit file before we install it.
     mkdir -p "${DP}/systemd"
-    sed -e 's#__JAVA__#'${JAVA}'#g' \
-        -e 's#__SFVASA_VERSION__#'${PVR}'#g' \
-        -e 's#__SFVASA_HOME__#'${PREFIX}'#g' \
+    sed -e 's|__JAVA__|'${JAVA}'|g' \
+        -e 's|__PV__|'${PV}'|g'		\
+        -e 's|__PVR__|'${PVR}'|g'	\
+        -e 's|__SFVASA_HOME__|'${PREFIX}'|g' \
         "${FILESDIR}/sfvasa.service" > "${DP}/systemd/sfvasa.service" || die "Error installing sfvasa.service"
 }
