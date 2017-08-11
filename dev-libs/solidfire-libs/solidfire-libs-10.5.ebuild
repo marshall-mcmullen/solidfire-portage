@@ -81,6 +81,7 @@ src_install()
 			# Deteremine package name and version to use for exports
 			local pn_export="${data[pn]^^}" pvr_export="${data[pvr]}"
 			pn_export="${pn_export//-SOLIDFIRE/}"
+			pn_export="${pn_export//SOLIDFIRE-/SF}"
 			pn_export="${pn_export//-/}"
 			[[ "${data[pn]}" == "crypto++-solidfire" ]] && pn_export="${pn_export/++/PP}"
 			[[ "${data[pn]}" =~ "solidfire"          ]] && pvr_export="solidfire-${data[pvr]}"

@@ -1,5 +1,6 @@
 [Unit]
 Description=SolidFire Vasa Provider
+ConditionPathExists=__VASAPROVIDER_HOME__/sf_cluster.conf
 
 [Service]
 Type=simple
