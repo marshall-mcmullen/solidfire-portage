@@ -1,0 +1,36 @@
+# Copyright 1999-2017 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=5
+
+inherit solidfire-libs
+
+DESCRIPTION="NetApp SnapMirror replicates data through ONTAP."
+HOMEPAGE="www.netapp.com"
+SRC_URI="${MY_PF}.tgz"
+
+LICENSE="NetApp"
+KEYWORDS="~amd64 ~x86"
+IUSE=""
+
+DEPEND=""
+RDEPEND="${DEPEND}"
+
+src_prepare()
+{
+	solidfire-libs_src_prepare
+
+	sed -i -e "s|^CC=.*|CC=$(tc-getCXX)|" $(find . -name Makefile) || die "Failed to set compiler"
+}
+
+src_install()
+{
+	# Header files
+	doheader "${S}/smagent/sma_interface.h"
+	doheader "${S}/smagent/sma_status.h"
+
+	# Libraries
+	dolib "${S}/smagent/libsmagent.a"
+	dolib "${S}/spinnpv2/libspinnp.a"
+	dolib "${S}/uuid/libsmuuid.a"
+}
