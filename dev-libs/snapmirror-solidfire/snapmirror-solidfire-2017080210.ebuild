@@ -7,7 +7,7 @@ inherit solidfire-libs
 
 DESCRIPTION="NetApp SnapMirror replicates data through ONTAP."
 HOMEPAGE="www.netapp.com"
-SRC_URI="ssh://root@bdr-jenkins.den.solidfire.net:/home/snapdrops/smagent_source/xplat_${PV}.tar -> ${PF}.tar"
+SRC_URI="ssh://bdr-jenkins.den.solidfire.net:/home/snapdrops/smagent_source/xplat_${PV}.tar -> ${PF}.tar"
 
 LICENSE="NetApp"
 KEYWORDS="~amd64 ~x86"
