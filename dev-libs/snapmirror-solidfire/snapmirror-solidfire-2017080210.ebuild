@@ -10,7 +10,7 @@ HOMEPAGE="www.netapp.com"
 SRC_URI="ssh://bdr-jenkins.den.solidfire.net:/home/snapdrops/smagent_source/xplat_${PV}.tar -> ${MY_PF}.tar"
 
 LICENSE="NetApp"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64"
 IUSE=""
 
 DEPEND=""
