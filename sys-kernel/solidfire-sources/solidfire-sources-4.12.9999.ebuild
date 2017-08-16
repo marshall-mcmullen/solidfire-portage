@@ -15,7 +15,7 @@ EGIT_CHECKOUT_DIR="${S}"
 
 #random cahnge
 #EGIT_BRANCH=master
-EGIT_COMMIT="7839e71ba4ce521182a4af653a67c6a7e45cb6aa"
+EGIT_COMMIT="0648f1e209b3283ddf3b4a5cda8a66eca9f5bc46"
 
 src_unpack() {
 	git-r3_src_unpack
