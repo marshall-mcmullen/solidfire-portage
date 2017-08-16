@@ -7,7 +7,7 @@ inherit solidfire-libs
 
 DESCRIPTION="NetApp SnapMirror replicates data through ONTAP."
 HOMEPAGE="www.netapp.com"
-SRC_URI="${MY_PF}.tgz"
+SRC_URI="ssh://bdr-jenkins.den.solidfire.net:/home/snapdrops/smagent_source/xplat_${PV}.tar -> ${PF}.tar"
 
 LICENSE="NetApp"
 KEYWORDS="~amd64 ~x86"
@@ -20,7 +20,17 @@ src_prepare()
 {
 	solidfire-libs_src_prepare
 
-	sed -i -e "s|^CC=.*|CC=$(tc-getCXX)|" $(find . -name Makefile) || die "Failed to set compiler"
+	# Set the compiler as CC and CXX are not honored.
+	sed -i -e "s|^CC=.*|CC=$(tc-getCXX)|" $(find . -name Makefile) \
+		|| die "Failed to set compiler"
+
+	sed -i -e 's|TARGETS = $(UUIDDIR) $(SPINNPDIR) $(SMAGENT) $(BTRFS) $(LRSE_TEST)|TARGETS = $(UUIDDIR) $(SPINNPDIR) $(SMAGENT)|' Makefile \
+		|| die "Failed to set TARGETS"
+
+	sed -i -e 's|TARGETS = $(TESTDIR)||' smagent/Makefile \
+		|| die "Failed to clear smagent TARGETS"
+
+	chmod +x spinnpv2/convert-spinnp.sh
 }
 
 src_install()
