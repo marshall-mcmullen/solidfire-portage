@@ -14,7 +14,7 @@ EGIT_REPO_URI="https://bitbucket.org/solidfire/solidfire-kernel"
 EGIT_CHECKOUT_DIR="${S}"
 
 EGIT_BRANCH=fcnode
-EGIT_COMMIT="0648f1e209b3283ddf3b4a5cda8a66eca9f5bc46"
+EGIT_COMMIT="6a6d35b45ccb74389be8b025c1c79b73310bcf2f"
 
 src_unpack() {
 	git-r3_src_unpack
