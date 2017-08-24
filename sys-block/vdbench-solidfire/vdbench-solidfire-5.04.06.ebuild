@@ -20,11 +20,12 @@ S="${WORKDIR}"
 src_install()
 {
     doins -r ${S}/${MY_PF}/*
+    chmod +x "${DP}"/bin/vdbench
 
     cat > "${T}/${ENVD_FILE}" <<-EOF
-    PATH="/sf/packages/${PF}/bin"
-    ROOTPATH="/sf/packages/${PF}/bin"
-    EOF
+	PATH="/sf/packages/${PF}/bin"
+	ROOTPATH="/sf/packages/${PF}/bin"
+	EOF
     doenvd "${T}/${ENVD_FILE}"
 }
 
