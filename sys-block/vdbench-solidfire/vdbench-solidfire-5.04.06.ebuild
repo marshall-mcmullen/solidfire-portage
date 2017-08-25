@@ -10,8 +10,8 @@ SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${MY_PF}.tar.gz -> 
 LICENSE="OTN"
 KEYWORDS="~amd64 amd64"
 
-DEPEND=">=virtual/jdk-1.7"
-RDEPEND="${DEPEND}"
+DEPEND=""
+RDEPEND=">=virtual/jre-1.7"
 
 ENVD_FILE="05${PF}"
 SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/etc" "/etc/env.d" "/etc/env.d/${ENVD_FILE}" )
