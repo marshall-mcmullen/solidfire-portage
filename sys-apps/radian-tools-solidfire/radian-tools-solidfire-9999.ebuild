@@ -21,8 +21,7 @@ KEYWORDS="~amd64"
 
 DEPEND='dev-libs/libnl'
 
-ENVD_FILE="05${PF}"
-SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/etc" "/etc/env.d" "/etc/env.d/${ENVD_FILE}" )
+SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
 
 src_prepare()
 {
@@ -32,10 +31,4 @@ src_prepare()
 src_install()
 {
 	emake DESTDIR="${D}" install
-
-	cat > "${T}/${ENVD_FILE}" <<-EOF
-	PATH="/sf/packages/${PF}/bin"
-	ROOTPATH="/sf/packages/${PF}/bin"
-	EOF
-	doenvd "${T}/${ENVD_FILE}"
 }

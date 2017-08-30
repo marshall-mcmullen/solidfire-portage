@@ -21,6 +21,8 @@ RDEPEND="${DEPEND}
 	sys-apps/util-linux"
 S="${WORKDIR}/${MY_P}"
 
+SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/sbin"
+
 src_prepare()
 {
 	# Since open-iscsi doesn't use the GNU autotools, we have to go hack the

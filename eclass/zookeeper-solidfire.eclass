@@ -8,8 +8,7 @@ _ZOOKEEPER_ECLASS=1
 inherit java-pkg-2 solidfire-libs
 EXPORT_FUNCTIONS src_prepare src_configure src_compile src_install src_test pkg_preinst
 
-ENVD_FILE="05${PF}"
-SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/etc/env.d/${ENVD_FILE}" )
+SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
 
 zookeeper-solidfire_src_prepare()
 {
@@ -118,12 +117,6 @@ zookeeper-solidfire_src_install()
 		mv ${DP}/bin/cli_st ${DP}/bin/zkcli_st || die
 		mv ${DP}/bin/cli_mt ${DP}/bin/zkcli_mt || die
 	}
-
-    cat > "${T}/${ENVD_FILE}" <<-EOF
-	PATH="/sf/packages/${PF}/bin"
-	ROOTPATH="/sf/packages/${PF}/bin"
-	EOF
-    doenvd "${T}/${ENVD_FILE}"
 }
 
 zookeeper-solidfire_pkg_preinst()

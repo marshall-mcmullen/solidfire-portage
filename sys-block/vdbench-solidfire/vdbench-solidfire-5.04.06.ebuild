@@ -13,20 +13,13 @@ KEYWORDS="~amd64 amd64"
 DEPEND=""
 RDEPEND=">=virtual/jre-1.7"
 
-ENVD_FILE="05${PF}"
-SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/etc" "/etc/env.d" "/etc/env.d/${ENVD_FILE}" )
+SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
 
 S="${WORKDIR}"
 src_install()
 {
     doins -r ${S}/${MY_PF}/*
     chmod +x "${DP}"/bin/vdbench
-
-    cat > "${T}/${ENVD_FILE}" <<-EOF
-	PATH="/sf/packages/${PF}/bin"
-	ROOTPATH="/sf/packages/${PF}/bin"
-	EOF
-    doenvd "${T}/${ENVD_FILE}"
 }
 
 src_compile()
