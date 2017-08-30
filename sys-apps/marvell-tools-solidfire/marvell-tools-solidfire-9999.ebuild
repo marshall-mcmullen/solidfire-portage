@@ -12,8 +12,7 @@ EGIT_REPO_URI="https://bitbucket.org/solidfire/marvell-tools"
 LICENSE="MIT"
 KEYWORDS="~amd64"
 
-ENVD_FILE="05${PF}"
-SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/etc/env.d/${ENVD_FILE}" )
+SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
 
 S="${S}/tools"
 
@@ -26,10 +25,4 @@ src_install()
 {
     tools=$(grep "target =" Makefile | sed -e 's|target = ||')
     dobin ${tools} libmvwam.so wam_getlogs.sh
-
-    cat > "${T}/${ENVD_FILE}" <<-EOF
-	PATH="/sf/packages/${PF}/bin"
-	ROOTPATH="/sf/packages/${PF}/bin"
-	EOF
-    doenvd "${T}/${ENVD_FILE}"
 }

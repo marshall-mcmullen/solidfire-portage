@@ -16,8 +16,7 @@ SLOT=0
 LICENSE="SuperMicro"
 KEYWORDS="~amd64 amd64"
 
-ENVD_FILE="05${PF}"
-SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/etc/env.d/${ENVD_FILE}" )
+SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}"
 
 # We don't need or want solidfire-libs package unpack magic (munging) in this case
 S="${WORKDIR}"
@@ -39,11 +38,4 @@ src_install()
 
     # Remove some files we don't care about
     rm --verbose "${DP}"/{SUM_UserGuide.pdf,ReleaseNote.txt} || die
-
-    # Create env.d file so we can find these binaries in our PATH
-    cat > "${T}/${ENVD_FILE}" <<-EOF
-	PATH="/sf/packages/${PF}"
-	ROOTPATH="/sf/packages/${PF}"
-	EOF
-    doenvd "${T}/${ENVD_FILE}"
 }

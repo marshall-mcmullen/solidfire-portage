@@ -298,6 +298,17 @@ solidfire-libs_src_prepare()
 
 solidfire-libs_pkg_preinst()
 {
+	if [[ -n ${SOLIDFIRE_EXPORT_PATH} ]]; then
+		phase "Exporting PATH and ROOTPATH: ${SOLIDFIRE_EXPORT_PATH}"
+		ENVD_FILE="05-${PF}"
+		SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/etc/env.d/${ENVD_FILE}" )
+		cat > "${T}/${ENVD_FILE}" <<-EOF
+		PATH="${SOLIDFIRE_EXPORT_PATH}"
+		ROOTPATH="${SOLIDFIRE_EXPORT_PATH}"
+		EOF
+		doenvd "${T}/${ENVD_FILE}"
+	fi
+
 	# Make sure no files got installed outside ${PREFIX}
 	phase "Looking for SolidFire sandbox violations"
 	local violations=( $(find ${D} -path ${D}sf/packages -prune -o -path ${D}sf -o -path ${D} -o -print) )
