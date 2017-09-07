@@ -13,9 +13,9 @@ DESCRIPTION="Full sources for the Linux kernel with Solidfire patches"
 EGIT_REPO_URI="https://bitbucket.org/solidfire/solidfire-kernel"
 EGIT_CHECKOUT_DIR="${S}"
 
-// fc private branch
+# fc private branch
 EGIT_BRANCH=fcnode
-EGIT_COMMIT="7169624bdb65547b734cb15c8fc31959024f35a6"
+EGIT_COMMIT="caa0e9238d3fc7bf6fe57a25716efb0365e4c30d"
 
 src_unpack() {
 	git-r3_src_unpack
