@@ -15,7 +15,7 @@ EGIT_CHECKOUT_DIR="${S}"
 
 # fc private branch
 EGIT_BRANCH=fcnode
-EGIT_COMMIT="caa0e9238d3fc7bf6fe57a25716efb0365e4c30d"
+EGIT_COMMIT="c463b5f8de94657c37415a53b61336b7a78837ea"
 
 src_unpack() {
 	git-r3_src_unpack
