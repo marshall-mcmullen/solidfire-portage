@@ -21,7 +21,7 @@ RDEPEND="
     >=dev-python/isoparser-0.3
     >=dev-python/netaddr-0.7.18
     >=dev-python/six-1.10.0
-    www-misc/fcgiwrap"
+    >=www-misc/fcgiwrap-1.1.0-r2"
 
 src_compile()
 {
