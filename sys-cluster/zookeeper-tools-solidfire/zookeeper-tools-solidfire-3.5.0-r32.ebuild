@@ -12,7 +12,7 @@ SRC_URI="https://bitbucket.org/solidfire/${MY_PN//-tools}/get/solidfire/${PVR}.t
 LICENSE="Apache-2.0"
 KEYWORDS="amd64 ~amd64"
 
-DEPEND="=sys-cluster/zookeeper-solidfire-${PV}"
+DEPEND="=sys-cluster/zookeeper-solidfire-${PVR}"
 RDEPEND="${DEPEND}"
 
 #----------------------------------------------------------------------------------------------------------------------
