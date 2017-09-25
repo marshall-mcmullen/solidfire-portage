@@ -226,6 +226,34 @@ dolib.a()
 	$(which dolib.a 2>/dev/null) "$@"
 }
 
+dopython_install()
+{
+	python_foreach_impl distutils-r1_src_install
+
+	_install_python_files()
+	{
+		phase "Moving python files from ${D}/${EPREFIX} -> ${DP}"
+		echo "EPYTHON: ${EPYTHON}"
+		echo "PYTHON:  ${PYTHON}"
+		echo "BUILD_DIR: ${BUILD_DIR}"
+		mkdir -p "${DP}/lib"
+		mv --verbose "${D}/${EPREFIX}/usr/lib64/${EPYTHON}" "${DP}/lib"
+		find "${D}/${EPREFIX}" -type d -empty -delete
+	}
+	
+	python_foreach_impl _install_python_files
+}
+
+get_export_pythonpath()
+{
+	_echo_python_path()
+	{
+		echo ":${PREFIX}/lib/${EPYTHON}/site-packages"
+	}
+
+	python_foreach_impl _echo_python_path
+}
+
 #----------------------------------------------------------------------------------------------------------------------
 # SolidFire Libs public ebuild methods
 #----------------------------------------------------------------------------------------------------------------------
@@ -298,15 +326,28 @@ solidfire-libs_src_prepare()
 
 solidfire-libs_pkg_preinst()
 {
-	if [[ -n ${SOLIDFIRE_EXPORT_PATH} ]]; then
-		phase "Exporting PATH and ROOTPATH: ${SOLIDFIRE_EXPORT_PATH}"
+	SOLIDFIRE_EXPORT_PYTHONPATH="$(get_export_pythonpath)"
+	
+	if [[ -n "${SOLIDFIRE_EXPORT_PATH}" || -n "${SOLIDFIRE_EXPORT_PYTHONPATH}" ]]; then
+		
+		phase "Exporting PATH=${SOLIDFIRE_EXPORT_PATH} PYTHONPATH=${SOLIDFIRE_EXPORT_PYTHONPATH}"
 		ENVD_FILE="05-${PF}"
 		SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/etc/env.d/${ENVD_FILE}" )
-		cat > "${T}/${ENVD_FILE}" <<-EOF
-		PATH="${SOLIDFIRE_EXPORT_PATH}"
-		ROOTPATH="${SOLIDFIRE_EXPORT_PATH}"
-		EOF
-		doenvd "${T}/${ENVD_FILE}"
+		
+		{
+			if [[ -n "${SOLIDFIRE_EXPORT_PATH}" ]]; then
+				echo 'PATH="'${SOLIDFIRE_EXPORT_PATH}'"'
+				echo 'ROOTPATH="'${SOLIDFIRE_EXPORT_PATH}'"'
+			fi
+
+			if [[ -n "${SOLIDFIRE_EXPORT_PYTHONPATH}" ]]; then
+				echo 'PYTHONPATH="'${SOLIDFIRE_EXPORT_PYTHONPATH}'"'
+			fi
+		} > "${T}/${ENVD_FILE}"
+	
+		if [[ -s "${T}/${ENVD_FILE}" ]]; then
+			doenvd "${T}/${ENVD_FILE}"
+		fi
 	fi
 
 	# Make sure no files got installed outside ${PREFIX}
