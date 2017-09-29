@@ -20,23 +20,20 @@ S="${WORKDIR}"
 src_install()
 {
 	# Meld libs so dolib.so behaves with SONAME
-	patchelf --debug --set-soname "libqlsdm${PS}.so" "${S}/${MY_PF}/libs/libqlsdm.so"
-	patchelf --debug --set-soname "libHBAAPI${PS}.so" "${S}/${MY_PF}/libs/libHBAAPI.so"
+	patchelf --debug --set-soname "libqlsdm${PS}.so" "${S}/${MY_PF}/libs/libqlsdm.so" || die
+	patchelf --debug --set-soname "libHBAAPI${PS}.so" "${S}/${MY_PF}/libs/libHBAAPI.so" || die
 
 	dolib.so ${S}/${MY_PF}/libs/{libqlsdm,libHBAAPI}.so
 	doins -r ${S}/${MY_PF}/*
-}
-
-src_compile()
-{
-	true
+	chmod +x "${DP}/bin/qaucli"
 }
 
 pkg_postinst()
 {
-	chmod +x "${PREFIX}"/bin/qaucli
-
-	# Heresy is at work here - change lib targets of Qlogic precompiled binary
-	patchelf --replace-needed "libHBAAPI.so" "${PREFIX}/lib64/libHBAAPI${PS}.so" "${PREFIX}/bin/qaucli" 
-	patchelf --replace-needed "libqlsdm.so" "${PREFIX}/lib64/libqlsdm${PS}.so" "${PREFIX}/bin/qaucli"
+	# Set library path and modify previous .so file names for automatic path mapping.
+	# Note: All libs must be in their final resting place before attempting --replace-needed
+	# to prevent binary corruption.
+	patchelf --set-rpath "${PREFIX}/lib" "${PREFIX}/bin/qaucli"
+	patchelf --replace-needed "libHBAAPI.so" "libHBAAPI${PS}.so" "${PREFIX}/bin/qaucli"  || die
+	patchelf --replace-needed "libqlsdm.so" "libqlsdm${PS}.so" "${PREFIX}/bin/qaucli" || die
 }
