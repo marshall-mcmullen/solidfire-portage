@@ -12,7 +12,7 @@ SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${MY_PF}.tar.gz -> 
 LICENSE="QLogic SLA"
 KEYWORDS="~amd64 amd64"
 
-DEPEND=">=dev-util/patchelf-0.9.0"
+DEPEND=">=dev-util/patchelf-0.9"
 
 SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
 

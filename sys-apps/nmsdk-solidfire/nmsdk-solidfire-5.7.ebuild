@@ -12,7 +12,7 @@ LICENSE="NetApp"
 KEYWORDS="~amd64 amd64"
 RESTRICT="strip"
 
-DEPEND=">=dev-util/patchelf-0.9.0"
+DEPEND=">=dev-util/patchelf-0.9"
 
 # We don't need or want solidfire-libs package unpack magic (munging) in this case
 S="${WORKDIR}"
