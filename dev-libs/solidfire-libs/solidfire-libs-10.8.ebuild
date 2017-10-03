@@ -30,7 +30,7 @@ RDEPEND=">=app-misc/jq-1.4
 	=dev-libs/jsoncpp-solidfire-0.6.0-r7
 	=dev-libs/liblzf-solidfire-3.6-r6
 	=dev-libs/skein-solidfire-121508-r6
-    =dev-libs/snapmirror-solidfire-2017080210
+    =dev-libs/snapmirror-solidfire-1.0.4533189
 	=net-analyzer/net-snmp-5.7.3-r5
 	=net-dns/c-ares-1.12.0
 	=net-libs/libmicrohttpd-solidfire-0.9.32-r4
@@ -41,6 +41,7 @@ RDEPEND=">=app-misc/jq-1.4
 	sys-apps/hdparm
 	sys-apps/iproute2
 	sys-apps/lshw
+	=sys-apps/nmsdk-solidfire-5.7
 	=sys-cluster/zookeeper-solidfire-3.5.0-r32
 	sys-devel/gdb
 	=sys-libs/libunwind-solidfire-1.1.1-r1
