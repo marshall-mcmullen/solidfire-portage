@@ -20,6 +20,5 @@ src_compile()
 
 src_install()
 {
-	echo -e "${D}"
     dobin "smart-nvdimm"
 }
