@@ -202,6 +202,12 @@ for cmd in doins newins; do
 	eval "${cmd}() { insinto ${PREFIX}; $(which ${cmd} 2>/dev/null) \$@; }"
 done
 
+dofirmware()
+{
+	insinto "${PREFIX}/lib/firmware"
+	$(which doins 2>/dev/null) "$@"
+}
+
 doheader()
 {
 	insinto "${PREFIX}/include"
