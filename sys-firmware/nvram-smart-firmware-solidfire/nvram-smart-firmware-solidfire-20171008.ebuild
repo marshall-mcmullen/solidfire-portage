@@ -8,7 +8,7 @@ HOMEPAGE="https://www.netapp.com"
 inherit solidfire-libs
 
 # Individual versions of all payloads in this package
-RADIAN_FIRMWARE="10.07.v24.r23766"
+SMART_FIRMWARE="10.07.v24.r23766"
 
 SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
 
