@@ -21,7 +21,7 @@ KEYWORDS="~amd64 amd64"
 S="${WORKDIR}"
 src_install()
 {
-    # Add chassis specific payloads into /sf/package/../lib/firmware/
-    dofirmware -r ${S}/${MY_PF}/*
+	# Add chassis specific payloads into /sf/package/../lib/firmware/
+	dofirmware -r ${S}/${MY_PF}/*
 }
 

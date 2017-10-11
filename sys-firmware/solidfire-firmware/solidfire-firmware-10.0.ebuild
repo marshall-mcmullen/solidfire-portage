@@ -10,7 +10,6 @@ HOMEPAGE="http://www.solidfire.com"
 SRC_URI=""
 
 LICENSE="metapackage"
-SLOT="${PVR}"
 KEYWORDS="~amd64 amd64"
 IUSE=""
 
@@ -63,7 +62,7 @@ src_install()
 			pn_export="${pn_export//-/}"
 			[[ "${data[pn]}" =~ "solidfire"          ]] && pvr_export="solidfire-${data[pvr]}"
 
-            # Append firmware paths for later exports
+			# Append firmware paths for later exports
 			local firmwareRtfiFolder=$(echo ${data[pf]} | cut -d "-" -f1)
 			local firmwareVendor=$(echo ${data[pf]} | cut -d "-" -f2)
 			firmwareData+=( ${firmwareRtfiFolder} )
