@@ -15,10 +15,10 @@ IUSE=""
 
 RDEPEND="
 	=sys-firmware/chassis-qs52b-firmware-solidfire-20171008
-	=sys-firmware/drive-intel-firmware-solidfire-20171008
-	=sys-firmware/drive-samsung-firmware-solidfire-20171008
-	=sys-firmware/drive-sandisk-firmware-solidfire-20171008
-	=sys-firmware/drive-toshiba-firmware-solidfire-20171008
+	=sys-firmware/drives-intel-firmware-solidfire-20171008
+	=sys-firmware/drives-samsung-firmware-solidfire-20171008
+	=sys-firmware/drives-sandisk-firmware-solidfire-20171008
+	=sys-firmware/drives-toshiba-firmware-solidfire-20171008
 	=sys-firmware/hba-lsi-firmware-solidfire-20171008
 	=sys-firmware/nic-broadcom-firmware-solidfire-20171008
 	=sys-firmware/nic-mellanox-firmware-solidfire-20171008
