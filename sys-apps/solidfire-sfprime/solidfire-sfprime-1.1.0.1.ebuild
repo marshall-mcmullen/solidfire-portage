@@ -40,5 +40,4 @@ src_install()
 	[Install]
 	WantedBy=multi-user.target
 	EOF
-	cat "${DP}/systemd/sf-nde.service"
 }
