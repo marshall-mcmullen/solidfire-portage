@@ -8,19 +8,18 @@ EXPORT_FUNCTIONS src_unpack
 
 EAPI="5"
 ETYPE="sources"
-detect_version
-detect_arch
 
 # Set variables used in ebuild SRC_URI and in src_unpack functions
 KVERSION="${PV%.*}"
 SFVERSION="${PV##*.}"
 SFVERSION="${SFVERSION::-1}"
+KV_FULL="${KVERSION}-solidfire${SFVERSION}"
+S="${WORKDIR}/linux-${KV_FULL}"
 
 solidfire-kernel_src_unpack()
 {
 	# Use solidfire-libs magic unpacking, but then rename unpacked directory so it fits in with kernel-2 eclass naming
 	solidfire-libs_src_unpack
-	S="${WORKDIR}/linux-${KVERSION}-solidfire${SFVERSION}"
 	mv "${MY_S}" "${S}"
 }
 
