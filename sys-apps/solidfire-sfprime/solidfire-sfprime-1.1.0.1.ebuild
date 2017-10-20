@@ -28,9 +28,12 @@ src_install()
 	# /sf/packages/${PF}/confrestapp-${PV}
 	# And have a non-versioned symlink at /sf/packages/${PF}/confrestapp that they can then change to point to other
 	# versions.
-	doins -r "${S}"
-	mv "${DP}/${PF}" "${DP}/confrestapp-${PV}"
+	mkdir -p "${DP}/confrestapp-${PV}" || die
+	cp --preserve=mode --recursive "${S}/." "${DP}/confrestapp-${PV}" || die
 	dosym "${PREFIX}/confrestapp-${PV}" "${PREFIX}/confrestapp"
+	if [[ ! -x "${DP}/confrestapp-${PV}/confrestapp" ]]; then
+		die "${DP}/confrestapp-${PV}/confrestapp must be executable"
+	fi
 
 	# EMBER-447: Until we have proper eselect behavior just blindly create the expected symlinks in /sf. We'll manage
 	# these better once we have eselect behavior.
