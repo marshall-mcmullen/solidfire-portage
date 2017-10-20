@@ -1,21 +1,10 @@
+# Copyright 2017 NetApp, Inc.  All rights reserved.
+
 EAPI="5"
 ETYPE="sources"
-inherit kernel-2
-inherit git-r3
-detect_version
-detect_arch
+inherit solidfire-kernel
 
-KEYWORDS="amd64"
+DESCRIPTION="Full sources for the Linux kernel with SolidFire patches"
 HOMEPAGE="https://solidfire.com"
-
-DESCRIPTION="Full sources for the Linux kernel with Solidfire patches"
-
-EGIT_REPO_URI="https://bitbucket.org/solidfire/solidfire-kernel"
-EGIT_CHECKOUT_DIR="${S}"
-
-#EGIT_BRANCH=master
-EGIT_COMMIT="v4.12.3-solidfire4"
-
-src_unpack() {
-	git-r3_src_unpack
-}
+SRC_URI="https://bitbucket.org/solidfire/solidfire-kernel/get/v${KVERSION}-solidfire${SFVERSION}.tar.bz2 -> ${PF}.tar.bz2"
+KEYWORDS="amd64"
