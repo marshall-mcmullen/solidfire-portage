@@ -53,7 +53,7 @@ src_install()
 	Type=simple
 	User=root
 	WorkingDirectory=/sf
-	ExecStart=${PREFIX}/confrestapp
+	ExecStart=${PREFIX}/confrestapp/confrestapp
 	Restart=always
 
 	[Install]
