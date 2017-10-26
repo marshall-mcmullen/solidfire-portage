@@ -84,7 +84,7 @@ handle_package_links()
 	fi
 
 	if [[ "${action}" != @(list|create|delete) ]]; then
-	    die -q "Unsupported action '${action}'"
+		die -q "Unsupported action '${action}'"
 	fi
 
 	if [[ ! -e "${pkg}/eselect/symlinks" ]]; then
@@ -100,16 +100,16 @@ handle_package_links()
 			echo "${lnk} -> $(readlink -e "${lnk}" || echo "(none)")"
 
 		elif [[ "${action}" == "create" ]]; then
-		    echo " - Creating symlink ${lnk} -> ${target}"
+			echo " - Creating symlink ${lnk} -> ${target}"
 			if [[ ! -e "${target}" ]]; then
-			    die -q "${target} does not exist"
+				die -q "${target} does not exist"
 			fi
 			ln --symbolic --relative "${target}" "${lnk}" 
 		
 		elif [[ "${action}" == "delete" ]]; then
-		    echo " - Deleting symlink ${lnk} -> ${target}"
+			echo " - Deleting symlink ${lnk} -> ${target}"
 			if [[ -e "${lnk}" && ! -L "${lnk}" ]]; then
-			    die "${lnk} must be a symlink"
+				die "${lnk} must be a symlink"
 			fi
 
 			rm --force "${lnk}"
@@ -172,7 +172,7 @@ do_show()
 
 	local lnk
 	for lnk in $(find "${SFDIR}" -maxdepth 1 -type l); do
-	    write_list_start "[$(basename ${lnk})]"
+		write_list_start "[$(basename ${lnk})]"
 		echo "${lnk} -> $(readlink -m ${lnk})"
 		handle_package_links "list" "${lnk}"
 		echo 
@@ -202,7 +202,7 @@ describe_set_parameters()
 # Set a specific SolidFire package by name to an explicit version number.
 do_set()
 {
-    if [[ $# != 2 ]]; then
+	if [[ $# != 2 ]]; then
 		die -q "Usage: <package> <version>"
 	fi
 
@@ -211,11 +211,11 @@ do_set()
 	local lnk="${SFDIR}/${pn}"
 	local target="$(ls -d ${SFDIR}/solidfire-${pn}-${pv} ${SFDIR}/${pn}-solidfire-${pv} 2>/dev/null)"
 	if [[ -z "${target}" ]]; then
-	    die -q "No viable target solidfire-${pn}-${pv} or ${pn}-solidfire-${pv} in ${SFDIR}"
+		die -q "No viable target solidfire-${pn}-${pv} or ${pn}-solidfire-${pv} in ${SFDIR}"
 	fi
 
 	if [[ -e "${lnk}" && ! -L "${lnk}" ]]; then
-	    die -q "Refusing to replace existing non-symlink at ${lnk}"
+		die -q "Refusing to replace existing non-symlink at ${lnk}"
 	fi
 
 	do_unset "${pn}"	
@@ -243,8 +243,8 @@ do_unset()
 	local lnk="${SFDIR}/${pn}"
 	if [[ -L "${lnk}" ]] ; then
 		write_list_start "Unsetting ${pn}"
-	    local current=$(readlink -m ${lnk})
-	    echo ">> Removing existing ${lnk} -> ${current}"
+		local current=$(readlink -m ${lnk})
+		echo ">> Removing existing ${lnk} -> ${current}"
 		rm --force "${lnk}"
 		handle_package_links "delete" "${current}"
 	fi
@@ -271,7 +271,7 @@ do_update()
 	local all=0	if_unset=0
 	while [[ $# -gt 0 ]]; do
 		local flag="${1#--}"
-        if [[ "${flag}" == "all" ]]; then
+		if [[ "${flag}" == "all" ]]; then
 			for pkg in $(find_packages); do
 				packages+=( $(echo "${pkg%%:*}" | sed -e 's|-*solidfire-*||') )
 			done
