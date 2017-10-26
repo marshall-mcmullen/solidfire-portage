@@ -2,7 +2,7 @@
 # Copyright 2017 NetApp, Inc. All rights reserved.
 
 DESCRIPTION="Manage SolidFire Package Symlinks"
-SFDIR="${EROOT}sf/packages"
+SFDIR="${EROOT:-/}sf/packages"
 VERSION="1.0"
 
 #----------------------------------------------------------------------------------------------------------------------
