@@ -37,5 +37,5 @@ src_install()
     # Remove some files we don't care about
     rm --verbose "${DP}"/{SUM_UserGuide.pdf,ReleaseNote.txt} || die
 
-	dobinlinks ${DP}/bin/*
+	dobinlinks ${DP}/{smc-ipmicfg,smc-sum}
 }
