@@ -87,6 +87,7 @@ src_compile_zktreeutil()
 src_install_zktreeutil()
 {
 	emake DESTDIR="${D}" install
+	dobinlinks ${DP}/bin/*
 }
 
 #----------------------------------------------------------------------------------------------------------------------

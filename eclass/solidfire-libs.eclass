@@ -11,9 +11,10 @@ _SOLIDFIRE_LIBS_ECLASS=1
 
 inherit base autotools eutils flag-o-matic
 
-EXPORT_FUNCTIONS src_unpack src_prepare pkg_preinst
+EXPORT_FUNCTIONS src_unpack src_prepare pkg_preinst pkg_postinst pkg_prerm
 
 DEPEND="app-portage/gentoolkit"
+PDEPEND="app-eselect/eselect-solidfire"
 
 # Fully version every solidfire-libs package by setting slot to full package version including
 # package revision.
@@ -260,6 +261,31 @@ get_export_pythonpath()
 	python_foreach_impl _echo_python_path
 }
 
+dopathlinks()
+{
+	if [[ $# -eq 0 ]]; then
+		return 0
+	fi
+
+	local dest="${1}"; shift
+	mkdir -p "${D}/${PREFIX}/eselect"
+
+	local entry
+	for entry in "${@}"; do
+		echo "${dest}$(basename ${entry}):${entry#${D}/}"
+	done >> "${D}/${PREFIX}/eselect/symlinks" || die "Failed to create eselect/symlinks file"
+}
+
+dobinlinks()
+{
+	dopathlinks "/usr/bin/" "${@}"
+}
+
+dosbinlinks()
+{
+	dopathlinks "/usr/sbin/" "${@}"
+}
+
 #----------------------------------------------------------------------------------------------------------------------
 # SolidFire Libs public ebuild methods
 #----------------------------------------------------------------------------------------------------------------------
@@ -332,30 +358,6 @@ solidfire-libs_src_prepare()
 
 solidfire-libs_pkg_preinst()
 {
-	SOLIDFIRE_EXPORT_PYTHONPATH="$(get_export_pythonpath)"
-	
-	if [[ -n "${SOLIDFIRE_EXPORT_PATH}" || -n "${SOLIDFIRE_EXPORT_PYTHONPATH}" ]]; then
-		
-		phase "Exporting PATH=${SOLIDFIRE_EXPORT_PATH} PYTHONPATH=${SOLIDFIRE_EXPORT_PYTHONPATH}"
-		ENVD_FILE="05-${PF}"
-		SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/etc/env.d/${ENVD_FILE}" )
-		
-		{
-			if [[ -n "${SOLIDFIRE_EXPORT_PATH}" ]]; then
-				echo 'PATH="'${SOLIDFIRE_EXPORT_PATH}'"'
-				echo 'ROOTPATH="'${SOLIDFIRE_EXPORT_PATH}'"'
-			fi
-
-			if [[ -n "${SOLIDFIRE_EXPORT_PYTHONPATH}" ]]; then
-				echo 'PYTHONPATH="'${SOLIDFIRE_EXPORT_PYTHONPATH}'"'
-			fi
-		} > "${T}/${ENVD_FILE}"
-	
-		if [[ -s "${T}/${ENVD_FILE}" ]]; then
-			doenvd "${T}/${ENVD_FILE}"
-		fi
-	fi
-
 	# Make sure no files got installed outside ${PREFIX}
 	phase "Looking for SolidFire sandbox violations"
 	local violations=( $(find ${D} -path ${D}sf/packages -prune -o -path ${D}sf -o -path ${D} -o -print) )
@@ -381,6 +383,16 @@ solidfire-libs_pkg_preinst()
 
 	# Verify all headers and libraries are versioned properly
 	versionize_check
+}
+
+solidfire-libs_pkg_postinst()
+{
+	eselect solidfire update "${MY_PN}"
+}
+
+solidfire-libs_pkg_prerm()
+{
+	eselect solidfire update "${MY_PN}"
 }
 
 #----------------------------------------------------------------------------------------------------------------------

@@ -17,8 +17,7 @@ DEPEND="dev-libs/boost
     dev-libs/log4cxx
     =sys-cluster/zookeeper-solidfire-${PVR}"
 RDEPEND="${DEPEND}"
-
-SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
+PDEPEND="app-eselect/eselect-solidfire"
 
 #----------------------------------------------------------------------------------------------------------------------
 # WRAPPERS FOR EACH TOOL
@@ -89,6 +88,7 @@ src_compile_zktreeutil()
 src_install_zktreeutil()
 {
 	emake DESTDIR="${D}" install
+	dobinlinks ${DP}/bin/*
 }
 
 #----------------------------------------------------------------------------------------------------------------------
