@@ -388,12 +388,12 @@ solidfire-libs_pkg_preinst()
 
 solidfire-libs_pkg_postinst()
 {
-	eselect solidfire update "${MY_PN}" || die "eselect solidfire update ${MY_PN} failed"
+	eselect solidfire update "$(echo ${PN} | sed 's|-*solidfire-*||')"
 }
 
 solidfire-libs_pkg_prerm()
 {
-	eselect solidfire update "${MY_PN}" || die "eselect solidfire update ${MY_PN} failed"
+	eselect solidfire update "$(echo ${PN} | sed 's|-*solidfire-*||')"
 }
 
 #----------------------------------------------------------------------------------------------------------------------
