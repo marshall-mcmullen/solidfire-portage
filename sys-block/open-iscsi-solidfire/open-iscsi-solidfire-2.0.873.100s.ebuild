@@ -19,8 +19,6 @@ RDEPEND="${DEPEND}
     sys-apps/util-linux"
 S="${WORKDIR}/${MY_P}"
 
-SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/sbin"
-
 src_prepare()
 {
     # Since open-iscsi doesn't use the GNU autotools, we have to go hack the
@@ -52,4 +50,6 @@ src_install()
         -e "s|ExecStart=.*|ExecStart=${PREFIX}/sbin/iscsid -c ${PREFIX}/etc/iscsid.conf -i ${PREFIX}/etc/initiatorname.iscsi|" \
         -e "s|ExecStop=/sbin/iscsiadm|ExecStop=${PREFIX}/sbin/iscsiadm|" \
         "${DP}/etc/systemd/iscsid.service" || die
+
+	dosbinlinks ${DP}/sbin/*
 }

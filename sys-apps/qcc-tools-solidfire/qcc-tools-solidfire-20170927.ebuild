@@ -14,8 +14,6 @@ KEYWORDS="~amd64 amd64"
 
 DEPEND=">=dev-util/patchelf-0.9"
 
-SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
-
 S="${WORKDIR}"
 src_install()
 {
@@ -36,4 +34,7 @@ pkg_postinst()
 	patchelf --set-rpath "${PREFIX}/lib" "${PREFIX}/bin/qaucli"
 	patchelf --replace-needed "libHBAAPI.so" "libHBAAPI${PS}.so" "${PREFIX}/bin/qaucli"  || die
 	patchelf --replace-needed "libqlsdm.so" "libqlsdm${PS}.so" "${PREFIX}/bin/qaucli" || die
+
+	# Expose bin symlinks outside our application specific directory
+	dobinlinks "${DP}"/bin/*
 }

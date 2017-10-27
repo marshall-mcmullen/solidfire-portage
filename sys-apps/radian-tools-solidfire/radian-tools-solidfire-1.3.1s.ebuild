@@ -15,8 +15,6 @@ KEYWORDS="~amd64 amd64"
 
 DEPEND='dev-libs/libnl'
 
-SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
-
 src_prepare()
 {
 	sed -i -re 's/(dump_log_page)/radian_\1/' utils/dump_log_page.in
@@ -25,4 +23,5 @@ src_prepare()
 src_install()
 {
 	emake DESTDIR="${D}" install
+	dobinlinks ${DP}/bin/*
 }

@@ -13,8 +13,6 @@ KEYWORDS="amd64 ~amd64"
 RDEPEND="dev-perl/JSON-Any
 	dev-perl/XML-Simple"
 
-SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
-
 src_unpack()
 {
 	mkdir -p ${S}
@@ -23,4 +21,5 @@ src_unpack()
 src_install()
 {
 	dobin ${FILESDIR}/xml2json
+	dobinlinks "${DP}/bin/xml2json"
 }

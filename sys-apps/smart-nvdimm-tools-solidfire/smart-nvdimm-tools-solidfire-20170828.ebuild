@@ -10,8 +10,6 @@ SRC_URI="http://bitbucket.org/solidfire/${MY_PN}/get/release/${PVR}.tar.bz2 -> $
 LICENSE="SMART NDA"
 KEYWORDS="~amd64 amd64"
 
-SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
-
 src_compile()
 {
     emake nvdimm -j1
@@ -20,4 +18,5 @@ src_compile()
 src_install()
 {
     dobin "smart-nvdimm"
+	dobinlinks "${DP}"/bin/*
 }

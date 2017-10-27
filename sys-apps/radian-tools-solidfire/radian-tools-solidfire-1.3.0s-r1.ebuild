@@ -12,9 +12,8 @@ KEYWORDS="~amd64 amd64"
 
 DEPEND='dev-libs/libnl'
 
-SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
-
 src_install()
 {
 	emake DESTDIR="${D}" install
+	dobinlinks ${DP}/bin/*
 }
