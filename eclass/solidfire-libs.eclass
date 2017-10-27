@@ -272,6 +272,7 @@ dopathlinks()
 
 	local entry
 	for entry in "${@}"; do
+		[[ -e "${entry}" ]] || die "${entry} does not exist"
 		echo "${dest}$(basename ${entry}):${entry#${D}/}"
 	done >> "${D}/${PREFIX}/eselect/symlinks" || die "Failed to create eselect/symlinks file"
 }
@@ -387,12 +388,12 @@ solidfire-libs_pkg_preinst()
 
 solidfire-libs_pkg_postinst()
 {
-	eselect solidfire update "${MY_PN}"
+	eselect solidfire update "${MY_PN}" || die "eselect solidfire update ${MY_PN} failed"
 }
 
 solidfire-libs_pkg_prerm()
 {
-	eselect solidfire update "${MY_PN}"
+	eselect solidfire update "${MY_PN}" || die "eselect solidfire update ${MY_PN} failed"
 }
 
 #----------------------------------------------------------------------------------------------------------------------
