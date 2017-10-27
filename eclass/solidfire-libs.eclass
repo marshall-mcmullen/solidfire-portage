@@ -237,7 +237,9 @@ dopython_install()
 {
 	python_foreach_impl distutils-r1_src_install
 
-	_install_python_files()
+	mkdir -p "${D}/${PREFIX}/eselect"
+
+	__dopython_install_internal()
 	{
 		phase "Moving python files from ${D}/${EPREFIX} -> ${DP}"
 		echo "EPYTHON: ${EPYTHON}"
@@ -246,19 +248,15 @@ dopython_install()
 		mkdir -p "${DP}/lib"
 		mv --verbose "${D}/${EPREFIX}/usr/lib64/${EPYTHON}" "${DP}/lib"
 		find "${D}/${EPREFIX}" -type d -empty -delete
+
+		# Now we also need to add these to our eselect file so that they are visible outside our package directory
+		local path
+		for path in $(find "${DP}/lib/${EPYTHON}/site-packages" -type f); do
+			echo "/usr/lib/${EPYTHON}/site-packages/$(basename ${path}):${path#${D}/}"
+		done >> "${D}/${PREFIX}/eselect/symlinks" || die "Failed to create eselect/symlinks file"
 	}
 	
-	python_foreach_impl _install_python_files
-}
-
-get_export_pythonpath()
-{
-	_echo_python_path()
-	{
-		echo ":${PREFIX}/lib/${EPYTHON}/site-packages"
-	}
-
-	python_foreach_impl _echo_python_path
+	python_foreach_impl __dopython_install_internal
 }
 
 dopathlinks()

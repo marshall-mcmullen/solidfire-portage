@@ -130,7 +130,7 @@ describe_list()
 # (if any) as well as available versions.
 do_list()
 {
-	[[ -z "${@}" ]] || die -q "Too many parameters"
+	[[ $# -eq 0 ]] || die -q "Too many parameters"
 
 	write_list_start "Available SolidFire Packages:"
 
@@ -168,10 +168,10 @@ describe_show()
 # Show additional output for each package by also displaying any links created for that package.
 do_show()
 {
-	[[ -z "${@}" ]] || die -q "Too many parameters"
+	[[ $# -eq 0 ]] || die -q "Too many parameters"
 
 	local lnk
-	for lnk in $(find "${SFDIR}" -maxdepth 1 -type l); do
+	for lnk in $(find "${SFDIR}" -maxdepth 1 -type l | sort); do
 		write_list_start "[$(basename ${lnk})]"
 		echo "${lnk} -> $(readlink -m ${lnk})"
 		handle_package_links "list" "${lnk}"
@@ -268,7 +268,7 @@ do_update()
 {
 	# Parse list of packages to update
 	local pkg="" packages=()
-	local all=0	if_unset=0
+	local all=0 if_unset=0
 	while [[ $# -gt 0 ]]; do
 		local flag="${1#--}"
 		if [[ "${flag}" == "all" ]]; then
