@@ -15,8 +15,6 @@ KEYWORDS="~amd64 amd64"
 
 DEPEND='dev-libs/libnl'
 
-SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
-
 src_compile()
 {
     cd src
@@ -31,4 +29,5 @@ src_compile()
 src_install()
 {
     dobin $(find src -perm /u=x -type f | xargs)
+	dobinlinks ${DP}/bin/*
 }
