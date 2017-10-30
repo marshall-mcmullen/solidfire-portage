@@ -17,17 +17,17 @@ DEPEND='dev-libs/libnl'
 
 src_compile()
 {
-    cd src
-    make
+	cd src
+	make
 	for binary in $(find . -perm /u=x -type f); do
 		local new_name="${PROGRAM_PREFIX}$(basename ${binary})"
 		einfo "renaming ${binary} to ${new_name}"
 		mv ${binary} ${new_name}
-    done
+	done
 }
 
 src_install()
 {
-    dobin $(find src -perm /u=x -type f | xargs)
+	dobin $(find src -perm /u=x -type f | xargs)
 	dobinlinks ${DP}/bin/*
 }
