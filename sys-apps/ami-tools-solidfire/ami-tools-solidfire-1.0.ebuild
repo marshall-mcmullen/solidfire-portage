@@ -18,16 +18,13 @@ SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${MY_PF}.tar.gz -> 
 LICENSE="AMI/Quanta"
 KEYWORDS="~amd64 amd64"
 
-SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
-
 S="${WORKDIR}"
 src_install()
 {
     doins -r ${S}/${MY_PF}/*
-    chmod +x "${DP}"/bin/{yafuflash2,afulnx_64,scelnx_64}
+    chmod +x ${DP}/bin/{yafuflash2,afulnx_64,scelnx_64}
+	dobinlinks ${DP}/bin/*
 }
 
 src_compile()
-{
-    true
-}
+{ :; }

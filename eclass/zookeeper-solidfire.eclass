@@ -8,8 +8,6 @@ _ZOOKEEPER_ECLASS=1
 inherit java-pkg-2 solidfire-libs
 EXPORT_FUNCTIONS src_prepare src_configure src_compile src_install src_test pkg_preinst
 
-SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
-
 zookeeper-solidfire_src_prepare()
 {
 	# Prepare JAVA
@@ -117,6 +115,9 @@ zookeeper-solidfire_src_install()
 		mv ${DP}/bin/cli_st ${DP}/bin/zkcli_st || die
 		mv ${DP}/bin/cli_mt ${DP}/bin/zkcli_mt || die
 	}
+
+	# Expose paths
+	dobinlinks "${DP}/bin/zkCli.sh"
 }
 
 zookeeper-solidfire_pkg_preinst()

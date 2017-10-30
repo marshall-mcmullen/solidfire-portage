@@ -11,9 +11,10 @@ _SOLIDFIRE_LIBS_ECLASS=1
 
 inherit base autotools eutils flag-o-matic
 
-EXPORT_FUNCTIONS src_unpack src_prepare pkg_preinst
+EXPORT_FUNCTIONS src_unpack src_prepare pkg_preinst pkg_postinst pkg_prerm
 
 DEPEND="app-portage/gentoolkit"
+PDEPEND="app-eselect/eselect-solidfire"
 
 # Fully version every solidfire-libs package by setting slot to full package version including
 # package revision.
@@ -236,7 +237,9 @@ dopython_install()
 {
 	python_foreach_impl distutils-r1_src_install
 
-	_install_python_files()
+	mkdir -p "${D}/${PREFIX}/eselect"
+
+	__dopython_install_internal()
 	{
 		phase "Moving python files from ${D}/${EPREFIX} -> ${DP}"
 		echo "EPYTHON: ${EPYTHON}"
@@ -245,19 +248,41 @@ dopython_install()
 		mkdir -p "${DP}/lib"
 		mv --verbose "${D}/${EPREFIX}/usr/lib64/${EPYTHON}" "${DP}/lib"
 		find "${D}/${EPREFIX}" -type d -empty -delete
+
+		# Now we also need to add these to our eselect file so that they are visible outside our package directory
+		local path
+		for path in $(find "${DP}/lib/${EPYTHON}/site-packages" -type f); do
+			echo "/usr/lib/${EPYTHON}/site-packages/$(basename ${path}):${path#${D}/}"
+		done >> "${D}/${PREFIX}/eselect/symlinks" || die "Failed to create eselect/symlinks file"
 	}
 	
-	python_foreach_impl _install_python_files
+	python_foreach_impl __dopython_install_internal
 }
 
-get_export_pythonpath()
+dopathlinks()
 {
-	_echo_python_path()
-	{
-		echo ":${PREFIX}/lib/${EPYTHON}/site-packages"
-	}
+	if [[ $# -eq 0 ]]; then
+		return 0
+	fi
 
-	python_foreach_impl _echo_python_path
+	local dest="${1}"; shift
+	mkdir -p "${D}/${PREFIX}/eselect"
+
+	local entry
+	for entry in "${@}"; do
+		[[ -e "${entry}" ]] || die "${entry} does not exist"
+		echo "${dest}$(basename ${entry}):${entry#${D}/}"
+	done >> "${D}/${PREFIX}/eselect/symlinks" || die "Failed to create eselect/symlinks file"
+}
+
+dobinlinks()
+{
+	dopathlinks "/usr/bin/" "${@}"
+}
+
+dosbinlinks()
+{
+	dopathlinks "/usr/sbin/" "${@}"
 }
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -332,30 +357,6 @@ solidfire-libs_src_prepare()
 
 solidfire-libs_pkg_preinst()
 {
-	SOLIDFIRE_EXPORT_PYTHONPATH="$(get_export_pythonpath)"
-	
-	if [[ -n "${SOLIDFIRE_EXPORT_PATH}" || -n "${SOLIDFIRE_EXPORT_PYTHONPATH}" ]]; then
-		
-		phase "Exporting PATH=${SOLIDFIRE_EXPORT_PATH} PYTHONPATH=${SOLIDFIRE_EXPORT_PYTHONPATH}"
-		ENVD_FILE="05-${PF}"
-		SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/etc/env.d/${ENVD_FILE}" )
-		
-		{
-			if [[ -n "${SOLIDFIRE_EXPORT_PATH}" ]]; then
-				echo 'PATH="'${SOLIDFIRE_EXPORT_PATH}'"'
-				echo 'ROOTPATH="'${SOLIDFIRE_EXPORT_PATH}'"'
-			fi
-
-			if [[ -n "${SOLIDFIRE_EXPORT_PYTHONPATH}" ]]; then
-				echo 'PYTHONPATH="'${SOLIDFIRE_EXPORT_PYTHONPATH}'"'
-			fi
-		} > "${T}/${ENVD_FILE}"
-	
-		if [[ -s "${T}/${ENVD_FILE}" ]]; then
-			doenvd "${T}/${ENVD_FILE}"
-		fi
-	fi
-
 	# Make sure no files got installed outside ${PREFIX}
 	phase "Looking for SolidFire sandbox violations"
 	local violations=( $(find ${D} -path ${D}sf/packages -prune -o -path ${D}sf -o -path ${D} -o -print) )
@@ -381,6 +382,16 @@ solidfire-libs_pkg_preinst()
 
 	# Verify all headers and libraries are versioned properly
 	versionize_check
+}
+
+solidfire-libs_pkg_postinst()
+{
+	eselect solidfire update "$(echo ${PN} | sed 's|-*solidfire-*||')"
+}
+
+solidfire-libs_pkg_prerm()
+{
+	eselect solidfire update "$(echo ${PN} | sed 's|-*solidfire-*||')"
 }
 
 #----------------------------------------------------------------------------------------------------------------------

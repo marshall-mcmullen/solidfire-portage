@@ -16,8 +16,6 @@ SLOT=0
 LICENSE="SuperMicro"
 KEYWORDS="~amd64 amd64"
 
-SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}"
-
 # We don't need or want solidfire-libs package unpack magic (munging) in this case
 S="${WORKDIR}"
 src_unpack()
@@ -38,4 +36,6 @@ src_install()
 
     # Remove some files we don't care about
     rm --verbose "${DP}"/{SUM_UserGuide.pdf,ReleaseNote.txt} || die
+
+	dobinlinks ${DP}/{smc-ipmicfg,smc-sum}
 }

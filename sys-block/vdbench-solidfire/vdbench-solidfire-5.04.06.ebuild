@@ -13,16 +13,13 @@ KEYWORDS="~amd64 amd64"
 DEPEND=""
 RDEPEND=">=virtual/jre-1.7"
 
-SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
-
 S="${WORKDIR}"
 src_install()
 {
     doins -r ${S}/${MY_PF}/*
     chmod +x "${DP}"/bin/vdbench
+	dobinlinks "${DP}/bin/vdbench"
 }
 
 src_compile()
-{
-    true
-}
+{ :; }

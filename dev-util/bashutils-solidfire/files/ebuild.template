@@ -37,10 +37,7 @@ SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/usr/local/share/${MY_PF}" )
 src_install()
 {
     DESTDIR=${D}/sf/packages/${P} PV=${PV} ${S}/.forge/install || die
-
-    # Setup backwards compatible symlinks into /usr/local/share/bashutils*
-    mkdir -p ${D}/usr/local/share/
-    ln -sf /sf/packages/${PF} ${D}/usr/local/share/${MY_PN}-${PV} || die
+    dobinlinks ${DP}/bin/*
 }
 
 src_compile()
