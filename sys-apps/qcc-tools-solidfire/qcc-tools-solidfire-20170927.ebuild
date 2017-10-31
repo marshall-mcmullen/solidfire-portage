@@ -36,5 +36,5 @@ pkg_postinst()
 	patchelf --replace-needed "libqlsdm.so" "libqlsdm${PS}.so" "${PREFIX}/bin/qaucli" || die
 
 	# Expose bin symlinks outside our application specific directory
-	dobinlinks "${DP}"/bin/*
+	dobinlinks "${PREFIX}"/bin/*
 }
