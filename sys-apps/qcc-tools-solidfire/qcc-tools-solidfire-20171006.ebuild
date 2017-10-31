@@ -35,5 +35,5 @@ pkg_postinst()
 	patchelf --replace-needed "libHBAAPI.so" "libHBAAPI${PS}.so" "${PREFIX}/bin/qaucli"  || die
 	patchelf --replace-needed "libqlsdm.so" "libqlsdm${PS}.so" "${PREFIX}/bin/qaucli" || die
 
-	dobinlinks ${DP}/bin/*
+	dobinlinks "${PREFIX}"/bin/*
 }
