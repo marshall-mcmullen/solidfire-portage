@@ -24,7 +24,10 @@ src_install()
 
 	dolib.so ${S}/${MY_PF}/libs/{libqlsdm,libHBAAPI}.so
 	doins -r ${S}/${MY_PF}/*
-	chmod +x "${DP}/bin/qaucli"
+	chmod +x ${DP}/bin/qaucli
+	
+	# Expose bin symlinks outside our application specific directory.
+	dobinlinks ${DP}/bin/*
 }
 
 pkg_postinst()
@@ -36,7 +39,6 @@ pkg_postinst()
 	patchelf --replace-needed "libHBAAPI.so" "libHBAAPI${PS}.so" "${PREFIX}/bin/qaucli"  || die
 	patchelf --replace-needed "libqlsdm.so" "libqlsdm${PS}.so" "${PREFIX}/bin/qaucli" || die
 
-	# Expose bin symlinks outside our application specific directory. Then call solidfire-libs pkg_postinst for eselect.
-	dobinlinks "${PREFIX}"/bin/*
+	# Call into solidfire-libs pkg_postinst to ensure eselect is called
 	solidfire-libs_pkg_postinst
 }
