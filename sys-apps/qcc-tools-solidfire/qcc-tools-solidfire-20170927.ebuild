@@ -11,6 +11,7 @@ SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${MY_PF}.tar.gz -> 
 
 LICENSE="QLogic SLA"
 KEYWORDS="~amd64 amd64"
+RESTRICT="strip"
 
 DEPEND=">=dev-util/patchelf-0.9"
 
@@ -35,6 +36,7 @@ pkg_postinst()
 	patchelf --replace-needed "libHBAAPI.so" "libHBAAPI${PS}.so" "${PREFIX}/bin/qaucli"  || die
 	patchelf --replace-needed "libqlsdm.so" "libqlsdm${PS}.so" "${PREFIX}/bin/qaucli" || die
 
-	# Expose bin symlinks outside our application specific directory
+	# Expose bin symlinks outside our application specific directory. Then call solidfire-libs pkg_postinst for eselect.
 	dobinlinks "${PREFIX}"/bin/*
+	solidfire-libs_pkg_postinst
 }
