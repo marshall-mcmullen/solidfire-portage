@@ -18,7 +18,7 @@ DEPEND='dev-libs/libnl'
 src_compile()
 {
 	cd src
-	make
+	emake
 	for binary in $(find . -perm /u=x -type f); do
 		local new_name="${PROGRAM_PREFIX}$(basename ${binary})"
 		einfo "renaming ${binary} to ${new_name}"
