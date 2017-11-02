@@ -26,19 +26,14 @@ src_install()
 	doins -r ${S}/${MY_PF}/*
 	chmod +x ${DP}/bin/qaucli
 	
+	# Set library path and modify previous .so file names for automatic path mapping.
+	patchelf --set-rpath "${PREFIX}/lib" "${DP}/bin/qaucli" || die
+	patchelf --replace-needed "libHBAAPI.so" "libHBAAPI${PS}.so" "${DP}/bin/qaucli"  || die
+	patchelf --replace-needed "libqlsdm.so" "libqlsdm${PS}.so" "${DP}/bin/qaucli" || die
+	
+	# To ensure there was no corruption of the binary caused by patchelf make sure it loads properly
+	${DP}/bin/qaucli -v || die
+
 	# Expose bin symlinks outside our application specific directory.
 	dobinlinks ${DP}/bin/*
-}
-
-pkg_postinst()
-{
-	# Set library path and modify previous .so file names for automatic path mapping.
-	# Note: All libs must be in their final resting place before attempting --replace-needed
-	# to prevent binary corruption.
-	patchelf --set-rpath "${PREFIX}/lib" "${PREFIX}/bin/qaucli"
-	patchelf --replace-needed "libHBAAPI.so" "libHBAAPI${PS}.so" "${PREFIX}/bin/qaucli"  || die
-	patchelf --replace-needed "libqlsdm.so" "libqlsdm${PS}.so" "${PREFIX}/bin/qaucli" || die
-
-	# Call into solidfire-libs pkg_postinst to ensure eselect is called
-	solidfire-libs_pkg_postinst
 }
