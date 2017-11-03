@@ -2,7 +2,7 @@
 
 EAPI=5
 
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="Collection of American Megatrend (AMI) tools."
 HOMEPAGE="https://ami.com/en/"

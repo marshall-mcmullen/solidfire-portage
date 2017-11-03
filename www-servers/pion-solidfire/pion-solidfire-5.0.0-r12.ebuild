@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="C++ framework for building light weight HTTP interfaces"
 HOMEPAGE="https://github.com/cloudmeter/pion"
@@ -29,7 +29,7 @@ src_prepare()
 	mkdir m4
 	autoreconf -ifs
 
-	solidfire-libs_src_prepare
+	solidfire_src_prepare
 
 	# Append boost specific flags
 	append-cppflags "-DBOOST_FILESYSTEM_VERSION=3 -DBOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS"

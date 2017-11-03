@@ -5,7 +5,7 @@ EAPI=5
 DESCRIPTION="Marvell NVRAM Firmware"
 HOMEPAGE="https://www.netapp.com"
 
-inherit solidfire-libs
+inherit solidfire
 
 # Individual versions of all payloads in this package
 MARVELL_FIRMWARES="wam_hw"

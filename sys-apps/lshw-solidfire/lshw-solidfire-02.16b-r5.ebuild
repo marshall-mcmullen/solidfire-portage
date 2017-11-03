@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="Hardware Lister"
 HOMEPAGE="http://ezix.org/project/wiki/HardwareLister"

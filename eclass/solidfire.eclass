@@ -16,7 +16,7 @@ EXPORT_FUNCTIONS src_unpack src_prepare pkg_preinst pkg_postinst pkg_prerm
 DEPEND="app-portage/gentoolkit"
 PDEPEND="app-eselect/eselect-solidfire"
 
-# Fully version every solidfire-libs package by setting slot to full package version including
+# Fully version every solidfire package by setting slot to full package version including
 # package revision.
 SLOT="${PVR}"
 
@@ -150,7 +150,7 @@ versionize_check()
 		ln --symbolic --relative ${DP}/lib64 ${DP}/lib
 	fi
 
-	# Reparent include and lib directories if needed. For solidfire-libs purposes a directory needs to be reparented 
+	# Reparent include and lib directories if needed. For solidfire purposes a directory needs to be reparented 
 	# if it is nested twice such as ${PN}/include/${PN}/${PN} -> ${PN}/include/${PN}.
 	local dname
 	for dname in "${DP}/include" "${DP}/lib"; do
@@ -294,7 +294,7 @@ archive_suffixes()
     echo -n ".tar|.tar.gz|.tgz|.taz|.tar.bz2|.tz2|.tbz2|.tbz|.tar.xz|.txz|.tar.lz|.tlz"
 }
 
-solidfire-libs_src_unpack()
+solidfire_src_unpack()
 {
 	if [[ -n "${EGIT_REPO_URI}" ]]; then
 		git-r3_src_unpack
@@ -331,7 +331,7 @@ solidfire-libs_src_unpack()
 	fi
 }
 
-solidfire-libs_src_prepare()
+solidfire_src_prepare()
 {
 	phase "SolidFire libs prepare"
 
@@ -355,7 +355,7 @@ solidfire-libs_src_prepare()
 	append-cxxflags "-std=c++11"
 }
 
-solidfire-libs_pkg_preinst()
+solidfire_pkg_preinst()
 {
 	# Make sure no files got installed outside ${PREFIX}
 	phase "Looking for SolidFire sandbox violations"
@@ -384,12 +384,12 @@ solidfire-libs_pkg_preinst()
 	versionize_check
 }
 
-solidfire-libs_pkg_postinst()
+solidfire_pkg_postinst()
 {
 	eselect solidfire update "$(echo ${PN} | sed 's|-*solidfire-*||')"
 }
 
-solidfire-libs_pkg_prerm()
+solidfire_pkg_prerm()
 {
 	eselect solidfire update "$(echo ${PN} | sed 's|-*solidfire-*||')"
 }

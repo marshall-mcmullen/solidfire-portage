@@ -5,7 +5,7 @@ EAPI=5
 DESCRIPTION="SMART NVRAM Firmware"
 HOMEPAGE="https://www.netapp.com"
 
-inherit solidfire-libs
+inherit solidfire
 
 # Individual versions of all payloads in this package
 SMART_FIRMWARE="10.07.v24.r23766"

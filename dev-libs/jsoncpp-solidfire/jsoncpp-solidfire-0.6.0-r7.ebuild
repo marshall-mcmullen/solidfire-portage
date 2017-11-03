@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="C++ JSON reader and writer"
 HOMEPAGE="http://jsoncpp.sourceforge.net"

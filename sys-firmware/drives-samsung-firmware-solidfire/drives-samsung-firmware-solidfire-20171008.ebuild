@@ -5,7 +5,7 @@ EAPI=5
 DESCRIPTION="Samsung SSD/NVME Drive Firmware"
 HOMEPAGE="https://www.netapp.com"
 
-inherit solidfire-libs
+inherit solidfire
 
 # Individual versions of all payloads in this package
 SAMSUNG_FIRMWARES="CXV8202Q CXV8501Q DXM9BW4Q

@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="Intel Threading Building Blocks"
 HOMEPAGE="http://threadingbuildingblocks.org"
@@ -18,7 +18,7 @@ RDEPEND="${DEPEND}"
 
 src_prepare()
 {
-	solidfire-libs_src_prepare
+	solidfire_src_prepare
 	
 	sed -i -e "s|soname=\$(BUILDING_LIBRARY)|soname=\$(patsubst %.so.\$(SONAME_SUFFIX),%${PS}.so,\$(BUILDING_LIBRARY))|" \
 		build/linux.gcc.inc || die

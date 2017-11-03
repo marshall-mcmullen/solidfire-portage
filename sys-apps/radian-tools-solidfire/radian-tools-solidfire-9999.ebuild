@@ -5,7 +5,7 @@ EAPI=5
 PROGRAM_PREFIX='radian_'
 
 inherit git-r3
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="Radian NVRAM userspace tools"
 HOMEPAGE="http://www.radianmemory.com"
@@ -14,21 +14,28 @@ HOMEPAGE="http://www.radianmemory.com"
 # on bitbucket.  This ebuild tries to clone from:
 #     file:///root/radian-tools
 EGIT_REPO_URI="file:///root/radian-tools"
-EGIT_BRANCH=${SOLIDFIRE_RADIAN_TOOLS_BRANCH:-solidfire-1.3}
+EGIT_BRANCH=${SOLIDFIRE_RADIAN_TOOLS_BRANCH:-solidfire-1.7}
 
 LICENSE="Radian NDA"
 KEYWORDS="~amd64"
 
 DEPEND='dev-libs/libnl'
 
-SOLIDFIRE_EXPORT_PATH="/sf/packages/${PF}/bin"
+DEPEND="dev-libs/libnl"
 
-src_prepare()
+src_compile()
 {
-	sed -i -re 's/(dump_log_page)/radian_\1/' utils/dump_log_page.in
+	cd src
+	emake
+	for binary in $(find . -perm /u=x -type f); do
+		local new_name="${PROGRAM_PREFIX}$(basename ${binary})"
+		einfo "renaming ${binary} to ${new_name}"
+		mv ${binary} ${new_name}
+	done
 }
 
 src_install()
 {
-	emake DESTDIR="${D}" install
+	dobin $(find src -perm /u=x -type f | xargs)
+	dobinlinks ${DP}/bin/*
 }

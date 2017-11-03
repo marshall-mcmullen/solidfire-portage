@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="C++ class library of cryptographic schemes"
 HOMEPAGE="http://cryptopp.com/"
@@ -35,7 +35,7 @@ src_prepare()
 	EOF
 	touch NEWS README AUTHORS ChangeLog Makefile.am
 
-	solidfire-libs_src_prepare
+	solidfire_src_prepare
 	eautoreconf
 }
 

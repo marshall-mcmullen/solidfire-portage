@@ -5,7 +5,7 @@ EAPI=5
 DESCRIPTION="LSI HBA Firmware"
 HOMEPAGE="https://www.netapp.com"
 
-inherit solidfire-libs
+inherit solidfire
 
 # Individual versions of all payloads in this package
 LSI_FIRMWARES="07.25.00.00 08.27.03.00 08.31.00.00

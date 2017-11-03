@@ -5,7 +5,7 @@ EAPI=5
 DESCRIPTION="Broadcom NIC Firmware"
 HOMEPAGE="https://www.netapp.com"
 
-inherit solidfire-libs
+inherit solidfire
 
 # Individual versions of all payloads in this package
 BROADCOM_FIRMWARES="NF92Y_LN_7.10.18"

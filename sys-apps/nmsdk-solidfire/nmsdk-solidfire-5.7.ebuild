@@ -2,7 +2,7 @@
 
 EAPI=5
 
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="NetApp Manageability SDK."
 HOMEPAGE="www.netapp.com"
@@ -14,7 +14,7 @@ RESTRICT="strip"
 
 DEPEND=">=dev-util/patchelf-0.9"
 
-# We don't need or want solidfire-libs package unpack magic (munging) in this case
+# We don't need or want solidfire package unpack magic (munging) in this case
 S="${WORKDIR}"
 src_unpack()
 {

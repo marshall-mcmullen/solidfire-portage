@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="Skein hash function family"
 HOMEPAGE="http://www.skein-hash.info"

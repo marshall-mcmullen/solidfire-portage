@@ -3,7 +3,7 @@
 
 EAPI=5
 
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="NetApp SnapMirror replicates data through ONTAP."
 HOMEPAGE="www.netapp.com"
@@ -18,7 +18,7 @@ RDEPEND="${DEPEND}"
 
 src_prepare()
 {
-	solidfire-libs_src_prepare
+	solidfire_src_prepare
 
 	# Set the compiler as CC and CXX are not honored.
 	sed -i -e "s|^CC=.*|CC=$(tc-getCXX)|" $(find . -name Makefile) \

@@ -3,7 +3,7 @@
 EAPI=5
 PYTHON_COMPAT=( python2_7 )
 
-inherit distutils-r1 solidfire-libs
+inherit distutils-r1 solidfire
 
 DESCRIPTION="Collection of ZooKeeper tools."
 HOMEPAGE="http://zookeeper.apache.org/"

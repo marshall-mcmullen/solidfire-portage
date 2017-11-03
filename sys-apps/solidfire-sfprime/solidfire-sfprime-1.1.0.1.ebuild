@@ -2,7 +2,7 @@
 
 EAPI=5
 
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="NetApp/SolidFire day zero configuration"
 HOMEPAGE="solidfire.com"

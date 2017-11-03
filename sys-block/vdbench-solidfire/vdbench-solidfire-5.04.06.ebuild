@@ -1,7 +1,7 @@
 # Copyright 2017 NetApp, Inc.  All rights reserved.
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="Oracle's IO benchmark and stress suite"
 HOMEPAGE="http://www.oracle.com/technetwork/server-storage/"

@@ -2,7 +2,7 @@
 
 EAPI=5
 
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="WAM tools"
 HOMEPAGE="http://www.marvell.com"

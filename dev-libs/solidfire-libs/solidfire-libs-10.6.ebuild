@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=5
-inherit toolchain-funcs solidfire-libs
+inherit toolchain-funcs solidfire
 
 DESCRIPTION="SolidFire 3rd Party Libraries"
 HOMEPAGE="http://www.solidfire.com"
@@ -58,7 +58,7 @@ src_install()
 	mkdir -p "${DP}/include" "${DP}/lib"
 
 	# Now we need to create some metadata for each package we depend on to allow downstream consumers to compile and 
-	# link against this version of solidfire-libs and all of it's explicit dependencies. There are two things we need
+	# link against this version of solidfire and all of it's explicit dependencies. There are two things we need
 	# to setup:
 	# (1) Create exports file that will live in ${DP}/exports.sh which lists all the package names and versions. This
 	#     file is suitable to be included by a Makefile or bash script. 

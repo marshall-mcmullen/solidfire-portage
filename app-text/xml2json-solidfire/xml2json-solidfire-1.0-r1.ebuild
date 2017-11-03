@@ -2,7 +2,7 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="Convert XML to JSON."
 HOMEPAGE="http://solidfire.com"

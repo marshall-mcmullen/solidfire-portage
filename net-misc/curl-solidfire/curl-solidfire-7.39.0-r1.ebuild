@@ -3,7 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/dev-cpp/gtest/gtest-1.6.0.ebuild,v 1.10 2012/07/16 12:17:56 blueness Exp $
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="A Client that groks URLs"
 HOMEPAGE="http://curl.haxx.se/"
@@ -22,7 +22,7 @@ DEPEND="${RDEPEND}"
 src_prepare()
 {
 	sed -i -e "s|-lcurl|-l${PF}|g" curl-config.in || die
-	solidfire-libs_src_prepare
+	solidfire_src_prepare
 }
 
 src_configure()

@@ -1,7 +1,7 @@
 # Copyright 2011-2017 NetApp, Inc.  All rights reserved.
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="SolidFire cluster healthtools"
 HOMEPAGE="solidfire.com"

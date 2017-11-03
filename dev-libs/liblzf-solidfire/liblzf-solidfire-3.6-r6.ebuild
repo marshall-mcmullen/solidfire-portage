@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="The extremely fast LZF compression algorithm"
 HOMEPAGE="http://oldhome.schmorp.de/marc/liblzf.html"

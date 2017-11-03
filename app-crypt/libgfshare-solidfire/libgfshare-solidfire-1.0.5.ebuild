@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="Library for multi-way secret-sharing"
 HOMEPAGE="http://www.digital-scurf.org"

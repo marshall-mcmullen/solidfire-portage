@@ -5,7 +5,7 @@ EAPI=5
 DESCRIPTION="Radian NVRAM Firmware"
 HOMEPAGE="https://www.netapp.com"
 
-inherit solidfire-libs
+inherit solidfire
 
 # Individual versions of all payloads in this package
 RADIAN_FIRMWARE="ae34b8cc"

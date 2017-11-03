@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=5
-inherit toolchain-funcs solidfire-libs
+inherit toolchain-funcs solidfire
 
 DESCRIPTION="SolidFire Firmware Collection"
 HOMEPAGE="http://www.solidfire.com"

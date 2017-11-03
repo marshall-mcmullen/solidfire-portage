@@ -2,7 +2,7 @@
 
 EAPI=5
 
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="Collection of SuperMicro tools for SuperMicro platforms only."
 HOMEPAGE="http://www.supermicro.com"
@@ -16,7 +16,7 @@ SLOT=0
 LICENSE="SuperMicro"
 KEYWORDS="~amd64 amd64"
 
-# We don't need or want solidfire-libs package unpack magic (munging) in this case
+# We don't need or want solidfire package unpack magic (munging) in this case
 S="${WORKDIR}"
 src_unpack()
 {

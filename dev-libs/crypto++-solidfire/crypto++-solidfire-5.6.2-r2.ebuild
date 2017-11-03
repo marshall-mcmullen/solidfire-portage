@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="C++ class library of cryptographic schemes"
 HOMEPAGE="http://cryptopp.com/"
@@ -22,7 +22,7 @@ PATCHES="makefile-${PV}.patch"
 
 BUILD_PATHS="DESTDIR=${D} INCLUDEDIR=${PREFIX}/include LIBDIR=${PREFIX}/lib BINDIR=${PREFIX}/bin LIBSUFFIX=${PS} LIBTOOL=./libtool"
 
-# Define a src_unpack() function to skip the solidfire-libs_src_unpack()
+# Define a src_unpack() function to skip the solidfire_src_unpack()
 # function, which does the wrong thing with our distfile's zip archive.
 src_unpack()
 {
@@ -42,7 +42,7 @@ src_prepare()
 	EOF
 	touch NEWS README AUTHORS ChangeLog Makefile.am
 
-	solidfire-libs_src_prepare
+	solidfire_src_prepare
 	eautoreconf
 }
 

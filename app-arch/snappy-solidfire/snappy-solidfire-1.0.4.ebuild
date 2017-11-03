@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="A high-speed compression/decompression library by Google"
 HOMEPAGE="https://code.google.com/p/snappy/"

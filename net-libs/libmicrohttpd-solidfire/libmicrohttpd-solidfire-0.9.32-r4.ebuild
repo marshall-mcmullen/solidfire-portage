@@ -3,7 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/net-libs/libmicrohttpd/libmicrohttpd-0.9.32.ebuild,v 1.11 2014/03/01 22:28:57 mgorny Exp $
 
 EAPI="5"
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="A small C library that makes it easy to run an HTTP server as part of another application."
 HOMEPAGE="http://www.gnu.org/software/libmicrohttpd/"

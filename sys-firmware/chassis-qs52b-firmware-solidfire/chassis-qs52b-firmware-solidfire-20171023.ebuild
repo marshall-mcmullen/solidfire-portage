@@ -5,7 +5,7 @@ EAPI=5
 DESCRIPTION="Triton BIOS and firmware payloads for chassis, ME, PCH, and BMC."
 HOMEPAGE="https://www.netapp.com"
 
-inherit solidfire-libs
+inherit solidfire
 
 # Individual versions of all payloads in this package
 BIOS_VERSION="2A02"

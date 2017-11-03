@@ -5,7 +5,7 @@ EAPI=5
 DESCRIPTION="Intel SSD/NVME Drive Firmware"
 HOMEPAGE="https://www.netapp.com"
 
-inherit solidfire-libs
+inherit solidfire
 
 # Individual versions of all payloads in this package
 INTEL_FIRMWARES="4PC10362 D210370"

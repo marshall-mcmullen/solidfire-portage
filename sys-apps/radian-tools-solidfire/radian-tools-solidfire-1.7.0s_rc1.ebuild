@@ -4,7 +4,7 @@ EAPI=5
 
 PROGRAM_PREFIX='radian_'
 
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="Radian NVRAM userspace tools"
 HOMEPAGE="http://www.radianmemory.com"
@@ -13,7 +13,7 @@ SRC_URI="http://bitbucket.org/solidfire/${MY_PN}/get/release/${PV}.tar.bz2 -> ${
 LICENSE="Radian NDA"
 KEYWORDS="~amd64 amd64"
 
-DEPEND='dev-libs/libnl'
+DEPEND="dev-libs/libnl"
 
 src_compile()
 {

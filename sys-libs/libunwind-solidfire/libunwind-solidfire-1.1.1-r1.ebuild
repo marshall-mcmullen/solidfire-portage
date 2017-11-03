@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="Portable and efficient API to determine the call-chain of a program"
 HOMEPAGE="http://savannah.nongnu.org/projects/libunwind"
@@ -21,7 +21,7 @@ SOLIDFIRE_WANT_EAUTORECONF=1
 
 src_prepare()
 {
-	solidfire-libs_src_prepare
+	solidfire_src_prepare
 
 	# Disable doc from subdirs to avoid trying to build the documentation since we don't need or want it.
 	sed -i -e '/^SUBDIRS/s:doc::' Makefile.in || die

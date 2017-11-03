@@ -5,7 +5,7 @@ EAPI=5
 DESCRIPTION="Toshiba SSD/NVME Drive Firmware"
 HOMEPAGE="https://www.netapp.com"
 
-inherit solidfire-libs
+inherit solidfire
 
 # Individual versions of all payloads in this package
 TOSHIBA_FIRMWARES="8ENP6101 8ENP7101"

@@ -2,7 +2,7 @@
 
 EAPI=5
 
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="QLogic FC HBA QConvergedConsole Tools."
 HOMEPAGE="http://www.qlogic.com"

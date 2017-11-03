@@ -2,7 +2,7 @@
 
 EAPI=5
 
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="NetApp/SolidFire's Networking layer"
 HOMEPAGE="https://bitbucket.org/solidfire/ember-network"
@@ -41,7 +41,7 @@ src_prepare()
     einfo "Fixing code differences between versions of Google test"
     sed -i -e 's/gflags::/google::/g' ${S}/daemon/logging.cpp
 
-    solidfire-libs_src_prepare
+    solidfire_src_prepare
 }
 src_install()
 {

@@ -4,7 +4,7 @@
 
 EAPI="5"
 PYTHON_COMPAT=( python{2_6,2_7,3_2,3_3} )
-inherit versionator solidfire-libs
+inherit versionator solidfire
 
 MY_P="${MY_PN}_$(replace_all_version_separators _)"
 

@@ -5,7 +5,7 @@ EAPI=5
 DESCRIPTION="Mellanox NIC Firmware"
 HOMEPAGE="https://www.netapp.com"
 
-inherit solidfire-libs
+inherit solidfire
 
 # Individual versions of all payloads in this package
 MELLANOX_FIRMWARES="14_20_1010"

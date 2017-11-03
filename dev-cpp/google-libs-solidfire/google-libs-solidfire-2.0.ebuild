@@ -4,7 +4,7 @@
 
 EAPI=5
 PYTHON_COMPAT=( python{2_6,2_7} )
-inherit python-any-r1 solidfire-libs
+inherit python-any-r1 solidfire
 
 DESCRIPTION="Collection of google libraries packaged by SolidFire."
 HOMEPAGE="http://www.solidfire.com"
@@ -30,7 +30,7 @@ RDEPEND="${DEPEND}"
 SOLIDFIRE_WANT_EAUTORECONF=1
 
 # NOTE: We want to build a cohesive version of all the google libraries we need so that they all compile and link against
-# one another properly without having to specify the specific versions in both solidfire-libs as well as inside each
+# one another properly without having to specify the specific versions in both solidfire as well as inside each
 # of the google libraries. To accomplish that we have a single ebuild which knows how to build all the google libraries
 # in a consistent manner. In order to get things to work properly, we must fully configure, compile and install each
 # google library (or module) in its entirely before building the next one. Because of this, we can't use the piecemeal
@@ -78,7 +78,7 @@ src_prepare()
 			sed -i -e 's|^#!/usr/bin/env python$|#!/usr/bin/env python2|' "${pyfile}" || die
 		done
 
-		solidfire-libs_src_prepare
+		solidfire_src_prepare
 
 		#--------------------------------------------------------------------------------------------------------------
 		# CONFIGURE

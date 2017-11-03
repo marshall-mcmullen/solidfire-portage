@@ -3,7 +3,7 @@
 if [[ -z ${_SOLIDFIRE_KERNEL_ECLASS} ]]; then
 _SOLIDFIRE_KERNEL_ECLASS=1
 
-inherit solidfire-libs kernel-2
+inherit solidfire kernel-2
 EXPORT_FUNCTIONS src_unpack
 
 EAPI="5"
@@ -18,8 +18,8 @@ S="${WORKDIR}/linux-${KV_FULL}"
 
 solidfire-kernel_src_unpack()
 {
-	# Use solidfire-libs magic unpacking, but then rename unpacked directory so it fits in with kernel-2 eclass naming
-	solidfire-libs_src_unpack
+	# Use solidfire magic unpacking, but then rename unpacked directory so it fits in with kernel-2 eclass naming
+	solidfire_src_unpack
 	mv "${MY_S}" "${S}"
 }
 

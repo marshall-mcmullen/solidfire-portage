@@ -3,7 +3,7 @@
 # $Header: $
 
 EAPI=5
-inherit solidfire-libs
+inherit solidfire
 
 DESCRIPTION="Skein hash function family"
 HOMEPAGE="http://www.skein-hash.info"
@@ -18,7 +18,7 @@ RDEPEND="${DEPEND}"
 
 S="${WORKDIR}/NIST/CD/Optimized_64bit"
 
-# Define a src_unpack() function to skip the solidfire-libs_src_unpack()
+# Define a src_unpack() function to skip the solidfire_src_unpack()
 # function, which does the wrong thing with our distfile's zip archive.
 src_unpack()
 {

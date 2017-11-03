@@ -5,7 +5,7 @@ EAPI=5
 DESCRIPTION="SanDisk SSD/NVME Drive Firmware"
 HOMEPAGE="https://www.netapp.com"
 
-inherit solidfire-libs
+inherit solidfire
 
 # Individual versions of all payloads in this package
 SANDISK_FIRMWARES="ZZ39RC23 ZZ39RC43 ZZ39RC93"

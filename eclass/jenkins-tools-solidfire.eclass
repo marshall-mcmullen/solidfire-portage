@@ -10,7 +10,7 @@
 if [[ -z ${_JENKINS_TOOLS_ECLASS} ]]; then
 JENKINS_TOOLS_ECLASS=1
 
-inherit solidfire-libs
+inherit solidfire
 
 EXPORT_FUNCTIONS src_install
 

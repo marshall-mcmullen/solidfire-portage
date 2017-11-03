@@ -5,7 +5,7 @@ EAPI=5
 DESCRIPTION="QLogic FC HBA Firmware"
 HOMEPAGE="https://www.netapp.com"
 
-inherit solidfire-libs
+inherit solidfire
 
 # Individual versions of all payloads in this package
 QLOGIC_FIRMWARES="bk011018 hld33424"
