@@ -14,7 +14,8 @@ KEYWORDS="~amd64 amd64"
 
 RDEPEND="dev-libs/libgcrypt:0
 	net-libs/gnutls"
-DEPEND="${RDEPEND}"
+DEPEND="${RDEPEND}
+	sys-apps/texinfo"
 
 # SolidFire Libs Settings
 SOLIDFIRE_WANT_EAUTORECONF=1
