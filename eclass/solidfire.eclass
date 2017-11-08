@@ -292,6 +292,8 @@ doblackduck_metadata()
 	local metafile="${DP}/blackduck/metadata.json"
 	
 	{
+		echo -n "{"
+
 		local entry key val
 		for entry in "${@}"; do
 			key=${entry%%=*}
@@ -299,7 +301,7 @@ doblackduck_metadata()
 			echo -n ',"'${key}'":"'${val}'"'
 		done
 		echo "}"
-	} | sed -e 's|"true"|true|g' -e 's|"false"|false|g' | jq --sort-keys . > "${metafile}"
+	} | sed -e 's|{,|{|' -e 's|"true"|true|g' -e 's|"false"|false|g' | jq --sort-keys . > "${metafile}" || die "Failed to create blackduck.json"
 }
 
 #----------------------------------------------------------------------------------------------------------------------
