@@ -21,5 +21,11 @@ src_install()
 	# Add chassis specific payloads into /sf/package/../lib/firmware/
 	dofirmware -r ${S}/${MY_PF}/*
 	chmod +x ${DP}/lib/firmware/*.BIN
+
+	doblackduck_metadata \
+		usage="Component (Separate Work)" \
+		comment="Checking and flashing firmware on Broadcom NICs" \
+		modified="false" \
+		commercial="false"
 }
 
