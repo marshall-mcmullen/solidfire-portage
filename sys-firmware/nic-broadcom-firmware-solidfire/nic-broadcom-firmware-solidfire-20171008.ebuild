@@ -12,7 +12,7 @@ BROADCOM_FIRMWARES="NF92Y_LN_7.10.18"
 
 SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
 
-LICENSE="NetApp"
+LICENSE="Dell EMC Software License and Support Services Agreement (09/12/2017)"
 KEYWORDS="~amd64 amd64"
 
 S="${WORKDIR}"
@@ -21,11 +21,5 @@ src_install()
 	# Add chassis specific payloads into /sf/package/../lib/firmware/
 	dofirmware -r ${S}/${MY_PF}/*
 	chmod +x ${DP}/lib/firmware/*.BIN
-
-	doblackduck_metadata \
-		usage="Component (Separate Work)" \
-		comment="Checking and flashing firmware on Broadcom NICs" \
-		modified="false" \
-		commercial="false"
 }
 

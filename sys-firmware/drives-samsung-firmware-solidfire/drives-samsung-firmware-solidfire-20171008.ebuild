@@ -14,7 +14,7 @@ SAMSUNG_FIRMWARES="CXV8202Q CXV8501Q DXM9BW4Q
 
 SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
 
-LICENSE="NetApp"
+LICENSE="Samsung Semiconductor Letter Agreement (Effective 9/26/2016)"
 KEYWORDS="~amd64 amd64"
 
 S="${WORKDIR}"
@@ -22,11 +22,5 @@ src_install()
 {
 	# Add chassis specific payloads into /sf/package/../lib/firmware/
 	dofirmware -r ${S}/${MY_PF}/*
-
-	doblackduck_metadata \
-		usage="Component (Separate Work)" \
-		comment="Checking and flashing firmware on Samsung drives" \
-		modified="false" \
-		commercial="false"
 }
 

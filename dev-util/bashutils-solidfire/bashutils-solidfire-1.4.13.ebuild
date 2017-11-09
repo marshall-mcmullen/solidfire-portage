@@ -36,12 +36,6 @@ src_install()
 {
     DESTDIR=${D}/sf/packages/${P} PV=${PV} ${S}/.forge/install || die
 	dobinlinks ${DP}/bin/*
-
-	doblackduck_metadata \
-		usage="Component (Separate Work)" \
-		comment="Used to harden our bash scripts used for build, install, test and upgrades" \
-		modified="false" \
-		commercial="false"
 }
 
 src_compile()

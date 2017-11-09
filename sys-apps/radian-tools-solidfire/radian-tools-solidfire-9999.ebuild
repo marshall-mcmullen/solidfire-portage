@@ -16,7 +16,7 @@ HOMEPAGE="http://www.radianmemory.com"
 EGIT_REPO_URI="file:///root/radian-tools"
 EGIT_BRANCH=${SOLIDFIRE_RADIAN_TOOLS_BRANCH:-solidfire-1.7}
 
-LICENSE="Radian NDA"
+LICENSE="Radian Memory Systems Restricted Use License (1/10/2014)"
 KEYWORDS="~amd64"
 
 DEPEND='dev-libs/libnl'

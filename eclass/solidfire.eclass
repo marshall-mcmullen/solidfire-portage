@@ -285,25 +285,6 @@ dosbinlinks()
 	dopathlinks "/usr/sbin/" "${@}"
 }
 
-doblackduck_metadata()
-{
-	mkdir -p "${DP}/blackduck" || die
-	
-	local metafile="${DP}/blackduck/metadata.json"
-	
-	{
-		echo -n "{"
-
-		local entry key val
-		for entry in "${@}"; do
-			key=${entry%%=*}
-			val=${entry#*=}
-			echo -n ',"'${key}'":"'${val}'"'
-		done
-		echo "}"
-	} | sed -e 's|{,|{|' -e 's|"true"|true|g' -e 's|"false"|false|g' | jq --sort-keys . > "${metafile}" || die "Failed to create blackduck.json"
-}
-
 #----------------------------------------------------------------------------------------------------------------------
 # SolidFire Libs public ebuild methods
 #----------------------------------------------------------------------------------------------------------------------

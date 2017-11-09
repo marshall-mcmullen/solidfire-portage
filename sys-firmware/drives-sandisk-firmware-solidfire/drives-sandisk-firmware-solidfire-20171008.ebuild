@@ -13,7 +13,7 @@ SANDISK_BINARIES="scli"
 
 SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
 
-LICENSE="NetApp"
+LICENSE="Western Digital Technologies Inc. (Sandisk) End User License Agreement (09/12/2017)"
 KEYWORDS="~amd64 amd64"
 
 S="${WORKDIR}"
@@ -21,10 +21,4 @@ src_install()
 {
 	# Add chassis specific payloads into /sf/package/../lib/firmware/
 	dofirmware -r ${S}/${MY_PF}/*
-
-	doblackduck_metadata \
-		usage="Component (Separate Work)" \
-		comment="Checking and flashing firmware on SanDisk drives" \
-		modified="false" \
-		commercial="false"
 }
