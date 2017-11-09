@@ -13,7 +13,7 @@ SANDISK_BINARIES="scli"
 
 SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
 
-LICENSE="Western Digital Technologies Inc. (Sandisk) End User License Agreement (09/12/2017)"
+LICENSE="Western-Digital-Technologies-Inc-Sandisk-End-User-License-Agreement"
 KEYWORDS="~amd64 amd64"
 
 S="${WORKDIR}"

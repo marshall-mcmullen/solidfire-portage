@@ -12,7 +12,7 @@ BROADCOM_FIRMWARES="NF92Y_LN_7.10.18"
 
 SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
 
-LICENSE="Dell EMC Software License and Support Services Agreement (09/12/2017)"
+LICENSE="Dell-EMC-Software-License-and-Support-Services-Agreement"
 KEYWORDS="~amd64 amd64"
 
 S="${WORKDIR}"

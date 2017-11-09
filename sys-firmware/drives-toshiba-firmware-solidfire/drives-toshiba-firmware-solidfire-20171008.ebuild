@@ -12,7 +12,7 @@ TOSHIBA_FIRMWARES="8ENP6101 8ENP7101"
 
 SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
 
-LICENSE="Samsung Semiconductor Letter Agreement (Effective 9/26/2016)"
+LICENSE="Samsung-Semiconductor-Letter-Agreement"
 KEYWORDS="~amd64 amd64"
 
 S="${WORKDIR}"
