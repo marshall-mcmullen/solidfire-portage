@@ -9,7 +9,7 @@ HOMEPAGE="http://www.qlogic.com"
 
 SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${MY_PF}.tar.gz -> ${PF}.tar.gz"
 
-LICENSE="QLogic SLA"
+LICENSE="QLogic-SLA"
 KEYWORDS="~amd64 amd64"
 RESTRICT="strip"
 

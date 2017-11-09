@@ -12,7 +12,7 @@ QLOGIC_FIRMWARES="bk011018 hld33424"
 
 SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
 
-LICENSE="QLogic SLA"
+LICENSE="QLogic-SLA"
 KEYWORDS="~amd64 amd64"
 
 S="${WORKDIR}"

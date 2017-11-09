@@ -13,7 +13,7 @@ INTEL_BINARIES="ConfigurationManager_Linux64"
 
 SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
 
-LICENSE="Intel Corporation Software License effective 12/13/2009"
+LICENSE="Intel-Corporation-Software-License"
 KEYWORDS="~amd64 amd64"
 
 S="${WORKDIR}"
