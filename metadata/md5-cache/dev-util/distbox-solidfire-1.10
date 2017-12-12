@@ -8,5 +8,5 @@ LICENSE=Apache-2.0
 RDEPEND==dev-util/bashutils-solidfire-0.8.20 app-portage/gentoolkit dev-vcs/mercurial app-arch/pigz virtual/jre net-misc/curl >=net-p2p/murder-solidfire-0.1.2-r2 app-misc/jq net-misc/openssh sys-devel/make sys-devel/distcc app-admin/sudo app-text/xmlstarlet
 SLOT=0
 SRC_URI=https://bitbucket.org/solidfire/distbox/get/distbox-1.10.tar.bz2 -> distbox-solidfire-1.10.tar.bz2
-_eclasses_=distbox-solidfire	ae056f9f4a31f87d87142cfc4dfb3bd9	multilib	97f470f374f2e94ccab04a2fb21d811e	systemd	e12dd5e3cf1f359292cea2a70abeba5f	toolchain-funcs	8fec6b1eb195836560e70b66d98fb163
+_eclasses_=distbox-solidfire	ae056f9f4a31f87d87142cfc4dfb3bd9	multilib	97f470f374f2e94ccab04a2fb21d811e	systemd	8f5286f89e265842f5b5189666eae88b	toolchain-funcs	185a06792159ca143528e7010368e8af
 _md5_=0ed62500ca888c88b4f156929806909b

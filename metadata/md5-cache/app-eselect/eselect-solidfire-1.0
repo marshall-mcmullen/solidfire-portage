@@ -1,0 +1,9 @@
+DEFINED_PHASES=install
+DESCRIPTION=Manage SolidFire package symlinks
+EAPI=5
+HOMEPAGE=https://www.solidfire.com
+KEYWORDS=amd64
+LICENSE=NetApp
+RDEPEND=app-admin/eselect
+SLOT=0
+_md5_=90ea99f6c8b82e52eed98044e68cbe20
