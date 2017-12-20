@@ -265,7 +265,7 @@ dopathlinks()
 		return 0
 	fi
 
-	local dest="${1}"; shift
+	local dest="${1}/"; shift
 	mkdir -p "${D}/${PREFIX}/eselect"
 
 	local entry
@@ -275,14 +275,39 @@ dopathlinks()
 	done >> "${D}/${PREFIX}/eselect/symlinks" || die "Failed to create eselect/symlinks file"
 }
 
+# Same as dopathlinks but also takes an additional argument to be stripped off of the left side of a path. This is
+# a convenience wrapper to allow you do things like: 'dopathlinks /foo /my/long/prefix /my/long/prefix/bar' and the link
+# that is created is '/foo/bar -> /my/long/prefix/bar'.
+dopathlinks_lstrip()
+{
+	if [[ $# -eq 0 ]]; then
+		return 0
+	fi
+
+	local dest="${1}/"; shift
+	local lstrip="${1}"; shift
+	mkdir -p "${D}/${PREFIX}/eselect"
+
+	local entry
+	for entry in "${@}"; do
+		[[ -e "${entry}" ]] || die "${entry} does not exist"
+		echo "${dest}${entry#${lstrip}}:${entry#${D}/}"
+	done >> "${D}/${PREFIX}/eselect/symlinks" || die "Failed to create eselect/symlinks file"
+}
+
 dobinlinks()
 {
-	dopathlinks "/usr/bin/" "${@}"
+	dopathlinks "/usr/bin" "${@}"
 }
 
 dosbinlinks()
 {
-	dopathlinks "/usr/sbin/" "${@}"
+	dopathlinks "/usr/sbin" "${@}"
+}
+
+doetclinks()
+{
+	dopathlinks "/etc" "${@}"
 }
 
 #----------------------------------------------------------------------------------------------------------------------
