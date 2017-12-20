@@ -6,7 +6,7 @@ inherit solidfire
 
 DESCRIPTION="NetApp/SolidFire day zero configuration"
 HOMEPAGE="solidfire.com"
-SRC_URI="http://sf-artifactory.eng.solidfire.net/sfprime/nde/confrestapp-bugfix-neon-ember-fcgi-sock-1.1.0.3-905-gbf6c044.tar -> ${PF}.tar"
+SRC_URI="http://sf-artifactory.eng.solidfire.net/sfprime/nde/confrestapp-bugfix-neon-ember-fcgi-sock-1.1.0.3-905-gbf6c044.tar -> ${P}.tar"
 
 LICENSE="SolidFire"
 KEYWORDS="amd64"
