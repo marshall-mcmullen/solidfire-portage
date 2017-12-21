@@ -41,7 +41,7 @@ src_install()
 	Type=simple
 	User=root
 	WorkingDirectory=/sf
-	ExecStart=/sf/hci/sfprime/confrestapp
+	ExecStart=/sf/hci/sfprime/confrestapp/confrestapp
 	Restart=always
 
 	[Install]
