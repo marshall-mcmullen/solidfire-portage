@@ -265,13 +265,13 @@ dopathlinks()
 		return 0
 	fi
 
-	local dest="${1}/"; shift
+	local dest="${1}"; shift
 	mkdir -p "${D}/${PREFIX}/eselect"
 
 	local entry
 	for entry in "${@}"; do
 		[[ -e "${entry}" ]] || die "${entry} does not exist"
-		echo "${dest}$(basename ${entry}):${entry#${D}/}"
+		echo "$(realpath -m -s "${dest}/$(basename ${entry})"):$(realpath -m -s "${entry#${D}/}")"
 	done >> "${D}/${PREFIX}/eselect/symlinks" || die "Failed to create eselect/symlinks file"
 }
 
@@ -284,14 +284,14 @@ dopathlinks_lstrip()
 		return 0
 	fi
 
-	local dest="${1}/"; shift
+	local dest="${1}"; shift
 	local lstrip="${1}"; shift
 	mkdir -p "${D}/${PREFIX}/eselect"
 
 	local entry
 	for entry in "${@}"; do
 		[[ -e "${entry}" ]] || die "${entry} does not exist"
-		echo "${dest}${entry#${lstrip}}:${entry#${D}/}"
+		echo "$(realpath -m -s "${dest}/${entry#${lstrip}}"):$(realpath -m -s "${entry#${D}/}")"
 	done >> "${D}/${PREFIX}/eselect/symlinks" || die "Failed to create eselect/symlinks file"
 }
 
