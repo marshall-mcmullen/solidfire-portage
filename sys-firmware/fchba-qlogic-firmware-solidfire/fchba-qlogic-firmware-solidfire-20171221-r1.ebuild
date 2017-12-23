@@ -10,7 +10,7 @@ inherit solidfire
 # Individual versions of all payloads in this package
 QLOGIC_FIRMWARES="bk011018 hld33424 ql2600_fw ql2700_fw"
 
-SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
+SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${P}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="QLogic-SLA"
 KEYWORDS="~amd64 amd64"
@@ -19,10 +19,9 @@ S="${WORKDIR}"
 src_install()
 {
 	# Add chassis specific payloads into /sf/package/../lib/firmware/
-	dofirmware -r ${S}/${MY_PF}/*
+	dofirmware -r ${S}/${MY_P}/*
 
-	# Install ql firmware files directly into /lib/firmware
-	mkdir -p ${D}/lib/firmware
-	cp ${S}/${MY_PF}/ql*_fw.bin ${D}/lib/firmware
+	# Install ql firmware symlinks into /lib/firmware
+	dopathlinks_lstrip "/lib/firmware" "${DP}/lib/firmware/" ${DP}/lib/firmware/ql*_fw.bin
 }
 
