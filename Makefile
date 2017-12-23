@@ -2,6 +2,10 @@
 sync:
 	emerge --sync
 
+.PHONY: shell
+shell: sync
+	bash
+
 .PHONY: digest
 digest: sync
 	for fname in $$(git ls-files --others --modified | grep "\.ebuild$$"); do \
