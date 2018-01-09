@@ -14,7 +14,7 @@ inherit base autotools eutils flag-o-matic
 EXPORT_FUNCTIONS src_unpack src_prepare pkg_preinst pkg_postinst pkg_prerm
 
 DEPEND="app-portage/gentoolkit"
-PDEPEND="app-eselect/eselect-solidfire"
+PDEPEND=">=app-eselect/eselect-solidfire-1.2"
 
 # Fully version every solidfire package by setting slot to full package version including
 # package revision.
