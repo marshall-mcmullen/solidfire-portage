@@ -5,7 +5,7 @@ inherit solidfire
 
 DESCRIPTION="Sedutil-cli OPAL Security Tool"
 HOMEPAGE="https://github.com/Drive-Trust-Alliance/sedutil"
-SRC_URI="https://github.com/Drive-Trust-Alliance/sedutil/archive/${PVR}.tar.gz -> ${PF}.tar.gz"
+SRC_URI="https://github.com/Drive-Trust-Alliance/sedutil/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-3"
 KEYWORDS="~amd64 amd64"
@@ -21,7 +21,7 @@ src_configure()
 
 src_compile()
 {
-	emake -j1
+	emake 
 }
 
 src_install()
