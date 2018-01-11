@@ -22,5 +22,6 @@ src_install()
 {
 	# Add chassis specific payloads into /sf/package/../lib/firmware/
 	dofirmware -r ${S}/${MY_PF}/*
+	dopathlinks "/sf/rtfi/firmware/drives/samsung" "${DP}/lib/firmware"
 }
 

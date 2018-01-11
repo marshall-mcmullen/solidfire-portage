@@ -18,3 +18,10 @@ digest-all: sync
 		fname=$$(ls $${dname}/*.ebuild 2>/dev/null | head -1); \
 		[[ -n $${fname} ]] && ebuild $${fname} digest;         \
 	done
+
+.PHONY: install
+install: sync
+	for fname in $$(git ls-files --others --modified | grep "\.ebuild$$"); do \
+		ebuild $${fname} digest install || exit 1; \
+	done
+

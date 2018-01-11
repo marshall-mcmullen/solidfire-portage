@@ -23,5 +23,6 @@ src_install()
 
 	# Install ql firmware symlinks into /lib/firmware
 	dopathlinks_lstrip "/lib/firmware" "${DP}/lib/firmware/" ${DP}/lib/firmware/ql*_fw.bin
+	dopathlinks "/sf/rtfi/firmware/fchba/qlogic" "${DP}/lib/firmware"
 }
 
