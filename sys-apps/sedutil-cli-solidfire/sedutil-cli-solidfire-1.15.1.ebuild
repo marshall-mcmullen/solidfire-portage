@@ -1,4 +1,4 @@
-# Copyright 2017 NetApp, Inc.  All rights reserved.
+# Copyright 2018 NetApp, Inc.  All rights reserved.
 
 EAPI=5
 inherit solidfire
@@ -26,8 +26,8 @@ src_compile()
 
 src_install()
 {
-    dobin "sedutil-cli"
+	dobin "sedutil-cli"
 	
-    # Expose bin symlinks outside our application specific directory
-    dobinlinks "${DP}"/bin/*
+	# Expose bin symlinks outside our application specific directory
+	dobinlinks "${DP}"/bin/*
 }
