@@ -21,6 +21,6 @@ src_install()
 	# Add chassis specific payloads into /sf/package/../lib/firmware/
 	dofirmware -r ${S}/${MY_PF}/*
 	chmod +x ${DP}/lib/firmware/mstflint
-	dopathlinks "/sf/rtfi/firmware/nic/mellanox" "${DP}/lib/firmware"
+	dopathlinks "/sf/rtfi/firmware/nic/mellanox" "${DP}/lib/firmware/."
 }
 

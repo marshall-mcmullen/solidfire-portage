@@ -128,7 +128,7 @@ create_exports_and_symlinks()
 	# Add compiler and java info to exports file
 	{
 		# Append compiler info
-		local gcc_version="$(gcc-config -S $(gcc-config -c) | awk '{print $2}')"
+		local gcc_version="$(gcc -dumpversion)"
 		echo "export GCC_VERSION=${gcc_version}"
 		echo "export CXX=g++-${gcc_version}"
 
@@ -187,8 +187,12 @@ create_exports_and_symlinks()
 	done
 
 	# Sort the file inplace then create symlinks
-	sort "${output}/exports.sh" -o "${output}/exports.sh"
-	sort "${output}/symlinks" -o "${output}/symlinks"
+	for fname in "${output}/exports.sh" "${output}/symlinks"; do
+	    if [[ -e "${fname}" ]]; then
+	        sort "${fname}" -o "${fname}"
+	    fi
+	done
+
 	handle_package_links "create" "${SFDIR}"
 }
 

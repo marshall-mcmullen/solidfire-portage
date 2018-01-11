@@ -21,6 +21,6 @@ src_install()
 	# Add chassis specific payloads into /sf/package/../lib/firmware/
 	dofirmware -r ${S}/${MY_PF}/*
 	chmod +x ${DP}/lib/firmware/*.BIN
-	dopathlinks "/sf/rtfi/firmware/nic/broadcom" "${DP}/lib/firmware"
+	dopathlinks "/sf/rtfi/firmware/nic/broadcom" "${DP}/lib/firmware/."
 }
 
