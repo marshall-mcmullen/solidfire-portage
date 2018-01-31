@@ -5,7 +5,7 @@ inherit solidfire
 
 DESCRIPTION="SMART NVDIMM Diagnostic Tools"
 HOMEPAGE="http://www.smartm.com"
-SRC_URI="http://bitbucket.org/solidfire/${MY_PN}/get/release/${PVR}.tar.bz2 -> ${PF}.tar.bz2"
+SRC_URI="http://bitbucket.org/solidfire/${MY_PN}/get/release/${PV}.tar.bz2 -> ${P}.tar.bz2"
 
 LICENSE="SMART-NDA"
 KEYWORDS="~amd64 amd64"
