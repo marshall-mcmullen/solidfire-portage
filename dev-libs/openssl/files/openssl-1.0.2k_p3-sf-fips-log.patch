@@ -1,0 +1,65 @@
+--- openssl-1.0.2k/crypto/o_fips.c	2017-01-26 13:22:03.000000000 +0000
++++ openssl-1.0.2k/crypto/o_fips.c	2018-02-08 16:59:33.122523799 +0000
+@@ -63,6 +63,45 @@
+ # include <openssl/rand.h>
+ #endif
+ 
++#if defined (OPENSSL_FIPS) && (SF_FIPS_LOG)
++#include <stdio.h>
++#include <unistd.h>
++#include <sys/types.h>
++
++#define SF_FIPS_LOG_FILENAME    "/var/log/sf-fips.info"
++
++/* 
++ * Log that a process has entered FIPS mode. This function is
++ * best-effort and simply returns if it encounters an error.
++ */
++static void FIPS_sf_log() {
++    pid_t pid = getpid();
++    char proc_name[1024];
++    size_t size;
++    FILE *f;
++    time_t curr_time;
++    struct tm *tm_info;
++    char time_str[32];
++    int x;
++    
++    if ((f = fopen("/proc/self/comm", "r")) == NULL)
++        return;
++    size = fread(proc_name, sizeof (char), 1024, f);
++    fclose(f);
++    if (size <= 0)
++        return;
++    proc_name[size - 1] = '\0';
++
++    if ((f = fopen(SF_FIPS_LOG_FILENAME, "a")) == NULL) 
++        return;
++    time(&curr_time);
++    tm_info = localtime(&curr_time);
++    strftime(time_str, 32, "%Y-%m-%d %H:%M:%S", tm_info);
++    fprintf(f, "%s %s[%d]: Entered FIPS Mode\n", time_str, proc_name, pid);
++    fclose(f);
++}
++#endif
++
+ int FIPS_mode(void)
+ {
+     OPENSSL_init();
+@@ -82,10 +121,14 @@
+ # endif
+     if (!FIPS_module_mode_set(r, FIPS_AUTH_USER_PASS))
+         return 0;
+-    if (r)
++    if (r) {
+         RAND_set_rand_method(FIPS_rand_get_method());
+-    else
++# ifdef SF_FIPS_LOG
++        FIPS_sf_log();
++# endif
++    } else {
+         RAND_set_rand_method(NULL);
++    }
+     return 1;
+ #else
+     if (r == 0)
