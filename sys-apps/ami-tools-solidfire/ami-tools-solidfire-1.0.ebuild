@@ -17,6 +17,7 @@ SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${MY_PF}.tar.gz -> 
 # Three way license between American Megatrends and Quanta
 LICENSE="AMI/Quanta"
 KEYWORDS="~amd64 amd64"
+RESTRICT="splitdebug"
 
 S="${WORKDIR}"
 src_install()
