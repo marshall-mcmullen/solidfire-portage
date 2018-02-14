@@ -388,23 +388,28 @@ solidfire_src_prepare()
 solidfire_pkg_preinst()
 {
 	# Make sure no files got installed outside ${PREFIX}
-	phase "Looking for SolidFire sandbox violations"
-	local violations=( $(find ${D} -path ${D}sf/packages -prune -o -path ${D}sf -o -path ${D} -o -print) )
+	phase "Looking for SolidFire sandbox violations outside $(realpath -m -s ${DP})"
+	local violations=( $(find ${D} \( -path $(realpath -m -s ${DP}) -o -path $(realpath -m -s ${D}/usr/lib/debug/${PREFIX}) \) -prune -o -print) )
 
-	if [[ ${#SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED[@]} -gt 0 ]]; then
-		local idx
-		for idx in ${!violations[@]}; do
-			local violation=${violations[$idx]}
-			local path
-			for path in ${SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED[@]}; do
-				if [[ "${D%%/}${path}" == ${violation}* ]]; then
-					ewarn "Allowing SolidFire sandbox violation ${violation#${D}}"
-					unset violations[$idx]
-					break
-				fi
-			done
+	local idx
+	for idx in ${!violations[@]}; do
+		local violation=${violations[$idx]}
+
+		# Skip over expected violations that are parent directories of ${PREFIX} paths
+		if [[ "${violation}" == @(${D}|${D}sf|${D}sf/packages|${D}usr|${D}usr/lib|${D}usr/lib/debug|${D}usr/lib/debug/sf|${D}usr/lib/debug/sf/packages) ]]; then
+			unset violations[$idx]
+			continue
+		fi
+
+		local path
+		for path in ${SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED[@]}; do
+			if [[ "${D%%/}${path}" == ${violation}* ]]; then
+				ewarn "Allowing SolidFire sandbox violation ${violation#${D}}"
+				unset violations[$idx]
+				break
+			fi
 		done
-	fi
+	done
 
 	if (( ${#violations[@]} > 0 )); then
 		die "SolidFire sandbox violations:\n${violations[@]}"

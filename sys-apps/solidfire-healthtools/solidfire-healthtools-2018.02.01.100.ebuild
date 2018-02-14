@@ -13,8 +13,7 @@ IUSE=""
 
 # Buildtime dependencies
 DEPEND="
-	=dev-util/bashutils-solidfire-1.4.13
-	>=dev-python/pyinstaller-3.2"
+	=dev-util/bashutils-solidfire-1.4.13"
 
 # Runtime dependencies
 RDEPEND="
