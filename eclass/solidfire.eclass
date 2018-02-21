@@ -327,11 +327,11 @@ archive_suffixes()
 solidfire_src_unpack()
 {
 	if [[ -n "${EGIT_REPO_URI}" ]]; then
-		git-r3_src_unpack
+		die "git repos are not allowed."
 	elif [[ -n "${EHG_REPO_URI}" ]]; then
-		mercurial_src_unpack
+		die "mercurial repos are not allowed."
 	elif [[ -n "${ESVN_REPO_URI}" ]]; then
-		svn_src_unpack
+		die "svn repos are not allowed."
 	else
 		rm --recursive --force --one-file-system "${MY_S}"
 		mkdir -p "${MY_S}"

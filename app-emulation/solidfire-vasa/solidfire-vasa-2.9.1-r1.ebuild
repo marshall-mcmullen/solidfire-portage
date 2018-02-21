@@ -1,12 +1,11 @@
 # Copyright 2017 NetApp, Inc.  All rights reserved.
 
 EAPI=5
-inherit mercurial java-pkg-2 solidfire
+inherit java-pkg-2 solidfire
 
 DESCRIPTION="SolidFire VASA (vSphere API for Storage Awareness) Provider"
 HOMEPAGE="http://solidfire.com"
-EHG_REPO_URI="http://hgserve.eng.solidfire.net/hg/vasa-plugin"
-EHG_REVISION="e95487c3fb7a"
+SRC_URI="http://bdr-jenkins.eng.solidfire.net/distfiles/${P}.tar.bz2"
 
 LICENSE="SolidFire"
 KEYWORDS="amd64 ~amd64"

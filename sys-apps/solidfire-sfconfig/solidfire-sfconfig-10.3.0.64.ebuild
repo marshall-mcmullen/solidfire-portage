@@ -1,15 +1,11 @@
 # Copyright 2018 NetApp. Inc. All rights reserved.
 
 EAPI="5"
-inherit mercurial solidfire
+inherit solidfire
 
 DESCRIPTION="SolidFire node configuration daemon"
 HOMEPAGE="https://www.solidfire.com"
-
-# Commit message for this version:
-# Update neon-patch3 version number to 10.3.0.64.
-EHG_REPO_URI="http://hgserve.eng.solidfire.net/hg/neon-patch3"
-EHG_REVISION="809e19dc891a"
+SRC_URI="http://bdr-jenkins.eng.solidfire.net/distfiles/solidfire-element-${PV}.tar.bz2"
 
 LICENSE="SolidFire"
 KEYWORDS="amd64"

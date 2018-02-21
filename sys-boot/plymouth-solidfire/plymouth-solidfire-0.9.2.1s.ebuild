@@ -2,10 +2,10 @@
 
 EAPI=5
 
- # Setup variables to upstream source that doesn't have solidfire in it.
- MY_P="${P//-solidfire}"
- MY_PN="${PN//-solidfire}"
- MY_PF="${PF//-solidfire}"
+# Setup variables to upstream source that doesn't have solidfire in it.
+MY_P="${P//-solidfire}"
+MY_PN="${PN//-solidfire}"
+MY_PF="${PF//-solidfire}"
 
 SRC_URI="
 	https://dev.gentoo.org/~aidecoe/distfiles/${CATEGORY}/${MY_PN}/gentoo-logo.png"
@@ -14,13 +14,8 @@ SRC_URI="
 MY_PV="$(sed 's/\.[[:digit:]]\+s//' <<< "${PV}")"
 
 AUTOTOOLS_AUTORECONF="1"
-if [[ ${PV} == 9999 ]]; then
-	EGIT_REPO_URI="git://anongit.freedesktop.org/plymouth"
-	inherit git-r3
-else
-	SRC_URI="${SRC_URI} https://www.freedesktop.org/software/plymouth/releases/${MY_PN}-${MY_PV}.tar.bz2"
-	S="${WORKDIR}/${MY_PN}-${MY_PV}"
-fi
+SRC_URI="${SRC_URI} https://www.freedesktop.org/software/plymouth/releases/${MY_PN}-${MY_PV}.tar.bz2"
+S="${WORKDIR}/${MY_PN}-${MY_PV}"
 
 inherit autotools-utils readme.gentoo systemd toolchain-funcs
 
