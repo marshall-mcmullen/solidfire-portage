@@ -13,6 +13,7 @@ KEYWORDS="amd64 ~amd64"
 RDEPEND=">=virtual/jre-1.8"
 DEPEND="${DEPEND}
     >=virtual/jdk-1.8
+    dev-vcs/mercurial
     dev-java/gradle-bin"
 
 src_prepare()
