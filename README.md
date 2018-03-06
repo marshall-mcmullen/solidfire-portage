@@ -54,7 +54,7 @@ Sometimes, the `$(ssh-agent)` will fail, at which point you can manually run the
 > SSH\_AGENT\_PID=6821; export SSH\_AGENT\_PID;  
 > echo Agent pid 6821;  
 
-`export SSH\_AUTH\_SOCK=/tmp/ssh-2OlWWp9TG8CK/agent.6820`  
-`export SSH\_AGENT\_PID=6821`  
+`export SSH_AUTH_SOCK=/tmp/ssh-2OlWWp9TG8CK/agent.6820`  
+`export SSH_AGENT_PID=6821`  
 
 At that point, everything _should_ work. At least in theory.
