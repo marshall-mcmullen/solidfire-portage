@@ -25,9 +25,9 @@ This should be as easy to accomplish as `dmake shell`.
 
 Once you are in the docker container, you will want to update the wgetrc configuration so wget has access to bitbucket (using your credentials) to download the .bz2 source tree of the package you are updating. To do this, simply add the following lines to the docker image's `/etc/wgetrc` file, and save it off. It is important to note that since this is all within a docker container, it is transient and you will have to do this each time.
 
-> user=example.user@example.com
-> password=mySuperAwesomePassw0rdYo!!!
-> auth-no-challenge=on
+> user=example.user@example.com  
+> password=mySuperAwesomePassw0rdYo!!!  
+> auth-no-challenge=on  
 
 ## Finally letting the build magic happen ##
 
@@ -41,8 +41,8 @@ Once that is all done, `exit` out of the docker image, commit your work (and the
 
 If you run into an error message along the lines of the following, it likely means that your ssh-agent isn't set up properly for some reason or another.
 
-> Could not open a connection to your authentication agent.
-> a bytes-like object is required, not 'str'
+> Could not open a connection to your authentication agent.  
+> a bytes-like object is required, not 'str'  
 
 In that case, what you will want to do is `$(ssh-agent)` to make sure that SSH agent is running, and then add your private keys to it via `ssh-add /path/to/private/ssh/key`. You may want to add multiple ssh keys.
 
@@ -50,11 +50,11 @@ Sometimes, the `$(ssh-agent)` will fail, at which point you can manually run the
 
 `ssh-agent` (notice that we aren't swapping it in the subshell)
 
-> SSH\_AUTH\_SOCK=/tmp/ssh-2OlWWp9TG8CK/agent.6820; export SSH\_AUTH\_SOCK;
-> SSH\_AGENT\_PID=6821; export SSH\_AGENT\_PID;
-> echo Agent pid 6821;
+> SSH\_AUTH\_SOCK=/tmp/ssh-2OlWWp9TG8CK/agent.6820; export SSH\_AUTH\_SOCK;  
+> SSH\_AGENT\_PID=6821; export SSH\_AGENT\_PID;  
+> echo Agent pid 6821;  
 
-`export SSH\_AUTH\_SOCK=/tmp/ssh-2OlWWp9TG8CK/agent.6820`
-`export SSH\_AGENT\_PID=6821`
+`export SSH\_AUTH\_SOCK=/tmp/ssh-2OlWWp9TG8CK/agent.6820`  
+`export SSH\_AGENT\_PID=6821`  
 
 At that point, everything _should_ work. At least in theory.
