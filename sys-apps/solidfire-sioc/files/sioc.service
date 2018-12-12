@@ -1,0 +1,16 @@
+# SIOC will not startup properly unless Jetty is already running. It's insufficient to use 'After=' dependency 
+# specification since that only implies ordering and does not actually start a dependent service. The more strict
+# 'Requires=' will also activate and start jetty before trying to start SIOC.
+[Unit]
+Description=NetApp SolidFire Storage I/O Control
+Requires=jetty.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/sf/packages/sioc
+ExecStart=/usr/bin/java -Xmx1024m -Xms256m -jar /sf/packages/sioc/solidfire-sioc-boot.jar --spring.config.location=classpath:/application.properties,/sf/packages/sioc/app.properties
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

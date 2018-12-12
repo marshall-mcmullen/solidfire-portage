@@ -1,11 +1,11 @@
-# Copyright 1999-2015 Gentoo Foundation
-# Distributed under the terms of the GNU General Public License v2
+
+
 # $Id$
 
 if [[ -z ${_ZOOKEEPER_ECLASS} ]]; then
 _ZOOKEEPER_ECLASS=1
 
-inherit java-pkg-2 solidfire
+inherit toolchain-funcs java-pkg-2 solidfire
 EXPORT_FUNCTIONS src_prepare src_configure src_compile src_install src_test pkg_preinst
 
 zookeeper-solidfire_src_prepare()
@@ -21,6 +21,17 @@ zookeeper-solidfire_src_prepare()
 	ant compile_jute || die
 
 	# Prepare C code
+	if tc-is-gcc && [[ ( $(gcc-major-version) -gt 7 ) || $(gcc-major-version) -eq 7 && $(gcc-minor-version) -ge 3 ]]; then
+		# GCC 7.3.0 fails with the following:
+		# src/zookeeper.c:2253:5: error: null argument where non-null required (argument 1) [-Werror=nonnull]
+		append-cppflags "-Wno-error=nonnull"
+		append-cflags "-Wno-error=nonnull"
+	fi
+
+	# Compile failure with glibc 2.26 due to movement of INT32_MAX symbol into a new header file. This change is safe
+	# on older glibc versions as well and will not alter the validity of what we build.
+	sed -i -e 's|#include <stdlib.h>|&\n#include <stdint.h>|' src/c/src/mt_adaptor.c || die
+
 	pushd src/c
 	eautoreconf
 	popd
@@ -97,7 +108,7 @@ zookeeper-solidfire_src_install()
 	{
 		einfo "Installing Java"
 		doins -r ${S}/conf ${S}/build/{lib,*.jar}
-		mv ${DP}/zookeeper-${PV}.jar ${DP}/${PF}.jar || die
+		mv ${DP}/zookeeper-${UPSTREAM_PV}.jar ${DP}/${PF}.jar || die
 		
 		local bin
 		for bin in $(find ${S}/bin/*.sh); do

@@ -1,0 +1,21 @@
+[Unit]
+Description=Jetty Web Application Server
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=forking
+
+# Run ExecStartPre with root-permissions so we can setup pid file properly
+PermissionsStartOnly=true
+ExecStartPre=-/bin/mkdir -p /var/run/jetty
+ExecStartPre=/bin/chown -R jetty:jetty /var/run/jetty
+
+# Run ExecStart with User=jetty Group=jetty
+ExecStart=/usr/bin/jetty start
+ExecStop=/usr/bin/jetty stop
+ExecReload=/usr/bin/jetty restart
+User=jetty
+Group=jetty
+
+[Install]
+WantedBy=multi-user.target

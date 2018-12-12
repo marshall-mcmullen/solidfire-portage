@@ -10,15 +10,15 @@ inherit solidfire
 # Individual versions of all payloads in this package
 MARVELL_FIRMWARES="wam_hw"
 
-SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
+SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${P}.tar.gz"
 
 LICENSE="NetApp"
 KEYWORDS="~amd64 amd64"
 
-S="${WORKDIR}"
 src_install()
 {
 	# Add chassis specific payloads into /sf/package/../lib/firmware/
-	dofirmware -r ${S}/${MY_PF}/*
+	dofirmware -r ${S}/*
+	dopathlinks "/sf/rtfi/firmware/nvram/marvell" "${DP}/lib/firmware/."
 }
 

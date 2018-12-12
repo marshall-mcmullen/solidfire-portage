@@ -7,7 +7,7 @@ inherit solidfire
 DESCRIPTION="QLogic FC HBA QConvergedConsole Tools."
 HOMEPAGE="http://www.qlogic.com"
 
-SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${MY_PF}.tar.gz -> ${PF}.tar.gz"
+SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${P}.tar.gz"
 
 LICENSE="QLogic-SLA"
 KEYWORDS="~amd64 amd64"
@@ -15,11 +15,10 @@ RESTRICT="strip"
 
 DEPEND=">=dev-util/patchelf-0.9"
 
-S="${WORKDIR}"
 src_install()
 {
-	dolib ${S}/${MY_PF}/libs/*
-	dobin ${S}/${MY_PF}/bin/*
+	dolib ${S}/libs/*
+	dobin ${S}/bin/*
 
 	einfo "Versioning libs"
 	for lib in ${DP}/lib/*; do
@@ -36,7 +35,6 @@ src_install()
 	done
 	
 	# To ensure there was no corruption of the binary caused by patchelf make sure it loads properly
-	ldd ${DP}/bin/qaucli || die
 	${DP}/bin/qaucli -v || die
 
 	# Expose bin symlinks outside our application specific directory.

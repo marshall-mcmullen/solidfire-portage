@@ -11,10 +11,11 @@ SUM_PKG_DATE="20170420"
 SUM_PKG_NAME="sum_2.0.0_Linux_x86_64_${SUM_PKG_DATE}"
 SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${SMC_PKG_NAME}.zip
          http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${SUM_PKG_NAME}.tar.gz"
-SLOT=0
+
 # License is SuperMicro, specific permission given to NetApp to include this tool as part of our product
 LICENSE="SuperMicro"
 KEYWORDS="~amd64 amd64"
+RESTRICT="splitdebug"
 
 # We don't need or want solidfire package unpack magic (munging) in this case
 S="${WORKDIR}"

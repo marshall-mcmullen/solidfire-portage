@@ -10,15 +10,15 @@ inherit solidfire
 # Individual versions of all payloads in this package
 QLOGIC_FIRMWARES="bk011018 hld33424"
 
-SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
+SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${P}.tar.gz"
 
 LICENSE="QLogic-SLA"
 KEYWORDS="~amd64 amd64"
 
-S="${WORKDIR}"
 src_install()
 {
 	# Add chassis specific payloads into /sf/package/../lib/firmware/
-	dofirmware -r ${S}/${MY_PF}/*
+	dofirmware -r ${S}/*
+	dopathlinks "/sf/rtfi/firmware/fchba/qlogic" "${DP}/lib/firmware/."
 }
 

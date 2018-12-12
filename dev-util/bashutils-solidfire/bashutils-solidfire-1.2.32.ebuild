@@ -1,13 +1,13 @@
-# Copyright 1999-2014 Gentoo Foundation
-# Distributed under the terms of the GNU General Public License v2
-# $Header: $
+
+
+# Copyright 2017-2018 NetApp, Inc. All rights reserved.
 
 EAPI=5
 inherit solidfire
 
 DESCRIPTION="Collection of bash utilities for simpler and more robust bash programming"
 HOMEPAGE="https://bitbucket.org/solidfire/bashutils"
-SRC_URI="https://bitbucket.org/solidfire/${MY_PN}/get/${MY_PN}-${PVR}.tar.bz2 -> ${PF}.tar.bz2"
+SRC_URI="https://bitbucket.org/solidfire/${UPSTREAM_PN}/get/${UPSTREAM_P}.tar.bz2 -> ${P}.tar.bz2"
 
 LICENSE="Apache-2.0"
 KEYWORDS="amd64"
@@ -18,7 +18,7 @@ DEPEND="net-misc/curl
 
 RDEPEND="${DEPEND}"
 
-SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/usr/local/share/${MY_PF}" )
+SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED=( "/usr/local/share/${UPSTREAM_P}" )
 
 src_install()
 {
@@ -26,5 +26,5 @@ src_install()
 
     # Setup backwards compatible symlinks into /usr/local/share/bashutils*
     mkdir -p ${D}/usr/local/share/
-    ln -sf /sf/packages/${PF} ${D}/usr/local/share/${MY_PN}-${PV} || die
+    ln -sf /sf/packages/${PF} ${D}/usr/local/share/${UPSTREAM_PN}-${PV} || die
 }

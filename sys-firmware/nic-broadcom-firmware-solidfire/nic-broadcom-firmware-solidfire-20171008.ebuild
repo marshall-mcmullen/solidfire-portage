@@ -10,16 +10,16 @@ inherit solidfire
 # Individual versions of all payloads in this package
 BROADCOM_FIRMWARES="NF92Y_LN_7.10.18"
 
-SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
+SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${P}.tar.gz"
 
 LICENSE="Dell-EMC-Software-License-and-Support-Services-Agreement"
 KEYWORDS="~amd64 amd64"
 
-S="${WORKDIR}"
 src_install()
 {
 	# Add chassis specific payloads into /sf/package/../lib/firmware/
-	dofirmware -r ${S}/${MY_PF}/*
+	dofirmware -r ${S}/*
 	chmod +x ${DP}/lib/firmware/*.BIN
+	dopathlinks "/sf/rtfi/firmware/nic/broadcom" "${DP}/lib/firmware/."
 }
 

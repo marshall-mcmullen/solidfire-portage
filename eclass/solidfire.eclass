@@ -1,11 +1,5 @@
-# Copyright 1999-2014 Gentoo Foundation
-# Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# Copyright 2018 NetApp, Inc.  All rights reserved.
 
-#
-# Original Author: root
-# Purpose: 
-#
 if [[ -z ${_SOLIDFIRE_LIBS_ECLASS} ]]; then
 _SOLIDFIRE_LIBS_ECLASS=1
 
@@ -14,23 +8,27 @@ inherit base autotools eutils flag-o-matic
 EXPORT_FUNCTIONS src_unpack src_prepare pkg_preinst pkg_postinst pkg_prerm
 
 DEPEND="app-portage/gentoolkit"
-PDEPEND="app-eselect/eselect-solidfire"
+PDEPEND=">=app-eselect/eselect-solidfire-1.2"
 
-# Fully version every solidfire package by setting slot to full package version including
-# package revision.
-SLOT="${PVR}"
+# Fully version every solidfire package by setting slot to full package version. Unlike prior versions, do not include
+# the package revision as part of the SLOT since package revisions are meant for packaging issue bumps only and not
+# entirely new software versions. But we need a way to have our own internal version separate from the upstream version.
+# For that we use the more proper "_p*" suffix (for patch level). 
+SLOT="${PV}"
 
-# Setup variables to upstream source that doesn't have solidfire in it.
-MY_P="${P//-solidfire}"
-MY_PN="${PN//-solidfire}"
-MY_PF="${PF//-solidfire}"
-PS="-solidfire-${PVR}"
-PREFIX="/sf/packages/${PF}"
+# Setup variables to upstream source that doesn't have solidfire in it. Also strip off SolidFire version suffix.
+UPSTREAM_P="${P//-solidfire}"
+UPSTREAM_P="${UPSTREAM_P%_p*}"
+UPSTREAM_PN="${PN//-solidfire}"
+UPSTREAM_PF="${PF//-solidfire}"
+UPSTREAM_PF="${UPSTREAM_PF%_p*}"
+UPSTREAM_PV=${PV%_p*}
+UPSTREAM_PF="${UPSTREAM_PN}-${PVR}"
+
+PS="-solidfire-${PV}"
+PREFIX="/sf/packages/${P}"
 DP="${D}/${PREFIX}"
-
-# Store off original MY_S incase ebuild modifies S.
-MY_S="${WORKDIR}/${MY_P}"
-S="${MY_S}"
+S="${WORKDIR}/${UPSTREAM_P}"
 
 # Set the directory epatch will look for patches in so we don't have to specify
 # it in every ebuild patch line.
@@ -60,7 +58,7 @@ EXTRA_ECONF="--prefix=${PREFIX}
 		     --docdir=${PREFIX}/share/doc
 		     --program-prefix=${PROGRAM_PREFIX}
 		     --program-suffix=${PROGRAM_SUFFIX}
-			 --with-pkgversion=\"SolidFire ${MY_PF}\""
+			 --with-pkgversion=\"SolidFire ${UPSTREAM_PF}\""
 
 #----------------------------------------------------------------------------------------------------------------------
 # VERSIONIZE INSTALL HELPERS
@@ -72,7 +70,7 @@ versionize_soname()
 	phase "SolidFire libs versioning"
 
     for fname in ${files_libtool}; do
-		einfo "Versioning $(basename ${fname})"
+		einfo "Versioning ${fname}"
 		sed -i -e 's|\(libname_spec\)=["'\'']\+\S\+$|\1="lib\\$name'${PS}'"|g'    \
 			   -e 's|\(library_names_spec\)=["'\'']\+\S\+$|\1="\\$libname\.so"|g' \
 			   -e 's|\(soname_spec\)=["'\'']\+\S\+$|\1="\\$libname\.so"|g'        \
@@ -157,13 +155,13 @@ versionize_check()
 		[[ ! -d "${dname}" ]] && continue
 
 		pushd "${dname}"
-		if [[ -d "${MY_PN}" ]]; then
-			einfo "Fixing nested '${MY_PN}' in ${dname#${D}/}"
-			reparent "${MY_PN}"
+		if [[ -d "${UPSTREAM_PN}" ]]; then
+			einfo "Fixing nested '${UPSTREAM_PN}' in ${dname#${D}/}"
+			reparent "${UPSTREAM_PN}"
 		
 		# Make a "self pointer" symlink to ourselves for proper -I inclusion by non-versioned name
-		elif [[ ! -e "${MY_PN}" ]]; then
-			ln -sn . "${MY_PN}" || die "ln . ${MY_PN} failed[1]"
+		elif [[ ! -e "${UPSTREAM_PN}" ]]; then
+			ln -sn . "${UPSTREAM_PN}" || die "ln . ${UPSTREAM_PN} failed[1]"
 		fi
 
 		popd
@@ -233,6 +231,12 @@ dolib.a()
 	$(which dolib.a 2>/dev/null) "$@"
 }
 
+doservice()
+{
+    insinto "${PREFIX}/systemd"
+    $(which doins 2>/dev/null) "$@"
+}
+
 dopython_install()
 {
 	python_foreach_impl distutils-r1_src_install
@@ -265,13 +269,12 @@ dopathlinks()
 		return 0
 	fi
 
-	local dest="${1}/"; shift
+	local dest="${1}"; shift
 	mkdir -p "${D}/${PREFIX}/eselect"
 
 	local entry
 	for entry in "${@}"; do
-		[[ -e "${entry}" ]] || die "${entry} does not exist"
-		echo "${dest}$(basename ${entry}):${entry#${D}/}"
+		echo "$(realpath -m -s "${dest}/$(basename ${entry})"):$(realpath -m -s "${entry#${D}/}")"
 	done >> "${D}/${PREFIX}/eselect/symlinks" || die "Failed to create eselect/symlinks file"
 }
 
@@ -284,14 +287,13 @@ dopathlinks_lstrip()
 		return 0
 	fi
 
-	local dest="${1}/"; shift
+	local dest="${1}"; shift
 	local lstrip="${1}"; shift
 	mkdir -p "${D}/${PREFIX}/eselect"
 
 	local entry
 	for entry in "${@}"; do
-		[[ -e "${entry}" ]] || die "${entry} does not exist"
-		echo "${dest}${entry#${lstrip}}:${entry#${D}/}"
+		echo "$(realpath -m -s "${dest}/${entry#${lstrip}}"):$(realpath -m -s "${entry#${D}/}")"
 	done >> "${D}/${PREFIX}/eselect/symlinks" || die "Failed to create eselect/symlinks file"
 }
 
@@ -310,6 +312,11 @@ doetclinks()
 	dopathlinks "/etc" "${@}"
 }
 
+dosfbinlinks()
+{
+	dopathlinks "/sf/bin" "${@}"
+}
+
 #----------------------------------------------------------------------------------------------------------------------
 # SolidFire Libs public ebuild methods
 #----------------------------------------------------------------------------------------------------------------------
@@ -322,26 +329,26 @@ archive_suffixes()
 solidfire_src_unpack()
 {
 	if [[ -n "${EGIT_REPO_URI}" ]]; then
-		git-r3_src_unpack
+		die "git repos are not allowed."
 	elif [[ -n "${EHG_REPO_URI}" ]]; then
-		mercurial_src_unpack
+		die "mercurial repos are not allowed."
 	elif [[ -n "${ESVN_REPO_URI}" ]]; then
-		svn_src_unpack
+		die "svn repos are not allowed."
 	else
-		rm --recursive --force --one-file-system "${MY_S}"
-		mkdir -p "${MY_S}"
+		rm --recursive --force --one-file-system "${S}"
+		mkdir -p "${S}"
 		local srcs=( ${A} )
 		
 		default_src_unpack
 
-		# Automatically fix our library distfiles to extract to the expected ${WORKDIR}/${MY_P}.
+		# Automatically fix our library distfiles to extract to the expected ${WORKDIR}/${UPSTREAM_P}.
 		local fname
 		for fname in ${A}; do
 			local base="$(shopt -s extglob; echo "${fname%%@($(archive_suffixes))}")"
 			local ext="${fname:${#base} + 1}"
 			[[ -z "${ext}" ]] && continue
 			local tardir=$(tar -tf "${DISTDIR}/${fname}" | head -1 | sed -e 's/\/.*//')
-			local sbase=$(basename "${MY_S}")
+			local sbase=$(basename "${S}")
 			local dest="${sbase}"
 			if [[ ${#srcs[@]} -gt 1 ]]; then
 				dest+="/$(basename ${base})"
@@ -383,23 +390,28 @@ solidfire_src_prepare()
 solidfire_pkg_preinst()
 {
 	# Make sure no files got installed outside ${PREFIX}
-	phase "Looking for SolidFire sandbox violations"
-	local violations=( $(find ${D} -path ${D}sf/packages -prune -o -path ${D}sf -o -path ${D} -o -print) )
+	phase "Looking for SolidFire sandbox violations outside $(realpath -m -s ${DP})"
+	local violations=( $(find ${D} \( -path $(realpath -m -s ${DP}) -o -path $(realpath -m -s ${D}/usr/lib/debug/${PREFIX}) \) -prune -o -print) )
 
-	if [[ ${#SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED[@]} -gt 0 ]]; then
-		local idx
-		for idx in ${!violations[@]}; do
-			local violation=${violations[$idx]}
-			local path
-			for path in ${SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED[@]}; do
-				if [[ "${D%%/}${path}" == ${violation}* ]]; then
-					ewarn "Allowing SolidFire sandbox violation ${violation#${D}}"
-					unset violations[$idx]
-					break
-				fi
-			done
+	local idx
+	for idx in ${!violations[@]}; do
+		local violation=${violations[$idx]}
+
+		# Skip over expected violations that are parent directories of ${PREFIX} paths
+		if [[ "${violation}" == @(${D}|${D}sf|${D}sf/packages|${D}usr|${D}usr/lib|${D}usr/lib/debug|${D}usr/lib/debug/sf|${D}usr/lib/debug/sf/packages) ]]; then
+			unset violations[$idx]
+			continue
+		fi
+
+		local path
+		for path in ${SOLIDFIRE_SANDBOX_VIOLATIONS_ALLOWED[@]}; do
+			if [[ "${D%%/}${path}" == ${violation}* ]]; then
+				ewarn "Allowing SolidFire sandbox violation ${violation#${D}}"
+				unset violations[$idx]
+				break
+			fi
 		done
-	fi
+	done
 
 	if (( ${#violations[@]} > 0 )); then
 		die "SolidFire sandbox violations:\n${violations[@]}"

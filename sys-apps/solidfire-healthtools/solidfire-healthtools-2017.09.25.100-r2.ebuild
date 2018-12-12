@@ -5,7 +5,7 @@ inherit solidfire
 
 DESCRIPTION="SolidFire cluster healthtools"
 HOMEPAGE="solidfire.com"
-SRC_URI="https://bitbucket.org/solidfire/${MY_PN}/get/v${PV}.tar.bz2 -> ${PF}.tar.bz2"
+SRC_URI="https://bitbucket.org/solidfire/${UPSTREAM_PN}/get/v${PV}.tar.bz2 -> ${P}.tar.bz2"
 
 LICENSE="SolidFire"
 KEYWORDS="amd64"

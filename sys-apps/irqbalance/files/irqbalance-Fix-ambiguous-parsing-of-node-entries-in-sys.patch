@@ -1,0 +1,73 @@
+From 721460664afad79e2d96bbcb173eda68eed9743b Mon Sep 17 00:00:00 2001
+From: Gerd Rausch <gerd.rausch@oracle.com>
+Date: Thu, 18 Oct 2018 11:21:40 -0700
+Subject: [PATCH] Fix ambiguous parsing of *node* entries in /sys.
+
+The code used to use strstr(..., "node") while iterating over
+sysfs directories such as /sys/devices/system/cpu/cpu*.
+It then made an assumption that the entry would start with "node",
+which is not necessarily the case (e.g. the "firmware_node" entry).
+
+The code happened to work for as long as the node[0-9]* entry
+would be processed before the "firmware_node" entry shows up.
+
+A change to the linux kernel "end_name_hash" function resulted
+in a different hash, and ultimately in a different order
+by which entries were returned by readdir(3).
+
+This led to the exposure of this bug.
+
+Signed-off-by: Gerd Rausch <gerd.rausch@oracle.com>
+---
+ cputree.c | 11 ++++++++---
+ numa.c    |  5 ++++-
+ 2 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/cputree.c b/cputree.c
+index c88143f..f08ce84 100644
+--- a/cputree.c
++++ b/cputree.c
+@@ -368,9 +368,14 @@ static void do_one_cpu(char *path)
+ 			entry = readdir(dir);
+ 			if (!entry)
+ 				break;
+-			if (strstr(entry->d_name, "node")) {
+-				nodeid = strtoul(&entry->d_name[4], NULL, 10);
+-				break;
++			if (strncmp(entry->d_name, "node", 4) == 0) {
++				char *end;
++				int num;
++				num = strtol(entry->d_name + 4, &end, 10);
++				if (!*end && num >= 0) {
++					nodeid = num;
++					break;
++				}
+ 			}
+ 		} while (entry);
+ 		closedir(dir);
+diff --git a/numa.c b/numa.c
+index cd67ec8..f0b1a98 100644
+--- a/numa.c
++++ b/numa.c
+@@ -29,6 +29,7 @@
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <stdio.h>
++#include <ctype.h>
+ #include <sys/types.h>
+ #include <dirent.h>
+ 
+@@ -115,7 +116,9 @@ void build_numa_node_list(void)
+ 		entry = readdir(dir);
+ 		if (!entry)
+ 			break;
+-		if ((entry->d_type == DT_DIR) && (strstr(entry->d_name, "node"))) {
++		if ((entry->d_type == DT_DIR) &&
++		    (strncmp(entry->d_name, "node", 4) == 0) &&
++		    isdigit(entry->d_name[4])) {
+ 			add_one_node(entry->d_name);
+ 		}
+ 	} while (entry);
+-- 
+2.7.4
+

@@ -1,13 +1,11 @@
-# Copyright 1999-2014 Gentoo Foundation
-# Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# Copyright 2017-2018 NetApp, Inc. All rights reserved.
 
 EAPI=5
 inherit solidfire
 
 DESCRIPTION="Collection of bash utilities for simpler and more robust bash programming"
 HOMEPAGE="https://bitbucket.org/solidfire/bashutils"
-SRC_URI="https://bitbucket.org/solidfire/${MY_PN}/get/${MY_PN}-${PVR}.tar.bz2 -> ${PF}.tar.bz2"
+SRC_URI="https://bitbucket.org/solidfire/${UPSTREAM_PN}/get/${UPSTREAM_P}.tar.bz2 -> ${P}.tar.bz2"
 
 LICENSE="Apache-2.0"
 KEYWORDS="amd64"

@@ -1,0 +1,12 @@
+[Unit]
+Description=Agigaram Non-Volatile DIMM driver loader
+Before=solidfire.service
+
+[Service]
+Type=oneshot
+ExecStart=/sf/packages/micron-nvdimm-tools/bin/agigaram start
+ExecStop=/sf/packages/micron-nvdimm-tools/bin/agigaram stop
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

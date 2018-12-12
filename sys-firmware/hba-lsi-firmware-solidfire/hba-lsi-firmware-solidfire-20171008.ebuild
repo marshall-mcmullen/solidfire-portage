@@ -13,14 +13,14 @@ LSI_FIRMWARES="07.25.00.00 08.27.03.00 08.31.00.00
                20.00.08.00"
 LSI_BINARIES="sas2flash sas3flash"
 
-SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
+SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${P}.tar.gz"
 
 LICENSE="NetApp"
 KEYWORDS="~amd64 amd64"
 
-S="${WORKDIR}"
 src_install()
 {
 	# Add chassis specific payloads into /sf/package/../lib/firmware/
-	dofirmware -r ${S}/${MY_PF}/*
+	dofirmware -r ${S}/*
+	dopathlinks "/sf/rtfi/firmware/hba/lsi" "${DP}/lib/firmware/."
 }

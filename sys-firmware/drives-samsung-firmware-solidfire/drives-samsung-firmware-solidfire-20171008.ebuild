@@ -12,15 +12,15 @@ SAMSUNG_FIRMWARES="CXV8202Q CXV8501Q DXM9BW4Q
                    EXT1303Q GXT1003Q GXT5003Q
                    GXT5104Q"
 
-SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
+SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${P}.tar.gz"
 
 LICENSE="Samsung-Semiconductor-Letter-Agreement"
 KEYWORDS="~amd64 amd64"
 
-S="${WORKDIR}"
 src_install()
 {
 	# Add chassis specific payloads into /sf/package/../lib/firmware/
-	dofirmware -r ${S}/${MY_PF}/*
+	dofirmware -r ${S}/*
+	dopathlinks "/sf/rtfi/firmware/drives/samsung" "${DP}/lib/firmware/."
 }
 

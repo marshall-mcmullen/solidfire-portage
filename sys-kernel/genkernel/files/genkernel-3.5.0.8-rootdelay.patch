@@ -1,0 +1,26 @@
+diff --git a/defaults/linuxrc b/defaults/linuxrc
+index 965d28f..6e7704e 100644
+--- a/defaults/linuxrc
++++ b/defaults/linuxrc
+@@ -523,10 +523,10 @@ do
+ 				if [ ${retval} -eq 0 ] && [ -n "${ROOT_DEV}" ]; then
+ 					good_msg "Detected real_root=${ROOT_DEV}"
+ 					REAL_ROOT="${ROOT_DEV}"
++					got_good_root=1
+ 				else
+-					prompt_user "REAL_ROOT" "root block device"
++					bad_msg "Could not find root block device: ${REAL_ROOT}"
+ 					got_good_root=0
+-					continue
+ 				fi
+ 				;;
+ 			ZFS*)
+@@ -586,7 +586,7 @@ do
+ 
+ 		if [ "${got_good_root}" != '1' ] ; then
+ 		  let ROOTDELAY_100MSEC=${ROOTDELAY_100MSEC}-1
+-		  usleep 100
++		  usleep 100000
+ 		fi
+ 		done  # End of sleep loop waiting on root
+ 		if [ "${REAL_ROOT}" = '' ]

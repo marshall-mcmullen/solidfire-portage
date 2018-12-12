@@ -1,0 +1,25 @@
+# Copyright 2018 NetApp, Inc.  All rights reserved.
+
+EAPI=5
+
+DESCRIPTION="Mellanox NIC Firmware"
+HOMEPAGE="https://www.netapp.com"
+
+inherit solidfire
+
+# Individual versions of all payloads in this package
+MELLANOX_FIRMWARES="14_21_1000 14_22_1002"
+
+SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${P}.tar.gz"
+
+LICENSE="NetApp"
+KEYWORDS="~amd64 amd64"
+
+src_install()
+{
+	# Add chassis specific payloads into /sf/package/../lib/firmware/
+	dofirmware -r ${S}/*
+	chmod +x ${DP}/lib/firmware/mstflint
+	dopathlinks "/sf/rtfi/firmware/nic/mellanox" "${DP}/lib/firmware/."
+}
+

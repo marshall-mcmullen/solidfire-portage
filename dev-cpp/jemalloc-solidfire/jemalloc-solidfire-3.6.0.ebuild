@@ -1,13 +1,11 @@
-# Copyright 1999-2014 Gentoo Foundation
-# Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-libs/jemalloc/jemalloc-3.6.0.ebuild,v 1.1 2014/05/19 14:09:08 anarchy Exp $
+# Copyright 2017-2018 NetApp, Inc. All rights reserved.
 
 EAPI=5
 inherit solidfire
 
 DESCRIPTION="Jemalloc is a general-purpose scalable concurrent allocator"
 HOMEPAGE="http://www.canonware.com/jemalloc/"
-SRC_URI="http://www.canonware.com/download/${MY_PN}/${MY_P}.tar.bz2"
+SRC_URI="http://www.canonware.com/download/${UPSTREAM_PN}/${UPSTREAM_P}.tar.bz2"
 
 DEPEND=""
 

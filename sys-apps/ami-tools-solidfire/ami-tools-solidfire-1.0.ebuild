@@ -12,16 +12,16 @@ AFULNX_VERSION="5.09.02.1396"
 SCELNX_VERSION="5.03.1106"
 YAFU_VERSION="4.16.13"
 
-SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${MY_PF}.tar.gz -> ${PF}.tar.gz"
+SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${P}.tar.gz"
 
 # Three way license between American Megatrends and Quanta
 LICENSE="AMI/Quanta"
 KEYWORDS="~amd64 amd64"
+RESTRICT="splitdebug"
 
-S="${WORKDIR}"
 src_install()
 {
-    doins -r ${S}/${MY_PF}/*
+    doins -r ${S}/*
     chmod +x ${DP}/bin/{yafuflash2,afulnx_64,scelnx_64}
 	dobinlinks ${DP}/bin/*
 }

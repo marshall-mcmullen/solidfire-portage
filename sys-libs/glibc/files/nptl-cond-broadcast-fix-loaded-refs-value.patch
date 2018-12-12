@@ -1,0 +1,11 @@
+--- a/nptl/pthread_cond_common.c.old	2018-08-10 17:05:19.737978441 +0000
++++ b/nptl/pthread_cond_common.c	2018-08-10 17:05:05.321978450 +0000
+@@ -406,7 +406,7 @@
+ 	  /* There is still a waiter after spinning.  Set the wake-request
+ 	     flag and block.  Relaxed MO is fine because this is just about
+ 	     this futex word.  */
+-	  r = atomic_fetch_or_relaxed (cond->__data.__g_refs + g1, 1);
++	  r = atomic_fetch_or_relaxed (cond->__data.__g_refs + g1, 1) | 1;
+
+ 	  if ((r >> 1) > 0)
+ 	    futex_wait_simple (cond->__data.__g_refs + g1, r, private);

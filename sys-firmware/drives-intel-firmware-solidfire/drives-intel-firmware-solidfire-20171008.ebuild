@@ -11,15 +11,15 @@ inherit solidfire
 INTEL_FIRMWARES="4PC10362 D210370"
 INTEL_BINARIES="ConfigurationManager_Linux64"
 
-SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${PF}.tar.gz -> ${PF}.tar.gz"
+SRC_URI="http://bdr-jenkins.eng.solidfire.net/libs/distfiles/${P}.tar.gz"
 
 LICENSE="Intel-Corporation-Software-License"
 KEYWORDS="~amd64 amd64"
 
-S="${WORKDIR}"
 src_install()
 {
 	# Add chassis specific payloads into /sf/package/../lib/firmware/
-	dofirmware -r ${S}/${MY_PF}/*
+	dofirmware -r ${S}/*
+	dopathlinks "/sf/rtfi/firmware/drives/intel" "${DP}/lib/firmware/."
 }
 

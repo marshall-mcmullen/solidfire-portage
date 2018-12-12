@@ -1,0 +1,13 @@
+diff -r 749a0e4916d3 build.gradle
+--- a/build.gradle  Fri Mar 16 09:35:27 2018 -0600
++++ b/build.gradle  Tue Jul 17 13:58:28 2018 -0600
+@@ -208,7 +208,7 @@
+ 
+   template = templateFile
+   versionString = version
+-  commitString = ('hg id -i '.execute() | 'tr -d \'\\n\''.execute()).text
++  commitString = (['awk', '/node/{print substr($2, 1, 12)}', "${projectDir}/.hg_archival.txt"].execute() | 'tr -d \'\\n\''.execute()).text
+   outputClass = file("${outputDir.toPath()}/VasaProviderInfo.java")
+ 
+   doFirst {
+

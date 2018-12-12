@@ -1,0 +1,14 @@
+[Unit]
+Description=NetApp SolidFire HCI Monitoring Agent for VMware Service
+Wants=sioc.service
+After=sioc.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/sf/hci/nma
+ExecStart=/sf/hci/nma/nma_server/nma_server
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,311 @@
+# -*-eselect-*- vim: ft=eselect
+# Copyright 2017 NetApp, Inc. All rights reserved.
+
+DESCRIPTION="Manage SolidFire Package Symlinks"
+SFDIR="${EROOT:-/}sf/packages"
+VERSION="1.1"
+
+#----------------------------------------------------------------------------------------------------------------------
+# HELPERS
+#----------------------------------------------------------------------------------------------------------------------
+
+# Parse package name (e.g. 'solidfire-zookeeper-3.5.0-r32') and find the package name (e.g. 'solidfire-zookeeper') and
+# the package version (e.g. 3.5.0-r32) and write them to stdout joined with a ':' for easier parsing.
+split_package_name()
+{
+	local input="${1}"
+	local regex="(.*)-((([0-9]+)((\.[0-9]+)*)([a-z]?)((_(pre|p|beta|alpha|rc)[0-9]*)*))*(-(r[0-9.]+))?)$"
+	local pn="" pv=""
+
+	if [[ "${input}" =~ ${regex} ]]; then
+		echo "${BASH_REMATCH[1]}:${BASH_REMATCH[2]}"
+	else
+		die "Failed to parse ${input}"
+	fi
+}
+
+# Find list of installed packages in ${SFDIR} which are NOT symlinks since the symlinks in ${SFDIR} are used for
+# eselect manipulation to keep track of the current version of software.
+find_packages()
+{
+	local pkg
+	for pkg in $(find ${SFDIR} -maxdepth 1 -mindepth 1 -type d | sort --version-sort | sed -e "s|${SFDIR}/||"); do
+		split_package_name "${pkg}"
+	done
+}
+
+# Get the current version for a specified package or an empty string if not set.
+get_current_version()
+{
+	local pn="$1"
+	[[ -z "${pn}" ]] && die -q "Package name required"
+
+	if [[ -e "${SFDIR}/${pn}" && -L "${SFDIR}/${pn}" ]]; then
+		readlink -e "${SFDIR}/${pn}" | sed -e "s|${SFDIR}/||" -e "s|-*solidfire-*||" -e "s|${pn}-*||"
+		return 0
+	fi
+
+	return 1
+}
+
+get_highest_version()
+{
+	local input="$1"
+	[[ -z "${input}" ]] && die -q "Package name required"
+
+	# Iterate over the packages via find_packages and split on a colon to find the package names and versions. Throw
+	# these into an associative array so that we can easily associate multiple versions of a given package.
+	declare -A sets=()
+	local pkg="" pn="" pv=""
+	for pkg in $(find_packages); do
+		pn=$(echo "${pkg%%:*}" | sed -e 's|-*solidfire-*||')
+		pv=${pkg#*:}
+		sets[${pn}]+="${pv} "
+	done
+
+	echo "${sets[$input]}" | tr ' ' '\n' | sort --version-sort | tail -1
+}
+
+# Handle any package specific links specified in file 'eselect/symlinks' at the top of the package directory and
+# perform the request action (e.g. 'list', 'create', 'delete'). The contents of this file use 'Path Mapping Syntax'
+# as used in bashutils to map one path to another using a colon to delimit the desired link name and the link target
+# relative to the package directory.
+#
+# For example, if the file contains:
+# /bin/myprog:foo/derp
+#
+# This would create a symlink at '/bin/myprog' which would point to '${SFDIR}/${pkg}/foo/derp'.
+handle_package_links()
+{
+	local action="${1}"
+	local pkg="${2}"
+	if [[ -z "${pkg}" || -z "${action}" ]]; then
+		die -q "Both pkg (${pkg}) and action (${action}) are required"
+	fi
+
+	if [[ "${action}" != @(list|create|delete) ]]; then
+		die -q "Unsupported action '${action}'"
+	fi
+
+	if [[ ! -e "${pkg}/eselect/symlinks" ]]; then
+		return 0
+	fi
+
+	local entry="" lnk="" target=""
+	for entry in $(cat "${pkg}/eselect/symlinks"); do
+		lnk="${entry%%:*}"
+		target="${entry#*:}"
+
+		if [[ "${action}" == "list" ]]; then
+			echo "${lnk} -> $(readlink -e "${lnk}" || echo "(none)")"
+
+		elif [[ "${action}" == "create" ]]; then
+			echo " - Creating symlink ${lnk} -> ${target}"
+			if [[ ! -e "${target}" ]]; then
+				die -q "${target} does not exist"
+			fi
+			mkdir -p "$(dirname "${lnk}")"
+			ln --symbolic --relative "${target}" "${lnk}" || die -q "Failed to create  ${lnk} -> ${target}"
+		
+		elif [[ "${action}" == "delete" ]]; then
+			echo " - Deleting symlink ${lnk} -> ${target}"
+			if [[ -e "${lnk}" && ! -L "${lnk}" ]]; then
+				die "${lnk} must be a symlink"
+			fi
+
+			rm --force "${lnk}"
+		fi
+	done
+}
+
+#----------------------------------------------------------------------------------------------------------------------
+# LIST
+#----------------------------------------------------------------------------------------------------------------------
+
+describe_list()
+{
+	echo "List available SolidFire packages"
+}
+
+# List all the *installed* SolidFire packages and pretty print them in a table that shows currently selected verion
+# (if any) as well as available versions.
+do_list()
+{
+	[[ $# -eq 0 ]] || die -q "Too many parameters"
+
+	write_list_start "Available SolidFire Packages:"
+
+	# Iterate over the packages via find_packages and split on a colon to find the package names and versions. Throw
+	# these into an associative array so that we can easily associate multiple versions of a given package and emit
+	# them in a nice table.
+	declare -A sets=()
+	local pkg="" pn="" pv=""
+	for pkg in $(find_packages); do
+		pn=$(echo "${pkg%%:*}" | sed -e 's|-*solidfire-*||')
+		pv=${pkg#*:}
+		sets[${pn}]+="${pv} "
+	done
+
+	# Pretty-print the set of packages
+	local choices=()
+	for pn in $(echo "${!sets[@]}" | tr ' ' '\n' | sort); do
+		local current_version=$(get_current_version "${pn}" || echo "none")
+		local versions="$(echo ${sets[$pn]} | tr ' ' '\n' | column | sed 's|^|        |')"
+		choices+=( $"$(highlight "${pn} (${current_version})")\n${versions}" )
+	done
+
+	write_numbered_list -m "(none found)" "${choices[@]}"
+}
+
+#----------------------------------------------------------------------------------------------------------------------
+# SHOW
+#----------------------------------------------------------------------------------------------------------------------
+
+describe_show()
+{
+	echo "Prints the current configuration for SolidFire packages."
+}
+
+describe_show_parameters()
+{
+	echo "<package>"
+}
+
+# Show additional output for each package by also displaying any links created for that package.
+do_show()
+{
+	local names=()
+	if [[ $# -eq 0 ]]; then
+		names=( $(find "${SFDIR}" -maxdepth 1 -type l | sort) )
+	else
+		names=( "${@/#/${SFDIR}/}" )
+	fi
+
+	local name
+	for name in "${names[@]}"; do
+		local current_version=$(get_current_version $(basename "${name}") || echo "none")
+		write_list_start "[$(basename ${name})] (${current_version})"
+		echo "${name} -> $(readlink -m ${name})"
+		handle_package_links "list" "${name}"
+		echo 
+	done
+}
+
+#----------------------------------------------------------------------------------------------------------------------
+# SET
+#----------------------------------------------------------------------------------------------------------------------
+
+describe_set()
+{
+	echo "Set a new SolidFire package provider"
+}
+
+describe_set_options()
+{
+	echo "package : Package name (from 'list' action)"
+	echo "version : Version number of the package"
+}
+
+describe_set_parameters()
+{
+	echo "<package> <version>"
+}
+
+# Set a specific SolidFire package by name to an explicit version number.
+do_set()
+{
+	if [[ $# != 2 ]]; then
+		die -q "Usage: <package> <version>"
+	fi
+
+	local pn="${1}"
+	local pv="${2}"
+	local lnk="${SFDIR}/${pn}"
+	local target="$(ls -d ${SFDIR}/solidfire-${pn}-${pv} ${SFDIR}/${pn}-solidfire-${pv} 2>/dev/null)"
+	if [[ -z "${target}" ]]; then
+		die -q "No viable target solidfire-${pn}-${pv} or ${pn}-solidfire-${pv} in ${SFDIR}"
+	fi
+
+	if [[ -e "${lnk}" && ! -L "${lnk}" ]]; then
+		die -q "Refusing to replace existing non-symlink at ${lnk}"
+	fi
+
+	do_unset "${pn}"	
+	write_list_start "Setting ${pn}"
+	echo ">> Setting ${lnk} -> ${target}"
+	ln --symbolic --relative "${target}" "${lnk}"
+	handle_package_links "create" "${lnk}"
+}
+
+#----------------------------------------------------------------------------------------------------------------------
+# UNSET
+#----------------------------------------------------------------------------------------------------------------------
+
+describe_unset()
+{
+	echo "Unset SolidFire package verison."
+}
+
+# Unset a package symlink if it is already set.
+do_unset()
+{
+	local pn="${1}"
+	[[ -z "${pn}" ]] && die -q "Package name must be specified."
+	
+	local lnk="${SFDIR}/${pn}"
+	if [[ -L "${lnk}" ]] ; then
+		write_list_start "Unsetting ${pn}"
+		local current=$(readlink -m ${lnk})
+		echo ">> Removing existing ${lnk} -> ${current}"
+		rm --force "${lnk}"
+		handle_package_links "delete" "${current}"
+	fi
+}
+
+#----------------------------------------------------------------------------------------------------------------------
+# UPDATE
+#----------------------------------------------------------------------------------------------------------------------
+
+describe_update()
+{
+	echo "Set SolidFire package to highest installed version."
+}
+
+describe_update_options()
+{
+	echo "--all      : Update all SolidFire packages."
+}
+
+do_update()
+{
+	# Parse list of packages to update
+	local pkg="" packages=()
+	local all=0 if_unset=0
+	while [[ $# -gt 0 ]]; do
+		local flag="${1#--}"
+		if [[ "${flag}" == "all" ]]; then
+			for pkg in $(find_packages); do
+				packages+=( $(echo "${pkg%%:*}" | sed -e 's|-*solidfire-*||') )
+			done
+		else
+			packages+=( "$1" )
+		fi
+		
+		shift
+	done
+
+	if [[ ${#packages[@]} -eq 0 ]]; then
+		die -q "No packages specified."
+	fi
+
+	# Update all the packages as needed
+	local pn
+	for pn in $(echo "${packages[@]}" | tr ' ' '\n' | sort --unique); do
+		local current_version=$(get_current_version "${pn}")
+		local highest_version=$(get_highest_version "${pn}")
+
+		if [[ -z "${current_version}" || ${if_unset} -eq 0 ]]; then
+			do_set "${pn}" "${highest_version}"
+		fi
+	done
+}

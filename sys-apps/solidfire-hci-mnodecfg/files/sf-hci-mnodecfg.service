@@ -1,0 +1,14 @@
+[Unit]
+Description=Initial mNode configuration service
+After=sfinitentropy.service network.target
+Requires=sfinitentropy.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/sf/packages/hci-mnodecfg
+ExecStart=/sf/packages/hci-mnodecfg/mnodecfg.py
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

@@ -6,7 +6,7 @@ inherit solidfire
 
 DESCRIPTION="Open-iSCSI is a high performance, transport independent, multi-platform implementation of RFC3720"
 HOMEPAGE="http://www.open-iscsi.org/"
-SRC_URI="https://bitbucket.org/solidfire/open-iscsi/get/solidfire/${PV}.tar.bz2"
+SRC_URI="https://bitbucket.org/solidfire/open-iscsi/get/solidfire/${PV}.tar.bz2 -> ${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -17,7 +17,6 @@ DEPEND=""
 RDEPEND="${DEPEND}
     sys-fs/lsscsi
     sys-apps/util-linux"
-S="${WORKDIR}/${MY_P}"
 
 src_prepare()
 {

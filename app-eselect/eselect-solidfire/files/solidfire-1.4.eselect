@@ -1,0 +1,407 @@
+# -*-eselect-*- vim: ft=eselect
+# Copyright 2017 NetApp, Inc. All rights reserved.
+
+DESCRIPTION="Manage SolidFire Package Symlinks"
+SFDIR="${EROOT:-/}sf/packages"
+VERSION="1.4"
+
+#----------------------------------------------------------------------------------------------------------------------
+# HELPERS
+#----------------------------------------------------------------------------------------------------------------------
+
+# Find list of installed packages in ${SFDIR} which are NOT symlinks since the symlinks in ${SFDIR} are used for
+# eselect manipulation to keep track of the current version of software. Output is returned in ${PN}:${PV} format.
+find_packages()
+{
+	local pkg
+	for pkg in $(find ${SFDIR} -maxdepth 1 -mindepth 1 -type d -not -path "${SFDIR}/eselect" | sort --version-sort | sed -e "s|${SFDIR}/||"); do
+		qatom --format "%{PN}:%{PV}:%[PR]" "${pkg}" | sed -e 's|-*solidfire-*||' -e 's|:r|-r|' -e 's|:$||'
+	done
+}
+
+# Get the full current version for a specified package or an empty string if not set. This does strip off any leading
+# 'solidfire-' in the name so that our own native IP, e.g. solidfire-binaries-10.2, would get just '10.2'. Our modified
+# versions of other software, e.g. foo-solidfire-1.2, would have the version 'solidfire-1.2'.
+get_current_version_full()
+{
+	local pn="$1"
+	[[ -z "${pn}" ]] && die -q "Package name required"
+
+	if [[ -e "${SFDIR}/${pn}" && -L "${SFDIR}/${pn}" ]]; then
+		readlink -e "${SFDIR}/${pn}" | sed -e "s|${SFDIR}/||" -e "s|^solidfire-||" -e "s|${pn}-*||"
+		return 0
+	fi
+
+	return 1
+}
+
+# Get simplex version of a package with any solidfire branding removed.
+get_current_version()
+{
+	get_current_version_full "${@}" | sed -e "s|-*solidfire-*||"
+}
+
+get_highest_version()
+{
+	local input="$1"
+	[[ -z "${input}" ]] && die -q "Package name required"
+
+	# Iterate over the packages via find_packages and extract the package names and versions via qatom.
+	declare -A sets=()
+	local pkg pn pv
+	for pkg in $(find_packages); do
+		pn=${pkg%%:*}
+		pv=${pkg#*:}
+		sets[${pn}]+="${pv} "
+	done
+
+	echo "${sets[$input]}" | tr ' ' '\n' | sort --version-sort | tail -1
+}
+
+# Handle any package specific links specified in file 'eselect/symlinks' at the top of the package directory and
+# perform the request action (e.g. 'list', 'create', 'delete'). The contents of this file use 'Path Mapping Syntax'
+# as used in bashutils to map one path to another using a colon to delimit the desired link name and the link target
+# relative to the package directory.
+#
+# For example, if the file contains:
+# /bin/myprog:foo/derp
+#
+# This would create a symlink at '/bin/myprog' which would point to '${SFDIR}/${pkg}/foo/derp'.
+handle_package_links()
+{
+	local action="${1}"
+	local pkg="${2}"
+	if [[ -z "${pkg}" || -z "${action}" ]]; then
+		die -q "Both pkg (${pkg}) and action (${action}) are required"
+	fi
+
+	if [[ "${action}" != @(list|create|delete) ]]; then
+		die -q "Unsupported action '${action}'"
+	fi
+
+	if [[ ! -e "${pkg}/eselect/symlinks" ]]; then
+		return 0
+	fi
+
+	local entry="" lnk="" target=""
+	for entry in $(cat "${pkg}/eselect/symlinks"); do
+		lnk="${entry%%:*}"
+		target="${entry#*:}"
+
+		if [[ "${action}" == "list" ]]; then
+			echo "${lnk} -> $(readlink -e "${lnk}" || echo "(none)")"
+
+		elif [[ "${action}" == "create" ]]; then
+			echo " - Creating symlink ${lnk} -> ${target}"
+			if [[ ! -e "${target}" ]]; then
+				die -q "${target} does not exist"
+			fi
+			mkdir -p "$(dirname "${lnk}")"
+			ln --symbolic --relative "${target}" "${lnk}" || die -q "Failed to create  ${lnk} -> ${target}"
+		
+		elif [[ "${action}" == "delete" ]]; then
+			echo " - Deleting symlink ${lnk} -> ${target}"
+			if [[ -e "${lnk}" && ! -L "${lnk}" ]]; then
+				die "${lnk} must be a symlink"
+			fi
+
+			rm --force "${lnk}"
+		fi
+	done
+}
+
+# Now we need to create some metadata for each package we depend on to allow downstream consumers to compile and 
+# link against this version of solidfire and all of it's explicit dependencies. There are two things we need
+# to setup:
+# (1) Create exports file that will live in ${SFDIR}/eselect/exports.sh which lists all the package names and
+#     versions. This file is suitable to be included by a Makefile or bash script. 
+# (2) Create ${SFDIR}/include and ${SFDIR}/lib directories with symlinks out to our dependent packages. This allows
+#     code to simply use "-isystem ${SFDIR}/include" and they will compile against the right versions without having
+#     to version their include paths. This works because we'll create non-versioned symlinks in ${SFDIR}/include.
+create_exports_and_symlinks()
+{
+	local output="${SFDIR}/eselect"
+	rm -rf "${output}"
+	mkdir -p "${output}"
+
+	write_list_start "Creating exports and symlinks in ${SFDIR}/eselect"
+	
+	# Add compiler and java info to exports file
+	{
+		# Append compiler info
+		local gcc_version="$(gcc -dumpversion)"
+		echo "export GCC_VERSION=${gcc_version}"
+		echo "export CXX=g++-${gcc_version}"
+
+		# Append JAVA info
+		local java_home="$(readlink -e /etc/java-config-2/current-system-vm)"
+		echo "export JAVA_HOME=${java_home}"
+		echo "export JAVA_VERSION=$(echo "${java_home}" | sed -e 's|/opt/icedtea-bin-||')"
+	
+	} > "${output}/exports.sh"
+
+	# Iterate over each package and add to exports file and create symlinks
+	local paths=( $(find "${SFDIR}" -maxdepth 1 -type l 2>/dev/null) )
+	local path
+	for path in "${paths[@]}"; do
+
+		local name=$(basename "${path}")
+		local current_version=$(get_current_version_full "${name}" || true)
+		if [[ -n "${current_version}" ]]; then
+			local name_output="$(echo "${name}" | sed -e 's|-|_|g' -e 's|++|PP|' -e 's|.*|\U&|')"
+			local rpath="$(readlink -e ${path})"
+
+			# Exports file
+			echo "export ${name_output}_HOME=${rpath}" >> "${output}/exports.sh"
+			echo "export ${name_output}_VERSION=${current_version}"  >> "${output}/exports.sh"
+			
+			# Conditonally create include links
+			if [[ -d "${rpath}/include" ]]; then
+				echo "${SFDIR}/eselect/include/${name}:${rpath}/include" >> "${output}/symlinks"
+			fi
+			
+			# Conditionally create lib links
+			if [[ -d "${rpath}/lib" ]]; then
+				echo "${SFDIR}/eselect/lib/${name}:${rpath}/lib" >> "${output}/symlinks"
+			fi
+
+			# Also include include/lib symlinks for any modules contained within this package
+			local modules_file="${rpath}/eselect/modules"
+			if [[ -e "${modules_file}" ]]; then
+				local modules=( $(cat ${modules_file}) )
+				local module
+				for module in ${modules[@]}; do
+					echo "export ${module^^}_VERSION=${current_version}" >> "${output}/exports.sh"
+
+					# include links
+					if [[ -d "${rpath}/include/${module}" ]]; then
+						echo "${SFDIR}/eselect/include/${module}:${rpath}/include/${module}" >> "${output}/symlinks"
+					fi
+					
+					# Lib links
+					if [[ -d "${rpath}/lib/${module}" ]]; then
+						echo "${SFDIR}/eselect/lib/${module}:${rpath}/lib/${module}" >> "${output}/symlinks"
+					fi
+				done
+			fi
+
+			# Also include any aliases for this package
+			local aliases_file="${rpath}/eselect/aliases"
+			if [[ -e "${aliases_file}" ]]; then
+				local aliases=( $(cat ${aliases_file}) )
+				local entry
+				for entry in ${aliases[@]}; do
+					echo "${SFDIR}/eselect/include/${entry}:${rpath}/include" >> "${output}/symlinks"
+					echo "${SFDIR}/eselect/lib/${entry}:${rpath}/lib"         >> "${output}/symlinks"
+				done
+			fi
+		fi
+	done
+
+	# Sort the file inplace then create symlinks
+	for fname in "${output}/exports.sh" "${output}/symlinks"; do
+	    if [[ -e "${fname}" ]]; then
+	        sort "${fname}" -o "${fname}"
+	    fi
+	done
+
+	handle_package_links "create" "${SFDIR}"
+}
+
+#----------------------------------------------------------------------------------------------------------------------
+# LIST
+#----------------------------------------------------------------------------------------------------------------------
+
+describe_list()
+{
+	echo "List available SolidFire packages"
+}
+
+# List all the *installed* SolidFire packages and pretty print them in a table that shows currently selected verion
+# (if any) as well as available versions.
+do_list()
+{
+	[[ $# -eq 0 ]] || die -q "Too many parameters"
+
+	write_list_start "Available SolidFire Packages:"
+
+	# Iterate over the packages via find_packages and split on a colon to find the package names and versions. Throw
+	# these into an associative array so that we can easily associate multiple versions of a given package and emit
+	# them in a nice table.
+	declare -A sets=()
+	local pkg pn pv
+	for pkg in $(find_packages); do
+		pn=${pkg%%:*}
+		pv=${pkg#*:}
+		sets[${pn}]+="${pv} "
+	done
+
+	# Pretty-print the set of packages
+	local choices=()
+	for pn in $(echo "${!sets[@]}" | tr ' ' '\n' | sort); do
+		local current_version=$(get_current_version "${pn}" || echo "none")
+		local versions="$(echo ${sets[$pn]} | tr ' ' '\n' | column | sed 's|^|        |')"
+		choices+=( $"$(highlight "${pn} (${current_version})")\n${versions}" )
+	done
+
+	write_numbered_list -m "(none found)" "${choices[@]}"
+}
+
+#----------------------------------------------------------------------------------------------------------------------
+# SHOW
+#----------------------------------------------------------------------------------------------------------------------
+
+describe_show()
+{
+	echo "Prints the current configuration for SolidFire packages."
+}
+
+describe_show_parameters()
+{
+	echo "<package>"
+}
+
+# Show additional output for each package by also displaying any links created for that package.
+do_show()
+{
+	local names=()
+	if [[ $# -eq 0 ]]; then
+		names=( $(find "${SFDIR}" -maxdepth 1 -type l | sort) )
+	else
+		names=( "${@/#/${SFDIR}/}" )
+	fi
+
+	local name
+	for name in "${names[@]}"; do
+		local current_version=$(get_current_version $(basename "${name}") || echo "none")
+		write_list_start "[$(basename ${name})] (${current_version})"
+		echo "${name} -> $(readlink -m ${name})"
+		handle_package_links "list" "${name}"
+		echo 
+	done
+}
+
+#----------------------------------------------------------------------------------------------------------------------
+# SET
+#----------------------------------------------------------------------------------------------------------------------
+
+describe_set()
+{
+	echo "Set a new SolidFire package provider"
+}
+
+describe_set_options()
+{
+	echo "package : Package name (from 'list' action)"
+	echo "version : Version number of the package"
+}
+
+describe_set_parameters()
+{
+	echo "<package> <version>"
+}
+
+# Set a specific SolidFire package by name to an explicit version number.
+do_set()
+{
+	if [[ $# != 2 ]]; then
+		die -q "Usage: <package> <version>"
+	fi
+
+	local pn="${1}"
+	local pv="${2}"
+	local lnk="${SFDIR}/${pn}"
+	local target="$(ls -d ${SFDIR}/solidfire-${pn}-${pv} ${SFDIR}/${pn}-solidfire-${pv} 2>/dev/null)"
+	if [[ -z "${target}" ]]; then
+		die -q "No viable target solidfire-${pn}-${pv} or ${pn}-solidfire-${pv} in ${SFDIR}"
+	fi
+
+	if [[ -e "${lnk}" && ! -L "${lnk}" ]]; then
+		die -q "Refusing to replace existing non-symlink at ${lnk}"
+	fi
+
+	do_unset "${pn}"	
+	write_list_start "Setting ${pn}"
+	echo ">> Setting ${lnk} -> ${target}"
+	ln --symbolic --relative "${target}" "${lnk}"
+	handle_package_links "create" "${lnk}"
+
+	# Create exports file and include and lib symlinks
+	create_exports_and_symlinks
+}
+
+#----------------------------------------------------------------------------------------------------------------------
+# UNSET
+#----------------------------------------------------------------------------------------------------------------------
+
+describe_unset()
+{
+	echo "Unset SolidFire package verison."
+}
+
+# Unset a package symlink if it is already set.
+do_unset()
+{
+	local pn="${1}"
+	[[ -z "${pn}" ]] && die -q "Package name must be specified."
+	
+	local lnk="${SFDIR}/${pn}"
+	if [[ -L "${lnk}" ]] ; then
+		write_list_start "Unsetting ${pn}"
+		local current=$(readlink -m ${lnk})
+		echo ">> Removing existing ${lnk} -> ${current}"
+		rm --force "${lnk}"
+		handle_package_links "delete" "${current}"
+
+		# Create exports file and include and lib symlinks
+		create_exports_and_symlinks
+	fi
+}
+
+#----------------------------------------------------------------------------------------------------------------------
+# UPDATE
+#----------------------------------------------------------------------------------------------------------------------
+
+describe_update()
+{
+	echo "Set SolidFire package to highest installed version."
+}
+
+describe_update_options()
+{
+	echo "--all      : Update all SolidFire packages."
+}
+
+do_update()
+{
+	# Parse list of packages to update
+	local pkg="" packages=()
+	local all=0 if_unset=0
+	while [[ $# -gt 0 ]]; do
+		local flag="${1#--}"
+		if [[ "${flag}" == "all" ]]; then
+			for pkg in $(find_packages); do
+				packages+=( $(echo "${pkg%%:*}" ) )
+			done
+		else
+			packages+=( "$1" )
+		fi
+		
+		shift
+	done
+
+	if [[ ${#packages[@]} -eq 0 ]]; then
+		die -q "No packages specified."
+	fi
+
+	# Update all the packages as needed
+	local pn
+	for pn in $(echo "${packages[@]}" | tr ' ' '\n' | sort --unique); do
+		local current_version=$(get_current_version "${pn}")
+		local highest_version=$(get_highest_version "${pn}")
+
+		if [[ -z "${current_version}" || ${if_unset} -eq 0 ]]; then
+			do_set "${pn}" "${highest_version}"
+		fi
+	done
+}
